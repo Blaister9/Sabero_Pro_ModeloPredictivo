@@ -1,0 +1,35 @@
+REPORTE DEMO INFERENCIA — MOTOR PREDICTIVO SABER PRO
+Fecha: 2026-04-14 08:33:06
+============================================================
+
+CASOS INDIVIDUALES:
+
+Caso 1 — Historial completo:
+  Predicción: 142.15 | Confianza: MEDIA
+  Flags: muestra_pequeña=False, sin_historial=False, extrapolacion=True
+
+Caso 2 — Muestra pequeña (N=3):
+  Predicción: 141.16 | Confianza: BAJA
+  Flags: muestra_pequeña=True, sin_historial=False, extrapolacion=True
+
+Caso 3 — Sin historial:
+  Predicción: 153.69 | Confianza: BAJA
+  Flags: muestra_pequeña=False, sin_historial=True, extrapolacion=True
+
+Caso 4 — Extrapolación 2025:
+  Predicción: 142.02 | Confianza: MEDIA
+  Flags: muestra_pequeña=False, sin_historial=False, extrapolacion=True
+
+Caso 5 — Outlier UMB prog 742 (N=1):
+  Predicción: 128.61 | Confianza: BAJA
+  Flags: muestra_pequeña=True, sin_historial=False, extrapolacion=True
+
+============================================================
+BATCH TEST 2024 (n=28,762):
+  RMSE:           9.3293
+  R²:             0.7062
+  Confianza ALTA: 0 (0.0%)
+  Confianza MEDIA:24,288 (84.4%)
+  Confianza BAJA: 4,474 (15.6%)
+  Muestra pequeña:3,406 predicciones con flag BAJA_CONFIANZA_MUESTRA_PEQUEÑA
+  Sin historial:  1,897 predicciones con flag BAJA_CONFIANZA_SIN_HISTORIAL

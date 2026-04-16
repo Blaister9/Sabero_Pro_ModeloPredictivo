@@ -1,0 +1,222 @@
+======================================================================
+REPORTE DE AUDITORÍA — DATOS SABER PRO
+Generado: 2026-04-13 14:40:20
+Años cargados: [2020, 2021, 2022, 2023, 2024]
+======================================================================
+
+── DIMENSIONES GENERALES ──
+Filas totales        : 1,730,805
+Columnas totales     : 35
+
+── DISTRIBUCIÓN POR AÑO ──
+  2020: 245,234 filas
+  2021: 353,498 filas
+  2022: 406,672 filas
+  2023: 313,455 filas
+  2024: 411,946 filas
+
+── TIPOS DE DATO POR COLUMNA ──
+  EXAMEN                                   object
+  AGREGACION                               object
+  MEDIDA_AGREGACION                        object
+  CANTIDADEVALUADOS                        int64
+  ID_PAIS                                  int64
+  ID_REGION                                float64
+  NOMBRE_REGION                            object
+  ID_DEPARTAMENTO                          float64
+  NOMBRE_DEPARTAMENTO                      object
+  ID_MUNICIPIO                             float64
+  NOMBRE_MUNICIPIO                         object
+  ID_INSTITUCION                           float64
+  NOMBRE_INSTITUCION                       object
+  ID_SEDE                                  float64
+  NOMBRE_SEDE                              object
+  ID_GRUPOREFERENCIA                       float64
+  NOMBRE_GRUPOREF                          object
+  ID_NBC                                   float64
+  NBC                                      object
+  ID_PROGRAMA_ACAD                         float64
+  NOMBRE_PROGRAMA_ACAD                     object
+  NOMBRE_PRUEBA                            object
+  CATEGORIAPRUEBA                          float64
+  PROMEDIO_GLOBAL                          float64
+  PROMEDIO_PRUEBA                          float64
+  DESVIACION                               float64
+  PROMEDIO_PERCENTIL                       float64
+  NIVEL1                                   float64
+  NIVEL2                                   float64
+  NIVEL3                                   float64
+  NIVEL4                                   float64
+  NIVEL5                                   float64
+  AFIRMACION                               object
+  PORCENTAJERTAINCORRECTA                  float64
+  AÑO                                      int64
+
+── NULIDAD POR COLUMNA ──
+  Columna                                     Nulos        %
+  ------------------------------------------------------------
+  EXAMEN                                          0    0.00%
+  AGREGACION                                      0    0.00%
+  MEDIDA_AGREGACION                               0    0.00%
+  CANTIDADEVALUADOS                               0    0.00%
+  ID_PAIS                                         0    0.00%
+  ID_REGION                                  13,841    0.80%
+  NOMBRE_REGION                              13,841    0.80%
+  ID_DEPARTAMENTO                            16,077    0.93%
+  NOMBRE_DEPARTAMENTO                        16,077    0.93%
+  ID_MUNICIPIO                               26,783    1.55%
+  NOMBRE_MUNICIPIO                           26,783    1.55%
+  ID_INSTITUCION                             41,091    2.37%
+  NOMBRE_INSTITUCION                         41,091    2.37%
+  ID_SEDE                                   555,916   32.12%
+  NOMBRE_SEDE                               555,916   32.12%
+  ID_GRUPOREFERENCIA                       1,136,605   65.67%
+  NOMBRE_GRUPOREF                          1,136,605   65.67%
+  ID_NBC                                    508,502   29.38%
+  NBC                                       508,502   29.38%
+  ID_PROGRAMA_ACAD                         1,135,762   65.62%
+  NOMBRE_PROGRAMA_ACAD                     1,135,762   65.62%
+  NOMBRE_PRUEBA                              74,060    4.28%
+  CATEGORIAPRUEBA                            74,060    4.28%
+  PROMEDIO_GLOBAL                          1,683,524   97.27%
+  PROMEDIO_PRUEBA                          1,403,383   81.08%
+  DESVIACION                               1,359,752   78.56%
+  PROMEDIO_PERCENTIL                       1,506,344   87.03%
+  NIVEL1                                   1,426,783   82.43%
+  NIVEL2                                   1,426,783   82.43%
+  NIVEL3                                   1,426,783   82.43%
+  NIVEL4                                   1,426,783   82.43%
+  NIVEL5                                   1,720,682   99.42%
+  AFIRMACION                                906,972   52.40%
+  PORCENTAJERTAINCORRECTA                   903,186   52.18%
+  AÑO                                             0    0.00%
+
+── DISTRIBUCIÓN DE CANTIDADEVALUADOS ──
+  Mínimo       : 1
+  P25          : 30.0
+  Mediana (P50): 89.0
+  P75          : 300.0
+  P99          : 7620.959999999963
+  Máximo       : 3077789
+  Filas con CE == 0 : 0
+  Filas con CE nulo : 0
+
+── INCONSISTENCIAS TARGET ──
+  CE > 0 pero PROMEDIO_GLOBAL nulo  : 1,683,524 filas
+  CE > 0 pero PROMEDIO_PRUEBA nulo  : 1,403,383 filas
+
+── VALORES ÚNICOS DE AGREGACION ──
+  DEPARTAMENTO                             10,706
+  INSTITUCIÓN                              93,590
+  MUNICIPIO                                17,066
+  NBC                                      10,121
+  NBC_INSTITUCION                          421,235
+  NBC_SEDE                                 471,514
+  PAIS                                     962
+  PROGRAMA_ACÁDEMICO                       595,043
+  REGIÓN                                   2,236
+  SEDE                                     108,332
+
+── VALORES ÚNICOS DE MEDIDA_AGREGACION ──
+  APRENDIZAJE_PRUEBA                       827,619
+  NIVEL_DESEMPEÑO_PRUEBA                   304,022
+  PERCENTIL_GLOBAL                         26,779
+  PERCENTIL_PRUEBA                         197,682
+  PUNTAJE_GLOBAL                           47,281
+  PUNTAJE_PRUEBA                           327,422
+
+── VALORES ÚNICOS DE NOMBRE_PRUEBA ──
+  Total pruebas distintas: 48
+  • ANÁLISIS DE PROBLEMÁTICAS PSICOLÓGICAS
+  • ANÁLISIS ECONÓMICO
+  • ATENCIÓN EN SALUD
+  • COMPETENCIAS CIUDADANAS
+  • COMUNICACIÓN ESCRITA
+  • COMUNICACIÓN JURÍDICA
+  • CUIDADO DE ENFERMERÍA EN LOS ÁMBITOS CLÍNICO Y COMUNITARIO
+  • DIAGNÓSTICO Y TRATAMIENTO EN SALUD ORAL
+  • DISEÑO DE OBRAS DE INFRAESTRUCTURA
+  • DISEÑO DE PROCESOS INDUSTRIALES
+  • DISEÑO DE SISTEMAS DE CONTROL
+  • DISEÑO DE SISTEMAS DE MANEJO DEL IMPACTO AMBIENTAL
+  • DISEÑO DE SISTEMAS MECÁNICOS
+  • DISEÑO DE SISTEMAS PRODUCTIVOS Y LOGÍSTICOS
+  • DISEÑO DE SISTEMAS, PROCESOS Y PRODUCTOS AGROINDUSTRIALES
+  • DISEÑO DE SISTEMAS. PROCESOS Y PRODUCTOS AGROINDUSTRIALES
+  • DISEÑO DE SOFTWARE
+  • ENSEÑAR
+  • ESTUDIO PROYECTUAL
+  • EVALUAR
+  • FORMAR
+  • FORMULACIÓN DE PROYECTOS DE INGENIERÍA
+  • FORMULACIÓN, EVALUACIÓN Y GESTIÓN DE PROYECTOS
+  • FORMULACIÓN. EVALUACIÓN Y GESTIÓN DE PROYECTOS
+  • FUNDAMENTACIÓN EN DIAGNÓSTICO Y TRATAMIENTO MÉDICOS
+  • GENERACIÓN DE ARTEFACTOS
+  • GESTIÓN DE ORGANIZACIONES
+  • GESTIÓN DEL CONFLICTO
+  • GESTIÓN FINANCIERA
+  • INFORMACIÓN Y CONTROL CONTABLE
+  • INGLÉS
+  • INTERVENCIÓN EN PROCESOS SOCIALES
+  • INVESTIGACIÓN EN CIENCIAS SOCIALES
+  • INVESTIGACIÓN JURÍDICA
+  • LECTURA CRÍTICA
+  • PENSAMIENTO CIENTÍFICO - CIENCIAS BIOLÓGICAS
+  • PENSAMIENTO CIENTÍFICO - CIENCIAS DE LA TIERRA
+  • PENSAMIENTO CIENTÍFICO - CIENCIAS FÍSICAS
+  • PENSAMIENTO CIENTÍFICO - MATEMÁTICAS Y ESTADÍSTICA
+  • PENSAMIENTO CIENTÍFICO - NÚCLEO COMÚN
+  • PENSAMIENTO CIENTÍFICO - QUÍMICA
+  • PROCESOS COMUNICATIVOS
+  • PRODUCCIÓN AGRÍCOLA
+  • PRODUCCIÓN PECUARIA
+  • PROMOCIÓN DE LA SALUD Y PREVENCIÓN DE LA ENFERMEDAD
+  • PROYECTO DE ARQUITECTURA
+  • RAZONAMIENTO CUANTITATIVO
+  • SALUD Y BIENESTAR ANIMAL
+
+======================================================================
+VALIDACIÓN DE SCHEMA
+======================================================================
+Columnas en el archivo: 35
+Columnas esperadas según spec: 34
+
+Columnas presentes en archivo:
+  ✓  AFIRMACION
+  ✓  AGREGACION
+  ✓  AÑO
+  ✓  CANTIDADEVALUADOS
+  ✓  CATEGORIAPRUEBA
+  ✓  DESVIACION
+  ✓  EXAMEN
+  ✓  ID_DEPARTAMENTO
+  ✓  ID_GRUPOREFERENCIA
+  ✓  ID_INSTITUCION
+  ✓  ID_MUNICIPIO
+  ✓  ID_NBC
+  ✓  ID_PAIS
+  ✓  ID_PROGRAMA_ACAD
+  ✓  ID_REGION
+  ✓  ID_SEDE
+  ✓  MEDIDA_AGREGACION
+  ✓  NBC
+  ✓  NIVEL1
+  ✓  NIVEL2
+  ✓  NIVEL3
+  ✓  NIVEL4
+  ✓  NIVEL5
+  ✓  NOMBRE_DEPARTAMENTO
+  ✓  NOMBRE_GRUPOREF
+  ✓  NOMBRE_INSTITUCION
+  ✓  NOMBRE_MUNICIPIO
+  ✓  NOMBRE_PROGRAMA_ACAD
+  ✓  NOMBRE_PRUEBA
+  ✓  NOMBRE_REGION
+  ✓  NOMBRE_SEDE
+  ✓  PORCENTAJERTAINCORRECTA
+  ✓  PROMEDIO_GLOBAL
+  ✓  PROMEDIO_PERCENTIL
+  ✓  PROMEDIO_PRUEBA
+
+Todas las columnas esperadas están presentes.

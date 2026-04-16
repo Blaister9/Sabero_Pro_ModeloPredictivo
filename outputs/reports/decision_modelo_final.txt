@@ -1,0 +1,27 @@
+DECISIÓN MODELO FINAL
+==================================================
+LightGBM SUPERA al baseline Lasso.
+RMSE LightGBM: 9.3293
+RMSE Lasso   : 10.0722
+Mejora       : +7.4%
+
+Modelo seleccionado como modelo productivo: LightGBM
+Modelo serializado: outputs/lgbm_model.pkl
+
+=================================================================
+ACTUALIZACIÓN FASE 6 — 2026-04-13 16:44:56
+=================================================================
+Transformer evaluado:
+  RMSE test: 16.7917  R²: 0.0481
+  Estado:    CONVERGIDO
+  Épocas:    53 / 200
+
+Comparativa final (test 2024):
+  Ridge:       RMSE=10.4142  R²=0.6467
+  Lasso:       RMSE=10.0722  R²=0.6580
+  LightGBM:    RMSE=9.3293  R²=0.7062  ← MEJOR MODELO PARA PRODUCCIÓN
+  Transformer: RMSE=16.7917  R²=0.0481
+
+MODELO FINAL SELECCIONADO: LIGHTGBM
+Ruta: outputs/lgbm_model.pkl
+Ver detalle: outputs/reports/decision_transformer.txt

@@ -1,0 +1,235 @@
+CHECKLIST FINAL — MOTOR PREDICTIVO SABER PRO
+Fecha de verificación: 2026-04-14
+Autor: Edwin Santiago Paz Bedoya — Código 1071010
+Entregable de grado — Especialización en Inteligencia Artificial
+================================================================
+Estado: 73/73 archivos verificados en disco   ✓ COMPLETO
+================================================================
+
+MÉTRICAS FINALES DEL PIPELINE
+------------------------------
+  Baseline Ridge:       RMSE=10.2294  MAE=7.2967  R²=0.6467
+  Baseline Lasso:       RMSE=10.0722  MAE=7.0622  R²=0.6575
+  LightGBM (FINAL):     RMSE= 9.3293  MAE=6.2109  R²=0.7062  ✓
+  Transformer encoder:  RMSE=16.7917  MAE=n/a     R²=0.0481
+  Mejora LightGBM/Lasso: -7.4% RMSE, +4.9% R²
+
+  Criterios de éxito del enunciado:
+    R² > 0.70 en test:           0.7062 > 0.70  ✓ CUMPLIDO
+    >= 3 años de datos:          5 años (2020-2024)  ✓ CUMPLIDO
+    Split temporal estricto:     train 2020-2023 / test 2024  ✓ CUMPLIDO
+    Sin data leakage:            6 tipos detectados y corregidos  ✓ CUMPLIDO
+    Módulo de inferencia:        src/inference.py + demo  ✓ CUMPLIDO
+    Paper draft completo:        8 secciones  ✓ CUMPLIDO
+
+================================================================
+FASE 1 — AUDITORÍA DE DATOS
+================================================================
+  [OK] fase1_auditoria.py
+  [OK] data/raw/saber_pro_2020.xlsx                 (33,007 KB)
+  [OK] data/raw/saber_pro_2021.xlsx                 (47,153 KB)
+  [OK] data/raw/saber_pro_2022.xlsx                 (54,366 KB)
+  [OK] data/raw/saber_pro_2023.xlsx                 (41,597 KB)
+  [OK] data/raw/saber_pro_2024.xlsx                 (55,067 KB)
+  [OK] outputs/reports/auditoria_2024.txt
+  [OK] outputs/figures/nulidad_2024.png
+  [OK] outputs/figures/nulidad_barplot_2024.png
+  [OK] outputs/figures/cobertura_temporal.png
+
+================================================================
+FASE 2 — LIMPIEZA Y PIVOT LONG→WIDE
+================================================================
+  [OK] fase2_limpieza.py
+  [OK] data/processed/saber_pro_limpio.csv          (127,716 × 24)
+  [OK] outputs/reports/log_limpieza.txt
+  [OK] outputs/figures/distribucion_post_limpieza.png
+  [OK] outputs/figures/nulidad_post_limpieza.png
+
+  Hallazgos documentados:
+    - Formato long-format con MEDIDA_AGREGACION como discriminador
+    - Pivot en 3 capas: PUNTAJE_PRUEBA / PUNTAJE_GLOBAL / NIVEL
+    - PERCENTIL_PRUEBA excluido: no disponible a nivel programa
+    - 4 reglas de limpieza aplicadas (C1–C5)
+
+================================================================
+FASE 3 — FEATURE ENGINEERING
+================================================================
+  [OK] fase3_features.py
+  [OK] src/features.py
+  [OK] data/processed/saber_pro_features.csv        (127,716 × 41)
+  [OK] outputs/reports/feature_report.txt
+  [OK] outputs/figures/distribucion_features.png
+  [OK] outputs/figures/correlacion_features_target.png
+
+  Features construidas (15 de entrada al modelo):
+    Numéricas (10): lag_1/2_promedio_global, lag_1/2_promedio_prueba,
+      tendencia_global/prueba, desviacion_estandar_historica,
+      coeficiente_variacion, log_cantidadevaluados, AÑO
+    Categóricas TargetEncoded (3): NBC, NOMBRE_PRUEBA, ID_DEPARTAMENTO
+    OHE (2): cat_prueba_1, cat_prueba_34
+
+  Correcciones de leakage en features (6 tipos corregidos):
+    L1: Target encoding global → movido al interior del Pipeline
+    L2: PROMEDIO_PRUEBA año t → reemplazado por lag_1_promedio_prueba
+    L3: DESVIACION año t → excluida (concurrent_*)
+    L4: NIVEL1-4 año t → excluidos (concurrent_prop_*)
+    L5: delta_1_global → eliminada (target leak directo)
+    L6: Tendencia/volatilidad con año t → reescritas con expanding lag
+
+================================================================
+FASE 4 — MODELOS BASELINE
+================================================================
+  [OK] fase4_baseline.py
+  [OK] src/models/baseline.py
+  [OK] outputs/ridge_model.pkl                      (171 KB)
+  [OK] outputs/lasso_model.pkl                      (175 KB)
+  [OK] outputs/metrics/baseline_metrics.csv
+  [OK] outputs/metrics/metricas_ridge_por_depto.csv
+  [OK] outputs/metrics/metricas_lasso_por_nbc.csv
+  [OK] outputs/metrics/metricas_lasso_por_depto.csv
+  [OK] outputs/figures/baseline_lasso_predicho_vs_real.png
+  [OK] outputs/figures/baseline_lasso_residuos.png
+  [OK] outputs/figures/baseline_ridge_predicho_vs_real.png
+  [OK] outputs/figures/baseline_ridge_residuos.png
+  [OK] outputs/figures/baseline_coeficientes_lasso.png
+  [OK] outputs/figures/baseline_error_por_depto.png
+  [OK] outputs/reports/narrativa_baseline.txt
+
+  Métricas:
+    Ridge: RMSE=10.2294  R²=0.6467  (baseline)
+    Lasso: RMSE=10.0722  R²=0.6575  (mejor baseline)
+
+================================================================
+FASE 5 — LIGHTGBM + OPTUNA + SHAP
+================================================================
+  [OK] fase5_lightgbm.py
+  [OK] src/models/boosting.py
+  [OK] outputs/lgbm_model.pkl                       (733 KB)
+  [OK] outputs/lgbm_best_params.json
+  [OK] outputs/metrics/metricas_lgbm_por_nbc.csv
+  [OK] outputs/metrics/metricas_lgbm_por_depto.csv
+  [OK] outputs/metrics/casos_mayor_error.csv
+  [OK] outputs/figures/lgbm_predicho_vs_real.png
+  [OK] outputs/figures/lgbm_residuos.png
+  [OK] outputs/figures/lgbm_shap_beeswarm.png
+  [OK] outputs/figures/lgbm_shap_summary.png
+  [OK] outputs/figures/lgbm_feature_importance_gain.png
+  [OK] outputs/figures/lgbm_curva_aprendizaje.png
+  [OK] outputs/figures/lgbm_error_por_departamento.png
+  [OK] outputs/figures/lgbm_error_por_nbc.png
+  [OK] outputs/reports/narrativa_lgbm.txt
+  [OK] outputs/reports/decision_modelo_final.txt
+
+  Métricas: RMSE=9.3293  MAE=6.2109  R²=0.7062  ✓ SUPERA 0.70
+  Optuna: 50 trials, lr=0.02894, num_leaves=31, n_estimators=500
+
+================================================================
+FASE 6 — TRANSFORMER + ANÁLISIS OUTLIERS
+================================================================
+  [OK] fase6_transformer.py
+  [OK] src/models/transformer.py
+  [OK] outputs/transformer_model.pt                 (288 KB)
+  [OK] outputs/figures/transformer_learning_curve.png
+  [OK] outputs/figures/transformer_scatter_test.png
+  [OK] outputs/reports/decision_transformer.txt
+  [OK] outputs/reports/analisis_outliers.txt
+
+  Transformer: RMSE=16.7917  R²=0.0481
+    Convergió en época 53 / 4.6 min (presupuesto: 20 min)
+    Causa del bajo rendimiento: 32k secuencias vs 98k filas (LGBM),
+    ausencia de features categóricas NBC/NOMBRE_PRUEBA
+
+  Outlier documentado: Lic. Ed. Básica Énfasis Tecnología e
+    Informática (UMB, ID_PROG=742): PROMEDIO_GLOBAL=31.0 en 2024
+    con CANTIDADEVALUADOS=1. Artefacto N=1, no excluido.
+    Flag BAJA_CONFIANZA_MUESTRA_PEQUEÑA implementado en inferencia.
+
+  MODELO FINAL: LightGBM  (outputs/lgbm_model.pkl)
+
+================================================================
+FASE 7 — MÓDULO DE INFERENCIA
+================================================================
+  [OK] src/inference.py
+  [OK] demo_inference.py
+  [OK] outputs/reports/demo_inferencia.txt
+
+  Funciones implementadas:
+    load_model(path)            → carga pipeline joblib
+    predict_institution(...)    → predicción individual + flags
+    predict_batch(df, model)    → predicción en lote
+    build_inference_row(...)    → construcción de features
+    format_prediction_report()  → reporte texto legible
+
+  Flags de confianza:
+    baja_confianza_muestra_pequeña  True si CANTIDADEVALUADOS < 5
+    baja_confianza_sin_historial    True si lag_1 es NaN
+    baja_confianza_extrapolacion    True si AÑO > 2023
+
+  Demo verificada: 5 casos individuales + batch test 2024
+    Batch test 2024: RMSE=9.3293  R²=0.7062 (confirmado)
+    Confianza ALTA:  0 (2024 está fuera del train, flag extrapolación)
+    Confianza MEDIA: 84.4% (solo flag extrapolación)
+    Confianza BAJA:  15.6% (muestra pequeña y/o sin historial)
+
+================================================================
+FASE 8 — PAPER DRAFT
+================================================================
+  [OK] paper/draft/01_titulo_y_abstract.txt
+         Título ES + EN, abstract ES + EN, palabras clave
+  [OK] paper/draft/02_introduccion.txt
+         Motivación, problema, objetivos, contribuciones, estructura
+  [OK] paper/draft/03_datos_y_metodologia.txt
+         Fuente ICFES, hallazgo long-format, estrategia pivot,
+         EXCLUSIÓN PERCENTIL_PRUEBA (documentada),
+         TABLA 1: 6 tipos de leakage con impacto cuantificado,
+         split temporal, métricas de evaluación
+  [OK] paper/draft/04_feature_engineering.txt
+         15 features, 4 grupos, implementación expanding lag,
+         correcciones de leakage L1-L6, variables excluidas
+  [OK] paper/draft/05_resultados.txt
+         TABLA 2: comparativa 4 modelos con métricas reales,
+         TABLA 3: RMSE por NBC, TABLA 4: Transformer,
+         TABLA 5: distribución de flags de confianza
+  [OK] paper/draft/06_discusion.txt
+         4 factores que explican por qué LGBM >> Transformer
+         (32k vs 98k muestras, ausencia categóricas, padding,
+         generalización a nuevas entidades),
+         condiciones en las que Transformer podría competir,
+         5 limitaciones del pipeline, implicaciones de política
+  [OK] paper/draft/07_conclusiones.txt
+         5 conclusiones principales, 6 líneas de trabajo futuro
+  [OK] paper/draft/08_referencias.txt
+         18 referencias (ICFES, LightGBM, Optuna, Transformer,
+         SHAP, sklearn, literatura tabular boosting vs DL)
+
+================================================================
+RESUMEN EJECUTIVO DE ENTREGABLES
+================================================================
+  Código fuente:         8 módulos Python en src/
+  Scripts por fase:      7 scripts (fase1–6 + demo)
+  Datos procesados:      2 CSVs (127,716 filas)
+  Modelos serializados:  4 (Ridge, Lasso, LightGBM, Transformer)
+  Figuras generadas:     23 PNG
+  Métricas exportadas:   6 CSV
+  Reportes de texto:     9 TXT
+  Secciones del paper:   8 TXT
+  ─────────────────────────────────────────────────────────────
+  TOTAL archivos:        73 / 73  ✓ TODO PRESENTE EN DISCO
+
+================================================================
+VERIFICACIÓN DE CRITERIOS DE GRADO
+================================================================
+  [OK] R² > 0.70 en test 2024:       R²=0.7062  ✓
+  [OK] Pipeline reproducible:        7 scripts secuenciales  ✓
+  [OK] Sin data leakage:             6 tipos documentados y corregidos  ✓
+  [OK] Split temporal estricto:      train 2020-2023 / test 2024  ✓
+  [OK] Target nunca imputado:        Regla R1 respetada  ✓
+  [OK] Interpretabilidad:            SHAP TreeExplainer implementado  ✓
+  [OK] Módulo de inferencia:         src/inference.py deployable  ✓
+  [OK] Flags de confianza reales:    basados en hallazgo outliers N=1  ✓
+  [OK] Paper draft completo:         8 secciones, ~55 páginas equivalente  ✓
+  [OK] Experimento Transformer:      evaluado, documentado, con presupuesto  ✓
+
+================================================================
+FIN DEL CHECKLIST — PIPELINE COMPLETO
+================================================================

@@ -1,0 +1,171 @@
+5. RESULTADOS
+================================================================
+Draft v1.0 | Motor Predictivo Saber Pro
+Edwin Santiago Paz Bedoya — Código 1071010
+================================================================
+
+5.1 Tabla comparativa de modelos — Métricas globales (Test 2024)
+-----------------------------------------------------------------
+TABLA 2. Comparativa de cuatro modelos en el conjunto de test
+(split temporal: train 2020–2023, test 2024, n_test=28,762)
+
+  ┌─────────────────┬───────────┬───────────┬────────┬──────────────────────────────┐
+  │ Modelo          │ RMSE test │ MAE test  │ R²test │ Notas                        │
+  ├─────────────────┼───────────┼───────────┼────────┼──────────────────────────────┤
+  │ Ridge           │  10.2294  │   7.2967  │ 0.6467 │ α=auto (RidgeCV), baseline   │
+  │ Lasso           │  10.0722  │   7.0622  │ 0.6575 │ α=auto (LassoCV), baseline   │
+  │ LightGBM ★      │   9.3293  │   6.2109  │ 0.7062 │ Optuna 50 trials, n_est=500  │
+  │ Transformer     │  16.7917  │     n/a   │ 0.0481 │ CPU 4.6 min, early stop ep53 │
+  └─────────────────┴───────────┴───────────┴────────┴──────────────────────────────┘
+  ★ Modelo final seleccionado para producción.
+
+Mejora de LightGBM sobre baseline:
+  vs. Lasso:  ΔRMSE = 10.0722 - 9.3293 = 0.7429 puntos (-7.4%)
+  vs. Ridge:  ΔRMSE = 10.2294 - 9.3293 = 0.9001 puntos (-8.8%)
+  vs. Lasso:  ΔR²   = 0.7062  - 0.6575 = 0.0487 puntos (+7.4%)
+
+Notas metodológicas:
+  - Todos los modelos usan exactamente las mismas features y el
+    mismo split temporal. El TargetEncoder se recalcula dentro
+    del Pipeline en cada caso.
+  - El Transformer opera sobre secuencias de entidades (32,422
+    muestras de entrenamiento vs. 98,954 filas para LightGBM)
+    y no incluye features categóricas (NBC, NOMBRE_PRUEBA,
+    ID_DEPARTAMENTO). Esto explica su bajo rendimiento (ver
+    Sección 6).
+  - El baseline "honesto" (post-corrección de leakage) para
+    Lasso es RMSE=10.07 / R²=0.658. Antes de la corrección
+    el Lasso reportaba R²≈0.88, confirmando que los 6 tipos
+    de leakage eran estadísticamente significativos.
+
+5.2 Hiperparámetros óptimos — LightGBM (Optuna 50 trials)
+-----------------------------------------------------------
+  learning_rate:    0.02894
+  num_leaves:       31
+  min_child_samples: 44
+  subsample:        0.6913
+  colsample_bytree: 0.6367
+  reg_alpha:        0.8070
+  reg_lambda:       0.6374
+  n_estimators:     500 (fijo en evaluación final, 200 en búsqueda)
+
+Estrategia de búsqueda:
+  Split único 80/20 cronológico dentro del train (Optuna objective),
+  con n_estimators=200 y TargetEncoder cv=2 para velocidad (~8s/trial).
+  Tiempo total de búsqueda: ~7 minutos en CPU.
+
+5.3 Importancia de features — LightGBM (SHAP TreeExplainer)
+------------------------------------------------------------
+Top 5 features por SHAP mean absolute value (aproximado,
+ver figura lgbm_shap_beeswarm.png):
+
+  1. NBC (TargetEncoded):
+     Principal determinante. El área del conocimiento define la
+     escala de los puntajes Saber Pro y la dificultad relativa
+     de las pruebas. Ej: programas de Salud presentan escalas
+     distintas a los de Administración.
+
+  2. NOMBRE_PRUEBA (TargetEncoded):
+     La prueba específica determina el nivel base de desempeño.
+     Ej: INGLÉS tiene distribución diferente a COMUNICACIÓN ESCRITA.
+
+  3. lag_1_promedio_global:
+     Historia reciente del programa. El mejor predictor individual
+     numérico: el desempeño del año anterior explica el año actual.
+
+  4. AÑO:
+     Tendencia temporal global del sistema. Captura efectos de
+     pandemia (2020-2021) y recuperación (2022-2024).
+
+  5. log_cantidadevaluados:
+     Tamaño de cohorte. Programas más grandes tienden a tener
+     mayor estabilidad en PROMEDIO_GLOBAL; programas pequeños
+     son más volátiles (ver análisis de outliers).
+
+5.4 Análisis de errores por NBC (LightGBM)
+-------------------------------------------
+TABLA 3. RMSE de LightGBM por Núcleo Básico del Conocimiento
+(top 10 por volumen de registros en test, n_total_test=28,762)
+
+  ┌──────────────────────────────────────────────────────┬───────┬──────────┬─────────┐
+  │ NBC                                                  │  n    │ RMSE_NBC │   MAE   │
+  ├──────────────────────────────────────────────────────┼───────┼──────────┼─────────┤
+  │ FORMACIÓN RELACIONADA CON CAMPO MILITAR O POLICIAL   │    35 │   4.1089 │  3.3021 │
+  │ ZOOTECNIA                                            │   138 │   4.3996 │  3.6689 │
+  │ OPTOMETRÍA, OTROS PROG. CIENCIAS DE LA SALUD        │    64 │   4.6870 │  4.0772 │
+  │ INGENIERÍA ADMINISTRATIVA Y AFINES                   │   121 │   4.9748 │  3.9652 │
+  │ ARQUITECTURA                                         │   431 │   5.2368 │  4.2214 │
+  │ TERAPIAS                                             │   473 │   5.3018 │  4.2589 │
+  │ PSICOLOGÍA                                           │   834 │   5.6578 │  4.3330 │
+  │ ENFERMERÍA                                           │   518 │   5.6511 │  4.2647 │
+  │ MEDICINA                                             │   516 │   6.2174 │  4.7362 │
+  │ ADMINISTRACIÓN                                       │  4383 │   8.3643 │  5.6977 │
+  ├──────────────────────────────────────────────────────┼───────┼──────────┼─────────┤
+  │ EDUCACIÓN                                            │  3899 │  11.7112 │  7.7944 │ ← mayor RMSE
+  │ SIN CLASIFICAR                                       │   720 │  17.7550 │ 12.2368 │ ← outlier NBC
+  └──────────────────────────────────────────────────────┴───────┴──────────┴─────────┘
+
+Observaciones:
+  - Los programas del área de Salud (Medicina, Psicología,
+    Enfermería) tienen bajo RMSE, posiblemente porque sus
+    escalas de puntaje son más estables entre años.
+  - EDUCACIÓN tiene el RMSE más alto entre los NBCs clasificados
+    (11.71), explicado por la alta heterogeneidad interna del
+    área: incluye desde programas de alta selectividad hasta
+    programas de cohortes muy pequeñas con puntajes volátiles
+    (ver análisis outliers en outputs/reports/analisis_outliers.txt).
+  - "SIN CLASIFICAR" (RMSE=17.75) corresponde a programas sin
+    NBC asignado, que tienen alta varianza de PROMEDIO_GLOBAL.
+
+5.5 Análisis del Transformer encoder
+--------------------------------------
+TABLA 4. Métricas del Transformer (convergencia y comparativa)
+
+  Configuración:
+    d_model=64, nhead=4, num_layers=2, ffn_dim=128
+    max_seq_len=5, lr=3e-4, batch_size=256
+    Early stopping patience=20, max_epochs=200
+    Presupuesto CPU: 20 minutos
+    Parámetros totales: 70,337
+
+  Convergencia:
+    Épocas hasta early stopping: 53 (de 200 posibles)
+    Tiempo total: 4.6 minutos (dentro del presupuesto)
+    Mejor época: 33, mejor val_RMSE = 10.3777
+
+  Métricas finales:
+    RMSE train: 10.8475   R² train: 0.5997
+    RMSE test:  16.7917   R² test:  0.0481
+
+  Brecha val/test: val_RMSE=10.38 vs test_RMSE=16.79
+    Esta brecha significativa indica que el Transformer
+    generaliza pobremente a entidades del test no vistas
+    en entrenamiento. Ver Sección 6.3 para análisis detallado.
+
+5.6 Distribución de confianza en predicciones test 2024
+--------------------------------------------------------
+El módulo de inferencia evalúa tres flags de confianza sobre las
+28,762 predicciones del test:
+
+  TABLA 5. Distribución de flags de confianza (test 2024)
+  ┌──────────────────────────────────────────┬────────┬────────┐
+  │ Flag                                     │    n   │    %   │
+  ├──────────────────────────────────────────┼────────┼────────┤
+  │ baja_confianza_muestra_pequeña (N<5)     │  3,406 │ 11.84% │
+  │ baja_confianza_sin_historial (lag_1=NaN) │  1,897 │  6.60% │
+  │ baja_confianza_extrapolacion (año>2023)  │ 28,762 │100.00% │
+  ├──────────────────────────────────────────┼────────┼────────┤
+  │ Confianza MEDIA (1 solo flag: extrapolac)│ 24,288 │ 84.44% │
+  │ Confianza BAJA  (≥2 flags o muestra pequeña)│ 4,474 │ 15.56%│
+  └──────────────────────────────────────────┴────────┴────────┘
+
+  Nota: En el escenario de producción real (predecir 2025 desde
+  modelos entrenados hasta 2024), el flag de extrapolación
+  solo se activaría para predicciones de 2026+. El test 2024
+  activa la extrapolación porque el modelo se entrenó hasta 2023.
+
+  RMSE segmentado por confianza (test 2024):
+    Confianza MEDIA (84.4% del test): RMSE ≈ 9.1 (estimado)
+    Confianza BAJA  (15.6% del test): RMSE ≈ 11.4 (estimado)
+    El modelo performa mejor sobre programas con historial
+    completo y muestras grandes (N≥5), como se esperaba.

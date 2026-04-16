@@ -1,0 +1,112 @@
+7. CONCLUSIONES Y TRABAJO FUTURO
+================================================================
+Draft v1.0 | Motor Predictivo Saber Pro
+Edwin Santiago Paz Bedoya — Código 1071010
+================================================================
+
+7.1 Conclusiones principales
+------------------------------
+Este trabajo construyó un motor predictivo del PROMEDIO_GLOBAL
+en el examen Saber Pro para el período 2020–2024, alcanzando un
+RMSE=9.33 y R²=0.706 en el conjunto de test 2024 mediante un
+modelo LightGBM con búsqueda de hiperparámetros Optuna.
+
+Las conclusiones más relevantes son:
+
+  C1 — El formato long-format del ICFES es una fuente de
+  complejidad subestimada. La estrategia de pivot en tres capas
+  (PUNTAJE_PRUEBA → PUNTAJE_GLOBAL → NIVEL_DESEMPEÑO_PRUEBA)
+  con joins explícitos resuelve correctamente la heterogeneidad
+  de pruebas entre años y permite construir un dataset wide
+  leakage-free.
+
+  C2 — El data leakage en datos de panel temporal es sistémico
+  y difícil de detectar sin análisis explícito. Se identificaron
+  seis tipos distintos que, en conjunto, inflaban el R² del
+  baseline en 0.22 puntos (de 0.658 a ~0.88). La corrección
+  sistemática produjo el "baseline honesto" que es el punto de
+  comparación correcto para evaluar LightGBM.
+
+  C3 — LightGBM supera a los modelos lineales baseline en un
+  7.4% en RMSE y 0.049 puntos en R², justificando su mayor
+  complejidad. Las variables categóricas (NBC, NOMBRE_PRUEBA)
+  codificadas con TargetEncoder dentro del Pipeline son las
+  features más importantes según SHAP, explicando por qué los
+  árboles de gradiente, que manejan categóricas de alta
+  cardinalidad eficientemente, son superiores a los modelos
+  lineales en este dominio.
+
+  C4 — El Transformer encoder no es competitivo en este dataset
+  específico: R²=0.048 vs. R²=0.706 de LightGBM. Los factores
+  determinantes son el reducido número de muestras efectivas
+  (32,422 secuencias vs. 98,954 filas), la ausencia de features
+  categóricas de alta señal y la alta proporción de entidades
+  con secuencias padded (51.7% con <5 años). Esto es consistente
+  con la literatura que muestra que los modelos tabulares de
+  boosting superan a los Transformers en datasets pequeños o
+  medianos sin estructura secuencial dominante.
+
+  C5 — El módulo de inferencia con flags de confianza basados
+  en evidencia empírica (CANTIDADEVALUADOS<5 como predictor de
+  outliers) proporciona un mecanismo de gestión de riesgo
+  estadístico práctico para uso institucional real. El 11.84%
+  de las predicciones en test 2024 activa el flag de muestra
+  pequeña, representando predicciones que requieren revisión
+  manual antes de ser usadas en decisiones de política.
+
+7.2 Trabajo futuro
+-------------------
+  TF1 — Incorporar variables externas:
+    Índices socioeconómicos por municipio (Sisbén, gasto
+    educativo por estudiante), indicadores de calidad docente
+    (ratio estudiante/docente, nivel de posgrado del cuerpo
+    docente) y variables de mercado laboral relacionadas con
+    cada NBC. Hipótesis: NBC con RMSE alto (EDUCACIÓN=11.71)
+    podrían beneficiarse más de estas variables externas.
+
+  TF2 — Extender el horizonte de predicción:
+    Implementar predicción multi-horizonte (predecir t+1 y t+2
+    simultáneamente). Para esto se necesitaría un modelo de
+    lags recursivos o un Transformer con decoder que produzca
+    secuencias de predicciones futuras.
+
+  TF3 — Mejorar el Transformer con embeddings categóricos:
+    Implementar embeddings aprendibles para NBC, NOMBRE_PRUEBA
+    e ID_DEPARTAMENTO como tokens adicionales en la secuencia.
+    Comparar con LightGBM usando exactamente las mismas features.
+
+  TF4 — Actualización incremental del modelo:
+    Diseñar un mecanismo de fine-tuning anual: cuando lleguen
+    los datos de un nuevo año, actualizar el modelo sin
+    reentrenar desde cero. Esto es crítico para mantener el
+    motor en producción en el ICFES o el MEN.
+
+  TF5 — Análisis de equidad (fairness):
+    Evaluar si el error del modelo es sistemáticamente mayor
+    para programas de regiones con menor desarrollo económico
+    (ej. Chocó, Vichada) o para programas de instituciones
+    de modalidad virtual. Un RMSE departamental alto podría
+    indicar sesgo que penalice desproporcionadamente a ciertas
+    regiones en decisiones de acreditación basadas en predicciones.
+
+  TF6 — API de predicción deployable:
+    Empaquetar el módulo de inferencia como una API REST
+    (FastAPI + Docker) consumible por los sistemas de gestión
+    académica institucional. Incluir endpoints de batch prediction
+    y un dashboard de monitoreo de drift de datos entre años.
+
+7.3 Disponibilidad del código
+-------------------------------
+El código fuente completo, los datos procesados y los modelos
+entrenados están disponibles en el repositorio del proyecto bajo
+la estructura:
+
+  src/         → módulos Python (ingestion, cleaning, features,
+                  models/, evaluation, inference)
+  data/        → datos crudos (data/raw/) y procesados
+                  (data/processed/)
+  outputs/     → modelos serializados (.pkl, .pt), figuras,
+                  métricas y reportes
+  paper/draft/ → secciones del presente documento
+  fase*.py     → scripts de ejecución por fase
+  demo_inference.py → demostración del módulo de inferencia

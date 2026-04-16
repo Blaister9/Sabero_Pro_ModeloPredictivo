@@ -1,0 +1,48 @@
+NARRATIVA METODOLÓGICA — MODELOS BASELINE (RIDGE Y LASSO)
+Generado: 2026-04-13 16:11:59
+============================================================
+
+SPLIT TEMPORAL
+  Estrategia: split estricto por año (nunca aleatorio en series temporales).
+  Train: años 2020–2023 (98,954 observaciones).
+  Test:  año 2024 (28,762 observaciones, 22.5% del total).
+  Justificación: un split aleatorio en datos temporales introduce leakage temporal
+  al permitir que observaciones futuras informen el entrenamiento. Al usar el año
+  más reciente como test se simula la tarea de predicción real: dado el histórico
+  hasta 2023, predecir el desempeño de 2024.
+
+PREPROCESAMIENTO (dentro del Pipeline)
+  - Variables numéricas: imputación por mediana + StandardScaler.
+  - Variables categóricas (NBC, NOMBRE_PRUEBA, ID_DEPARTAMENTO): TargetEncoder
+    de scikit-learn, calculado únicamente sobre datos de train en cada fold
+    de TimeSeriesSplit (N=4 folds). Esto garantiza que las targets del
+    conjunto de test no influyan en el encoding durante el entrenamiento.
+  - Variables OHE (CATEGORIAPRUEBA): passthrough (ya codificadas en Fase 3).
+  - Validación cruzada interna: TimeSeriesSplit(4 folds) sobre train,
+    respetando el orden cronológico en la selección de hiperparámetros.
+
+MODELO RIDGE
+  Se evaluó Ridge Regression con regularización L2. La constante de
+  regularización alpha se eligió mediante RidgeCV con búsqueda en 60 valores
+  logarítmicamente espaciados entre 1e-3 y 1e5.
+  Alpha óptimo: 11.689518
+  Ridge obtuvo RMSE=10.2294 y R²=0.6467 en el
+  conjunto de prueba, con MAE=7.2964 puntos en la escala Saber Pro.
+
+MODELO LASSO
+  Se evaluó Lasso Regression con regularización L1, que actúa simultáneamente
+  como selector de features al llevar coeficientes irrelevantes exactamente a cero.
+  Alpha óptimo: 0.011250
+  Lasso seleccionó 10 de 15 features disponibles.
+  Features seleccionadas: ['lag_1_promedio_global', 'lag_2_promedio_global', 'lag_1_promedio_prueba', 'lag_2_promedio_prueba', 'tendencia_global', 'tendencia_prueba', 'desviacion_estandar_historica', 'coeficiente_variacion', 'log_cantidadevaluados', 'AÑO']
+  Lasso obtuvo RMSE=10.0722 y R²=0.6575 en el
+  conjunto de prueba, con MAE=7.0589 puntos.
+  Los features más influyentes según Lasso fueron: ['lag_1_promedio_global', 'coeficiente_variacion', 'desviacion_estandar_historica', 'lag_2_promedio_global', 'tendencia_global']
+
+CONCLUSIÓN
+  Los modelos lineales regularizados establecen el piso de referencia
+  (RMSE_baseline = 10.0722).
+  El mejor modelo lineal fue Lasso
+  con RMSE=10.0722.
+  Todo modelo no lineal entrenado en las siguientes fases deberá superar
+  este umbral en el conjunto de prueba para justificar su mayor complejidad.

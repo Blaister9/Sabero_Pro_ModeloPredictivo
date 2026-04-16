@@ -1,0 +1,109 @@
+TÍTULO Y ABSTRACT — MOTOR PREDICTIVO SABER PRO
+Draft v1.0 | Especialización en Inteligencia Artificial
+Edwin Santiago Paz Bedoya — Código 1071010
+================================================================
+
+
+TÍTULO (español)
+----------------
+Motor predictivo del desempeño académico agregado en el examen
+Saber Pro: un enfoque basado en datos de panel temporales
+(2020–2024) con LightGBM e ingeniería de features libre de
+fuga de información
+
+
+TITLE (English)
+---------------
+A Predictive Engine for Aggregate Academic Performance in the
+Saber Pro Exam: A Temporal Panel Data Approach (2020–2024)
+Using LightGBM and Leakage-Free Feature Engineering
+
+
+================================================================
+ABSTRACT (español)
+================================================================
+
+Este trabajo presenta un motor predictivo del PROMEDIO_GLOBAL
+—indicador de desempeño académico agregado a nivel de programa
+universitario— en el examen de Estado Saber Pro del ICFES para
+Colombia, utilizando datos de panel del período 2020–2024.
+
+El principal desafío metodológico fue la estructura nativa del
+dataset en formato long (una fila por prueba-año-programa), que
+requirió un proceso de pivot a formato wide, con unión de tres
+capas: puntajes por prueba (PUNTAJE_PRUEBA), promedio global
+institucional (PUNTAJE_GLOBAL) y niveles de desempeño
+(NIVEL_DESEMPEÑO_PRUEBA). Durante la construcción del pipeline
+se identificaron y corrigieron seis tipos de fuga de información
+(data leakage), incluyendo leakage temporal en variables de
+tendencia, leakage de target encoding sobre el dataset completo
+y leakage concurrente por la inclusión de variables del mismo
+año de evaluación.
+
+Se construyeron features temporales de rezago (lag_1, lag_2),
+tendencia (pendiente OLS sobre historia expandida) y volatilidad
+histórica, todas calculadas con información estrictamente
+anterior al año t. El split de evaluación es temporal estricto:
+entrenamiento en 2020–2023 (n=98,954) y prueba en 2024
+(n=28,762), preservando la asimetría temporal de un sistema de
+evaluación anual.
+
+Se compararon cuatro modelos: Ridge (baseline, RMSE=10.23,
+R²=0.647), Lasso (RMSE=10.07, R²=0.657), LightGBM con
+optimización Optuna de 50 trials (RMSE=9.33, R²=0.706) y un
+Transformer encoder con secuencias temporales por entidad
+(RMSE=16.79, R²=0.048). LightGBM resultó ser el modelo
+definitivo, mejorando el mejor baseline en un 7.4% en RMSE.
+
+El módulo de inferencia implementado incluye tres flags de
+confianza —baja_confianza_muestra_pequeña (N<5),
+baja_confianza_sin_historial y baja_confianza_extrapolacion—
+y predice PROMEDIO_GLOBAL para cualquier combinación de
+institución, programa y prueba con las features de entrada.
+
+Palabras clave: Saber Pro, ICFES, predicción de desempeño
+académico, datos de panel temporales, LightGBM, leakage
+temporal, feature engineering, educación superior Colombia.
+
+
+================================================================
+ABSTRACT (English)
+================================================================
+
+This paper presents a predictive engine for PROMEDIO_GLOBAL
+—an aggregate academic performance indicator at the university
+program level— in Colombia's Saber Pro state exam administered
+by ICFES, using panel data from 2020 to 2024.
+
+The main methodological challenge was the dataset's native
+long format (one row per test-year-program), which required a
+pivot to wide format via three-layer joins: test scores
+(PUNTAJE_PRUEBA), global institutional averages
+(PUNTAJE_GLOBAL), and performance levels (NIVEL_DESEMPEÑO_
+PRUEBA). During pipeline construction, six types of data
+leakage were identified and corrected, including temporal
+leakage in trend variables, target encoding leakage over the
+full dataset, and concurrent leakage from same-year variables.
+
+Temporal lag features (lag_1, lag_2), trend (OLS slope over
+expanding history), and historical volatility were built using
+information strictly prior to year t. Evaluation uses a strict
+temporal split: training on 2020–2023 (n=98,954) and testing
+on 2024 (n=28,762), preserving the temporal asymmetry of an
+annual evaluation system.
+
+Four models were compared: Ridge (baseline, RMSE=10.23,
+R²=0.647), Lasso (RMSE=10.07, R²=0.657), LightGBM with
+50-trial Optuna search (RMSE=9.33, R²=0.706), and a
+Transformer encoder operating on per-entity temporal sequences
+(RMSE=16.79, R²=0.048). LightGBM was selected as the final
+model, improving the best baseline by 7.4% in RMSE.
+
+The inference module includes three confidence flags:
+baja_confianza_muestra_pequeña (N<5),
+baja_confianza_sin_historial, and
+baja_confianza_extrapolacion.
+
+Keywords: Saber Pro, ICFES, academic performance prediction,
+temporal panel data, LightGBM, temporal leakage, feature
+engineering, Colombian higher education.

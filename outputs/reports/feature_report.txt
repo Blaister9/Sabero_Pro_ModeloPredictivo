@@ -1,0 +1,103 @@
+======================================================================
+REPORTE DE FEATURE ENGINEERING — SABER PRO
+Generado: 2026-04-13 15:44:48
+======================================================================
+
+── IMPUTACIÓN (Regla C3) ──
+  DESVIACION  : 0 nulos restantes tras imputación grupal
+  NIVEL1      : 0 nulos restantes tras imputación grupal
+  NIVEL2      : 0 nulos restantes tras imputación grupal
+  NIVEL3      : 0 nulos restantes tras imputación grupal
+  NIVEL4      : 0 nulos restantes tras imputación grupal
+  Grupos de imputación: ['NBC', 'NOMBRE_PRUEBA']
+
+── LAGS TEMPORALES ──
+  lag_1_promedio_global         : 26.9% nulos (esperado: ~13.7% por cobertura temporal)
+  lag_2_promedio_global         : 50.1% nulos (esperado: ~13.7% por cobertura temporal)
+  lag_1_promedio_prueba         : 26.9% nulos (esperado: ~13.7% por cobertura temporal)
+  lag_2_promedio_prueba         : 50.1% nulos (esperado: ~13.7% por cobertura temporal)
+
+── FEATURES DE TENDENCIA ──
+  tendencia_global            : mean=-2.155, std=6.498, 50.1% nulos
+  tendencia_prueba            : mean=-1.746, std=10.276, 50.1% nulos
+
+── PROPORCIONES DE NIVELES ──
+  Escala original NIVEL1-4: porcentajes 0-100, suma ~100 por fila.
+  Features creadas: proporción respecto al total de la fila.
+
+── VOLATILIDAD ──
+  desviacion_estandar_historica      : mean=4.9147, 50.1% nulos
+  coeficiente_variacion              : mean=0.0335, 50.1% nulos
+
+── CONTEXTO ──
+  log_cantidadevaluados: mean=3.343, std=1.203
+
+── AÑO COMO FEATURE ──
+  AÑO: columna numérica incluida directamente (captura tendencia global).
+  Valores: [2020, 2021, 2022, 2023, 2024]
+
+── OHE CATEGORIAPRUEBA ──
+  CATEGORIAPRUEBA (2 categorías <=20) → one-hot encoding (sin leakage)
+
+── VARIABLES CATEGÓRICAS DIFERIDAS AL PIPELINE ──
+  NBC, NOMBRE_PRUEBA, ID_DEPARTAMENTO: target encoding calculado
+  dentro del Pipeline sklearn (Fase 4) con TargetEncoder + TimeSeriesSplit.
+  Motivo: calcularlas sobre el dataset completo introduce leakage cruzado
+  porque las targets del test influyen en el encoding del train.
+
+── VALIDACIÓN ANTI-LEAKAGE ──
+  lag_1/lag_2: usan shift() sobre años anteriores solamente. [OK]
+  delta_1: diferencia contra lag_1 (año anterior). [OK]
+  tendencia OLS: slope sobre trayectoria histórica de la entidad. [OK]
+  OHE CATEGORIAPRUEBA: no usa target. [OK]
+  te_nbc/te_nombre_prueba/te_id_departamento: DIFERIDOS al Pipeline. [OK]
+  No hay features que usen PROMEDIO_GLOBAL del año siguiente. [OK]
+
+── RESUMEN FINAL ──
+  Filas: 127,716 (sin cambios vs. dataset limpio)
+  Columnas totales post-features: 41
+  Features nuevas construidas: 17
+  Features con >70% nulos (excluir en modelado): []
+
+  LISTA COMPLETA DE FEATURES NUEVAS:
+  cat_prueba_1                        null=0.0% | mean=0.791 | std=0.406 | min=0.000 | max=1.000
+  cat_prueba_34                       null=0.0% | mean=0.209 | std=0.406 | min=0.000 | max=1.000
+  coeficiente_variacion               null=50.1% | mean=0.033 | std=0.031 | min=0.000 | max=0.949
+  concurrent_prop_nivel1              null=0.0% | mean=0.219 | std=0.212 | min=0.000 | max=1.000
+  concurrent_prop_nivel2              null=0.0% | mean=0.363 | std=0.201 | min=0.000 | max=1.000
+  concurrent_prop_nivel3              null=0.0% | mean=0.348 | std=0.211 | min=0.000 | max=1.000
+  concurrent_prop_nivel4              null=0.0% | mean=0.071 | std=0.136 | min=0.000 | max=1.000
+  concurrent_prop_niveles_altos       null=0.0% | mean=0.419 | std=0.263 | min=0.000 | max=1.000
+  concurrent_prop_niveles_bajos       null=0.0% | mean=0.581 | std=0.263 | min=0.000 | max=1.000
+  desviacion_estandar_historica       null=50.1% | mean=4.915 | std=4.307 | min=0.000 | max=79.903
+  lag_1_promedio_global               null=26.9% | mean=148.433 | std=16.542 | min=25.000 | max=209.000
+  lag_1_promedio_prueba               null=26.9% | mean=147.856 | std=20.558 | min=0.000 | max=300.000
+  lag_2_promedio_global               null=50.1% | mean=148.983 | std=16.609 | min=60.000 | max=209.000
+  lag_2_promedio_prueba               null=50.1% | mean=148.379 | std=20.490 | min=0.000 | max=300.000
+  log_cantidadevaluados               null=0.0% | mean=3.343 | std=1.203 | min=0.693 | max=8.313
+  tendencia_global                    null=50.1% | mean=-2.155 | std=6.498 | min=-113.000 | max=97.000
+  tendencia_prueba                    null=50.1% | mean=-1.746 | std=10.276 | min=-210.000 | max=164.000
+── TOP 20 CORRELACIONES CON PROMEDIO_GLOBAL ──
+  lag_2_promedio_global              : 0.8392
+  lag_1_promedio_global              : 0.8384
+  concurrent_prop_niveles_bajos      : -0.7189
+  concurrent_prop_niveles_altos      : 0.7189
+  lag_2_promedio_prueba              : 0.6531
+  lag_1_promedio_prueba              : 0.6412
+  concurrent_prop_nivel1             : -0.5541
+  concurrent_prop_nivel3             : 0.5528
+  concurrent_prop_nivel4             : 0.5323
+  concurrent_prop_nivel2             : -0.3577
+  ID_PROGRAMA_ACAD                   : -0.1126
+  ID_NBC                             : 0.1123
+  coeficiente_variacion              : -0.0856
+  ID_MUNICIPIO                       : -0.0844
+  ID_DEPARTAMENTO                    : -0.0747
+  ID_REGION                          : -0.0690
+  log_cantidadevaluados              : 0.0595
+  ID_INSTITUCION                     : -0.0549
+  DESVIACION                         : 0.0424
+  AÑO                                : -0.0317
+
+── FEATURES EXCLUIDAS (>70% nulos) ──
+  Ninguna feature nueva supera el 70% de nulos.

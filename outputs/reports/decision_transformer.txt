@@ -1,0 +1,104 @@
+ANÁLISIS COMPARATIVO TRANSFORMER vs MODELOS ANTERIORES — FASE 6
+Fecha: 2026-04-13 16:44:56
+Autor: Edwin Santiago Paz Bedoya — Código 1071010
+=================================================================
+
+1. CONFIGURACIÓN DEL TRANSFORMER
+---------------------------------
+  Arquitectura:
+    - Tipo:           TransformerEncoder (solo encoder, sin decoder)
+    - d_model:        64 (dimensión de embedding)
+    - nhead:          4 (cabezas de atención multi-head)
+    - num_layers:     2 (capas TransformerEncoderLayer)
+    - ffn_dim:        128 (dimensión feed-forward interna)
+    - dropout:        0.1
+    - norm_first:     True (pre-norm, más estable en datos tabulares pequeños)
+    - Positional enc: Aprendible (LearnedPositionalEncoding)
+    - Pooling:        Último token de la secuencia temporal
+    - Cabeza:         Linear(64→32)→GELU→Dropout→Linear(32→1)
+    - Parámetros:     70,337
+
+  Dataset:
+    - Tipo:           Secuencias temporales por entidad
+    - Entidad:        (ID_INSTITUCION, ID_PROGRAMA_ACAD, NOMBRE_PRUEBA)
+    - max_seq_len:    5 (años)
+    - Features/paso:  12 (lag_1_promedio_global, lag_2_promedio_global, lag_1_promedio_prueba, lag_2_promedio_prueba, tendencia_global...)
+    - Train samples:  32422 entidades
+    - Test  samples:  28762 entidades
+    - NaN impute:     0.0 (sin historia = cero antes de normalizar)
+    - Normalización:  μ/σ calculados SOLO sobre train → sin leakage
+
+  Entrenamiento:
+    - Optimizador:    AdamW (lr=3e-4, weight_decay=1e-4)
+    - Scheduler:      CosineAnnealingLR (T_max=200, eta_min=1e-5)
+    - Grad clipping:  max_norm=1.0
+    - Loss:           MSELoss → RMSE para monitoreo
+    - Early stopping: patience=20 épocas
+    - Presupuesto:    1200s (20 minutos)
+
+2. RESULTADOS DEL ENTRENAMIENTO
+---------------------------------
+  Estado:             CONVERGIDO
+  Tiempo total:       277.7s (4.6 min)
+  Épocas completadas: 53
+  Mejor época:        33
+  Mejor val RMSE:     10.3777
+
+  Métricas finales (mejor modelo restaurado):
+    RMSE train:   10.8475
+    R²   train:   0.5997
+    RMSE test:    16.7917
+    R²   test:    0.0481
+
+3. COMPARATIVA DE MODELOS — TEST 2024
+-----------------------------------------
+  | Modelo           | RMSE test | R² test | Notas                          |
+  |------------------|-----------|---------|--------------------------------|
+  | Ridge (baseline) | 10.4142   | 0.6467  | Regularización L2              |
+  | Lasso (baseline) | 10.0722   | 0.6580  | Selección de features L1       |
+  | LightGBM         |  9.3293   |  0.7062 | Optuna 50 trials, SHAP         |
+  | Transformer      |  16.7917   |  0.0481 | CONVERGIDO                     |
+
+4. ANÁLISIS Y DECISIÓN
+-----------------------
+  4.1 ¿Supera el Transformer a LightGBM?
+      NO: LightGBM sigue siendo el mejor modelo (+7.4624 puntos RMSE).
+
+  4.2 Ventajas del Transformer en este contexto:
+      - Captura dependencias temporales entre años de forma explícita
+        (self-attention sobre la secuencia t-4..t-1..t).
+      - No requiere ingeniería de features de lags manuales; aprende
+        patrones de tendencia directamente de la secuencia.
+      - Escalable si se agregan más años o features por timestep.
+      - Positional encoding aprendible se adapta a las 5 posiciones
+        posibles del dataset (2020–2024).
+
+  4.3 Desventajas observadas:
+      - Dataset pequeño (≈32422 entidades de train vs 98,954 filas en LGBM):
+        el Transformer agrega por entidad, perdiendo variabilidad intra-
+        entidad. Esto reduce el tamaño efectivo de muestra.
+      - Alta proporción de entidades con historia corta (1-2 años):
+        el left-padding introduce ruido que la attention puede amplificar.
+      - Features categóricas (NBC, NOMBRE_PRUEBA, ID_DEPARTAMENTO) no
+        incluidas en el Transformer (requeriría embeddings adicionales),
+        lo que lo pone en desventaja informacional frente a LightGBM.
+      - Más costoso en CPU que LightGBM para este volumen de datos.
+
+  4.4 Consideración del time budget:
+      El modelo CONVERGIÓ antes del límite de 20 min.
+      Esta decisión documenta que el Transformer es factible en CPU para
+      este dataset, pero la inferencia de tiempo limita la búsqueda de
+      hiperparámetros.
+
+5. MODELO FINAL SELECCIONADO PARA FASE 7
+------------------------------------------
+  LIGHTGBM (sigue siendo el mejor modelo)
+
+  Justificación:
+  LightGBM ofrece mejor RMSE (9.3293 vs 16.7917), menor complejidad, tiempo de entrenamiento << 20 min, e interpretabilidad SHAP. El Transformer no justifica su complejidad adicional para este dataset en este momento.
+  Para la Fase 7 (inferencia) y la Fase 8 (paper), el modelo primario es
+  LightGBM (outputs/lgbm_model.pkl). El Transformer queda documentado
+  como experimento adicional con potencial para datasets más grandes.
+
+=================================================================
+FIN DEL REPORTE

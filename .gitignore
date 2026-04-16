@@ -1,0 +1,50 @@
+# ── Python ────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ── Entornos virtuales ─────────────────────────────────────────
+.env
+.venv
+venv/
+env/
+
+# ── Jupyter ────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ── Datos crudos ICFES (demasiado grandes para GitHub) ─────────
+data/raw/*.xlsx
+data/raw/*.csv
+data/raw/*.zip
+
+# ── Modelos serializados (pesados, usar releases o LFS) ────────
+outputs/lgbm_model.pkl
+outputs/ridge_model.pkl
+outputs/lasso_model.pkl
+outputs/transformer_model.pt
+
+# MANTENER en el repo (archivos pequeños útiles):
+# outputs/lgbm_best_params.json   ← hiperparámetros Optuna
+# outputs/metrics/*.csv           ← métricas
+# outputs/reports/*.txt           ← reportes
+# outputs/figures/*.png           ← gráficas
+# outputs/CHECKLIST_FINAL.txt     ← checklist
+
+# ── OS ─────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── IDEs ───────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ── Claude Code internal ───────────────────────────────────────
+.claude/

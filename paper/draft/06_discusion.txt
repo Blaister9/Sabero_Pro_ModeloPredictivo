@@ -1,0 +1,191 @@
+6. DISCUSIÓN
+================================================================
+Draft v1.0 | Motor Predictivo Saber Pro
+Edwin Santiago Paz Bedoya — Código 1071010
+================================================================
+
+6.1 Por qué LightGBM supera al Transformer en este contexto
+-------------------------------------------------------------
+El resultado de que LightGBM (RMSE=9.33, R²=0.706) supera
+ampliamente al Transformer encoder (RMSE=16.79, R²=0.048) no
+es sorpresivo dados los siguientes factores estructurales del
+problema. Este análisis tiene implicaciones generales para el
+diseño de sistemas de predicción sobre datos de panel educativo.
+
+6.1.1 Asimetría de muestras de entrenamiento efectivas
+-------------------------------------------------------
+El factor más determinante es el número de ejemplos disponibles
+para cada arquitectura.
+
+  LightGBM:
+    Entrenamiento sobre 98,954 filas (una fila = un programa ×
+    prueba × año). Cada fila es una observación independiente
+    con sus propias features de rezago, tendencia y categoría.
+    El modelo aprende patrones a nivel de observación individual.
+
+  Transformer:
+    Entrenamiento sobre secuencias por entidad. Cada entidad
+    contribuye exactamente UNA secuencia (la más reciente de
+    hasta 5 años). El conjunto de entrenamiento del Transformer
+    tiene 32,422 secuencias de entidades únicas, frente a las
+    98,954 filas de LightGBM.
+
+  Ratio: LightGBM usa 98,954 / 32,422 = 3.05× más datos
+  efectivos durante el entrenamiento. En datos tabulares con
+  alta variabilidad por entidad, este factor es dominante.
+
+6.1.2 Ausencia de features categóricas de alta señal
+------------------------------------------------------
+  LightGBM:
+    Incluye NBC, NOMBRE_PRUEBA e ID_DEPARTAMENTO con
+    TargetEncoder calculado sobre el conjunto de train. Estas
+    tres variables son las de mayor importancia SHAP (ver Sección
+    5.3). NBC solo explica gran parte de la varianza porque el
+    área del conocimiento define la escala de las pruebas Saber Pro.
+
+  Transformer:
+    Solo usa 12 features numéricas y OHE. NBC, NOMBRE_PRUEBA
+    e ID_DEPARTAMENTO están ausentes porque su integración como
+    embeddings de entidad habría requerido un diseño de
+    arquitectura más complejo (embeddings aprendibles por
+    categoría) que excede el alcance de la comparativa.
+
+  Este déficit informacional penaliza fuertemente al Transformer:
+  sin saber el área del conocimiento, el modelo no puede
+  distinguir que MEDICINA tiene puntajes base distintos que
+  ADMINISTRACIÓN, y predice en un espacio mezclado con alta
+  varianza residual.
+
+  Cuantificación del impacto:
+    Si aceptamos que las features categóricas con TargetEncoder
+    explican ~Δ0.05 del R² (diferencia entre baseline
+    Ridge=0.647 y Lasso=0.658, ambos con las categóricas),
+    la ausencia completa de NBC+NOMBRE_PRUEBA en el Transformer
+    podría explicar una pérdida de R² de 0.10–0.15 puntos,
+    consistente con la brecha observada.
+
+6.1.3 Distribución desequilibrada de longitudes de secuencia
+--------------------------------------------------------------
+  El Transformer opera con secuencias left-padded de largo
+  máximo 5. De las 34,319 entidades en el dataset:
+    - 48.3% tienen 5 años (secuencia completa, sin padding)
+    - 51.7% tienen <5 años (requieren padding con ceros)
+
+  El padding con ceros introduce ruido en el mecanismo de
+  atención multi-cabeza. Una entidad con 1 año de historia
+  produce una secuencia [0, 0, 0, 0, x_t], donde los cuatro
+  ceros son artificiales. Aunque la máscara de padding
+  previene que estos tokens contribuyan a la atención,
+  el modelo debe aprender a ignorarlos, lo que dificulta la
+  optimización con 70,337 parámetros y ~32,000 secuencias.
+
+  LightGBM maneja este problema naturalmente: las filas con
+  lag_1=NaN son imputadas con la mediana del train por el
+  SimpleImputer, y el árbol puede crear ramas específicas
+  para "sin historia previa" sin ningún overhead arquitectónico.
+
+6.1.4 Generalización a nuevas entidades en test
+-------------------------------------------------
+  El test 2024 contiene 28,762 registros de entidades, muchas
+  de las cuales son nuevas o tienen una sola aparición en test.
+  Para el Transformer esto representa un desafío de transfer:
+  el modelo aprendió patrones de secuencia sobre las entidades
+  de train (32,422), y debe generalizar a las 28,762 entidades
+  de test.
+
+  La brecha val/test del Transformer (val_RMSE=10.38 vs.
+  test_RMSE=16.79, diferencia de 6.41 puntos) indica que el
+  modelo sobreajusta a las entidades de validación y no
+  generaliza bien fuera de ellas. LightGBM no tiene este
+  problema porque opera a nivel de features individuales, no
+  de identidad de entidad.
+
+6.1.5 Eficiencia computacional
+-------------------------------
+  LightGBM: búsqueda Optuna completa en ~7 min (50 trials × 8s)
+             + entrenamiento final en ~2 min.
+  Transformer: 4.6 min hasta early stopping (convergencia parcial,
+               53 de 200 épocas posibles).
+
+  Ambos son viables en CPU en el presupuesto de 20 minutos, pero
+  LightGBM ofrece mucho mayor rendimiento predictivo por unidad
+  de tiempo de cómputo en este dominio.
+
+6.2 Condiciones bajo las cuales el Transformer podría superar a LightGBM
+--------------------------------------------------------------------------
+El Transformer podría ser competitivo o superior si:
+
+  (a) El dataset temporal tuviera >= 10 años de historia por
+      entidad, reduciendo el porcentaje de entidades con padding
+      y enriqueciendo las secuencias con patrones de tendencia
+      más complejos.
+
+  (b) Se implementaran embeddings aprendibles para NBC,
+      NOMBRE_PRUEBA e ID_DEPARTAMENTO como tokens adicionales
+      en la secuencia (ej. [CLS_nbc, t-4, t-3, t-2, t-1, t]).
+
+  (c) Se usara transfer learning pre-entrenando en datos de
+      todos los países con exámenes estandarizados similares
+      (PISA, Enlace-México, etc.), y luego fine-tuning sobre
+      los datos ICFES.
+
+  (d) El objetivo fuera capturar patrones intra-secuencia
+      complejos (ej. detección de caída abrupta en 2 años
+      consecutivos), donde la self-attention es más expresiva
+      que los rezagos lineales.
+
+6.3 Limitaciones del pipeline
+-------------------------------
+  L1 – Cobertura temporal corta (5 años):
+       El período 2020–2024 incluye los años de pandemia COVID-19
+       (2020–2021), que son atípicos. Los modelos entrenados con
+       estos datos podrían sobrestimar la variabilidad inter-anual.
+       Con más años históricos, las tendencias serían más estables.
+
+  L2 – Granularidad de datos:
+       El dataset opera a nivel de programa-institución-prueba
+       agregado. No hay información individual por estudiante.
+       Esto limita la capacidad de capturar heterogeneidad dentro
+       del programa (ej. variaciones por sede, turno, etc.).
+
+  L3 – Ausencia de variables externas:
+       No se incluyen variables socioeconómicas (estrato medio del
+       programa, gasto por estudiante), de mercado laboral o de
+       calidad docente que podrían mejorar las predicciones,
+       especialmente para NBC con alto RMSE (EDUCACIÓN=11.71).
+
+  L4 – Estabilidad del sistema de pruebas:
+       El conjunto de pruebas Saber Pro no es completamente
+       estable entre años: algunas pruebas desaparecen y aparecen
+       nuevas. Esto genera entidades con historial incompleto no
+       solo por ser programas nuevos sino por cambios en el
+       catálogo de pruebas.
+
+  L5 – Extrapolación temporal:
+       El modelo está validado únicamente para predecir 2024
+       (un año adelante desde 2023). No hay garantía de que
+       mantenga su desempeño para predicciones de 2 o más años
+       adelante, donde la incertidumbre acumulada puede degradar
+       el R² significativamente.
+
+6.4 Implicaciones para política educativa
+------------------------------------------
+  Un R²=0.706 implica que el motor predictivo puede anticipar
+  correctamente el ~71% de la varianza en PROMEDIO_GLOBAL de
+  los programas universitarios colombianos un año antes de que
+  el ICFES publique los resultados.
+
+  En términos prácticos:
+    - Programas con lag_1_promedio_global bajo y tendencia
+      negativa pueden ser identificados como de alto riesgo
+      para el año siguiente, permitiendo intervenciones
+      curriculares anticipadas.
+    - Los flags de baja confianza (especialmente CANTIDADEVALUADOS
+      < 5) señalan automáticamente los programas donde el
+      PROMEDIO_GLOBAL no es representativo del desempeño real
+      del programa, evitando decisiones de política basadas en
+      artefactos estadísticos de muestra pequeña.
+    - El análisis de errores por departamento (ver figura
+      lgbm_error_por_departamento.png) puede guiar la focalización
+      de recursos de acompañamiento institucional hacia regiones
+      con mayor error de predicción (mayor incertidumbre).

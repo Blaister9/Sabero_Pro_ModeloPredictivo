@@ -1,0 +1,85 @@
+2. INTRODUCCIÓN
+================================================================
+Draft v1.0 | Motor Predictivo Saber Pro
+Edwin Santiago Paz Bedoya — Código 1071010
+================================================================
+
+2.1 Motivación
+--------------
+El examen de Estado Saber Pro, administrado por el Instituto
+Colombiano para la Evaluación de la Educación (ICFES), es el
+principal instrumento de evaluación de calidad de los programas
+de educación superior en Colombia. Los resultados agregados a
+nivel de programa —sintetizados en la variable PROMEDIO_GLOBAL—
+son utilizados por el Ministerio de Educación Nacional para el
+proceso de acreditación institucional, la asignación de recursos
+de fomento y la comparación de calidad educativa entre
+instituciones y regiones.
+
+Sin embargo, el ICFES publica los resultados retrospectivamente:
+las instituciones no conocen su PROMEDIO_GLOBAL antes de que el
+examen ocurra. Esta asimetría de información limita la capacidad
+de las instituciones para tomar acciones preventivas, ajustar
+currículos o focalizar recursos pedagógicos antes de que los
+estudiantes presenten la evaluación.
+
+Un motor predictivo que estime con anticipación el
+PROMEDIO_GLOBAL de cada combinación institución-programa-prueba
+podría transformar la gestión de calidad educativa, permitiendo
+intervenciones proactivas en lugar de análisis post-hoc.
+
+2.2 Problema y objetivos
+-------------------------
+El problema de predicción se formula como:
+
+  Dado el historial de desempeño del programa p en la prueba q
+  de la institución i durante los años t-1, t-2, ..., t-k,
+  predecir PROMEDIO_GLOBAL(i, p, q, t) para el año t sin usar
+  ninguna información del mismo año t.
+
+El objetivo principal es construir un pipeline reproducible,
+libre de fuga de información temporal, que:
+
+  (a) Transforme los datos crudos del ICFES (formato long) en
+      features temporales limpias.
+  (b) Entrene y evalúe múltiples familias de modelos con split
+      temporal estricto (train: 2020–2023; test: 2024).
+  (c) Alcance un R² > 0.70 en el conjunto de test, superando
+      modelos lineales regularizados como baseline honesto.
+  (d) Produzca un módulo de inferencia deployable con flags de
+      confianza para uso institucional.
+
+2.3 Contribuciones
+------------------
+Las contribuciones principales de este trabajo son:
+
+  1. Documentación sistemática de seis tipos de data leakage
+     identificados durante la construcción del pipeline para
+     datos de evaluación educativa de panel temporal, con
+     impacto cuantificado en métricas de test.
+
+  2. Estrategia de pivot long→wide para datos ICFES que resuelve
+     la heterogeneidad de pruebas entre años y la indisponibilidad
+     de PERCENTIL_PRUEBA a nivel de programa académico.
+
+  3. Diseño de features temporales de rezago, tendencia y
+     volatilidad que respetan la causalidad temporal en datos de
+     panel con cobertura desigual entre entidades (1 a 5 años).
+
+  4. Evaluación comparativa de modelos lineales, boosting y
+     Transformer encoder en el contexto específico de datos
+     tabulares de panel educativo pequeño, con análisis de por
+     qué los modelos de secuencias no escalan en este dominio.
+
+  5. Módulo de inferencia con flags de confianza diseñados desde
+     el hallazgo de outliers reales del dataset (CANTIDADEVALUADOS
+     < 5 como factor de riesgo principal).
+
+2.4 Organización del documento
+--------------------------------
+La Sección 3 describe los datos, el proceso de limpieza y
+la detección y corrección de leakage. La Sección 4 presenta
+la ingeniería de features temporales. La Sección 5 reporta
+los resultados comparativos de los cuatro modelos. La Sección
+6 discute las implicaciones y limitaciones. La Sección 7
+presenta las conclusiones y trabajo futuro.

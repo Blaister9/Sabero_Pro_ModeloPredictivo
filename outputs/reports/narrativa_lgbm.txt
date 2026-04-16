@@ -1,0 +1,55 @@
+NARRATIVA METODOLÓGICA — LIGHTGBM
+Generado: 2026-04-13 16:20:38
+============================================================
+
+INTEGRIDAD DEL PIPELINE
+  El TargetEncoder para NBC, NOMBRE_PRUEBA e ID_DEPARTAMENTO se calcula
+  DENTRO del Pipeline de sklearn, ajustándose únicamente sobre los datos de
+  entrenamiento. Durante la búsqueda de hiperparámetros con Optuna, cada trial
+  reajusta el Pipeline completo (incluido el TargetEncoder) en los folds de
+  TimeSeriesSplit, garantizando que el conjunto de prueba (2024) no influya
+  en ninguna etapa del entrenamiento.
+
+MODELO
+  Se entrenó un modelo Gradient Boosting con LightGBM sobre 98,954
+  observaciones del período 2020–2023. El split temporal usa 2024 (28,762
+  observaciones) como conjunto de prueba, simulando la predicción en producción.
+
+BÚSQUEDA DE HIPERPARÁMETROS
+  Tras búsqueda de hiperparámetros con Optuna (50 trials, TPESampler),
+  los mejores parámetros encontrados fueron:
+    learning_rate: 0.028939610073511528
+    num_leaves: 31
+    min_child_samples: 44
+    subsample: 0.6913464841688229
+    colsample_bytree: 0.636711453427824
+    reg_alpha: 0.80695067857092
+    reg_lambda: 0.6374148961140256
+    n_estimators: 188
+
+  n_estimators ajustado a best_iter+20=188 según
+  curva de aprendizaje con early stopping (validación = año 2023).
+
+RESULTADOS
+  LightGBM alcanzó RMSE=9.3293 en el conjunto de prueba,
+  representando una mejora de 7.4% sobre el baseline Lasso (RMSE=10.0722).
+  MAE=6.2109, R²=0.7062.
+
+FEATURES MÁS INFLUYENTES (SHAP)
+  El análisis SHAP sobre 5,000 muestras del test revela que los
+  features más influyentes son: ['lag_1_promedio_global', 'lag_2_promedio_global', 'lag_1_promedio_prueba', 'log_cantidadevaluados', 'NBC_129.0'].
+  Los lags temporales dominan la predicción, confirmando que el desempeño
+  histórico de un programa es el predictor más potente de su desempeño futuro.
+
+ANÁLISIS DE ERRORES
+  Los errores más altos se concentran en:
+  - NBC con mayor RMSE: SIN CLASIFICAR (RMSE=12.237)
+  - Los programas con trayectorias cortas (sin lags disponibles) muestran
+    mayor error, ya que el modelo no puede aprovechar la señal histórica.
+
+TABLA COMPARATIVA FINAL
+  Modelo     | RMSE    | MAE     | R²
+  -----------|---------|---------|-------
+  Ridge      | 10.2294  | 7.2967  | 0.6467
+  Lasso      | 10.0722  | 7.0622  | 0.6575
+  LightGBM   | 9.3293  | 6.2109  | 0.7062

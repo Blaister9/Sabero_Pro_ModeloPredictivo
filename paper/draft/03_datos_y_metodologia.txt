@@ -1,0 +1,193 @@
+3. DATOS Y METODOLOGÍA
+================================================================
+Draft v1.0 | Motor Predictivo Saber Pro
+Edwin Santiago Paz Bedoya — Código 1071010
+================================================================
+
+3.1 Fuente de datos
+--------------------
+Los datos provienen de los reportes agregados de resultados
+Saber Pro publicados anualmente por el ICFES para el período
+2020–2024. Cada archivo anual contiene resultados a nivel de
+programa académico-institución-prueba, con variables de:
+  - Identificación: ID_PAIS, ID_REGION, ID_DEPARTAMENTO,
+    ID_MUNICIPIO, ID_INSTITUCION, ID_NBC, ID_PROGRAMA_ACAD
+  - Descriptores: NOMBRE_INSTITUCION, NBC, NOMBRE_PROGRAMA_ACAD,
+    NOMBRE_PRUEBA, CATEGORIAPRUEBA
+  - Métricas de desempeño: PUNTAJE_PRUEBA, PUNTAJE_GLOBAL,
+    NIVEL_DESEMPEÑO_PRUEBA, PERCENTIL_PRUEBA
+  - Tamaño de cohorte: CANTIDADEVALUADOS
+
+El dataset en su estado crudo contiene una fila por cada
+combinación (institución × programa × prueba × año × tipo de
+medida), resultando en una estructura long con múltiples filas
+por entidad-año.
+
+3.2 Hallazgo del formato long-format y estrategia de pivot
+-----------------------------------------------------------
+El descubrimiento más relevante en la fase de auditoría de datos
+fue que los archivos ICFES utilizan una columna discriminadora
+MEDIDA_AGREGACION que distingue el tipo de estadística agregada
+en cada fila. Se identificaron tres capas:
+
+  (a) PUNTAJE_PRUEBA @ PROGRAMA_ACÁDEMICO:
+      Puntaje promedio de cada prueba específica (ej. INGLÉS,
+      LECTURA CRÍTICA) para el programa académico. Esta es la
+      capa principal con 47 pruebas distintas.
+
+  (b) PUNTAJE_GLOBAL @ PROGRAMA_ACÁDEMICO:
+      Promedio global del programa a través de todas las pruebas.
+      Esta capa produce la variable objetivo PROMEDIO_GLOBAL.
+      Nota: esta capa tiene NOMBRE_PRUEBA=NaN en las filas crudas,
+      por lo que no se une directamente a la capa (a) por prueba.
+
+  (c) NIVEL_DESEMPEÑO_PRUEBA @ PROGRAMA_ACÁDEMICO:
+      Proporción de estudiantes en cada nivel de desempeño (1–4)
+      para cada prueba, disponible a nivel de programa.
+
+DECISIÓN SOBRE PERCENTIL_PRUEBA:
+  Una cuarta capa, PERCENTIL_PRUEBA, existe en los datos crudos
+  pero está disponible únicamente a nivel de INSTITUCIÓN, no a
+  nivel de PROGRAMA_ACÁDEMICO. Cuando se intentó incluirla en
+  el pivot, el cruce produjo NaN en el 100% de las filas al
+  unir por (AÑO × ID_INSTITUCION × ID_PROGRAMA_ACAD ×
+  NOMBRE_PRUEBA). Por este motivo se excluyó formalmente:
+
+  >> EXCLUSIÓN FORMAL: PERCENTIL_PRUEBA no se incluye en el
+  >> modelo porque no está disponible a nivel de programa
+  >> académico en las fuentes ICFES 2020–2024. Incluirla
+  >> requeriría imputación masiva que introduciría sesgo
+  >> sistemático, dado que el percentil institucional no es
+  >> representativo del percentil del programa.
+
+ESTRATEGIA DE PIVOT:
+  El pivot se implementa en tres pasos con uniones explícitas:
+
+  Paso 1: Filtrar filas con MEDIDA_AGREGACION ==
+          "PUNTAJE_PRUEBA" y nivel "PROGRAMA_ACÁDEMICO".
+          Resultado: base wide con una fila por
+          (AÑO, ID_INSTITUCION, ID_PROGRAMA_ACAD, NOMBRE_PRUEBA).
+          Variables resultantes: PROMEDIO_PRUEBA, DESVIACION,
+          CANTIDADEVALUADOS, más metadatos de identificación.
+
+  Paso 2: Inner join con las filas de "PUNTAJE_GLOBAL" para
+          agregar PROMEDIO_GLOBAL (target). El inner join asegura
+          que solo se conservan programas con target disponible.
+
+  Paso 3: Left join con las filas de "NIVEL_DESEMPEÑO_PRUEBA"
+          para agregar NIVEL1, NIVEL2, NIVEL3, NIVEL4 (proporción
+          de estudiantes en cada nivel de desempeño).
+
+  Resultado final: 127,716 filas × 24 columnas antes de features.
+  Entidades únicas (institución × programa × prueba): 34,319.
+  Cobertura temporal: 48.3% de entidades presentes en los 5 años.
+
+3.3 Limpieza y reglas de calidad
+----------------------------------
+Se aplicaron las siguientes reglas (documentadas en
+outputs/reports/log_limpieza.txt):
+
+  C1 – Eliminación de filas con PROMEDIO_GLOBAL nulo:
+       El target nunca se imputa (regla R1 del pipeline).
+       Filas eliminadas: <1% del total.
+
+  C2 – Eliminación de años sin cobertura suficiente:
+       Se conservan solo años 2020–2024 con datos completos.
+
+  C3 – Imputación de DESVIACION (1.6% nulos):
+       Mediana agrupada por NBC + NOMBRE_PRUEBA. La desviación
+       estándar es un indicador de dispersión del grupo, no
+       del rendimiento individual, por lo que la imputación
+       grupal es metodológicamente sólida.
+
+  C4 – Imputación de NIVEL1-4 (4.7% nulos):
+       Mediana agrupada por NBC + NOMBRE_PRUEBA. Los niveles
+       de desempeño se imputan en grupo porque la distribución
+       de niveles varía sistemáticamente por área del conocimiento.
+
+  C5 – Codificación OHE de CATEGORIAPRUEBA:
+       Variable con 4 categorías (1=genérica, 2=específica,
+       3=genérica con módulo, 4=específica con módulo) transformada
+       en dos indicadores binarios: cat_prueba_1 y cat_prueba_34.
+
+3.4 Identificación y corrección de data leakage
+-------------------------------------------------
+Durante el desarrollo del pipeline se identificaron seis tipos
+de data leakage. Cada uno fue descubierto, documentado y
+corregido antes de continuar con el entrenamiento de modelos.
+
+TABLA 1. Tipos de data leakage identificados y corregidos
+-----------------------------------------------------------
+ # | Tipo de Leakage            | Variable(s)              | Impacto en R² | Corrección aplicada
+---|----------------------------|--------------------------|---------------|--------------------------------------------
+ 1 | Target encoding global     | te_nbc, te_nombre_prueba | R² inflado    | Mover TargetEncoder al interior del Pipeline
+   |                            | te_id_departamento       | ~0.22 puntos  | con cv=2; calcular solo sobre train en cada
+   |                            |                          |               | fold de TimeSeriesSplit. Eliminar columnas
+   |                            |                          |               | te_* del CSV de features.
+---|----------------------------|--------------------------|---------------|--------------------------------------------
+ 2 | Variable concurrente:      | PROMEDIO_PRUEBA          | R² inflado    | Eliminar como feature directo. Reemplazar
+   | puntaje de prueba mismo    | (valor año t)            | ~0.15 puntos  | solo por lag_1_promedio_prueba (valor t-1).
+   | año que el target          |                          |               |
+---|----------------------------|--------------------------|---------------|--------------------------------------------
+ 3 | Variable concurrente:      | DESVIACION               | Menor pero    | Excluir del modelo. Renombrar a columna
+   | desviación estándar del    | (valor año t)            | real          | "concurrent_*" en el CSV para distinguir
+   | puntaje del mismo año      |                          |               | features válidos de concurrentes.
+---|----------------------------|--------------------------|---------------|--------------------------------------------
+ 4 | Variable concurrente:      | NIVEL1, NIVEL2,          | Menor pero    | Renombrar a concurrent_prop_nivel*. Excluir
+   | niveles de desempeño del   | NIVEL3, NIVEL4           | real          | del modelo; documentar como features
+   | mismo año de evaluación    | (valores año t)          |               | "concurrent" no disponibles en inferencia.
+---|----------------------------|--------------------------|---------------|--------------------------------------------
+ 5 | Target leak directo en     | delta_1_global           | Leak directo: | Eliminar completamente. La variable se
+   | feature de diferencia:     | = PROMEDIO_GLOBAL(t)     | R²≈1.0 si no | definió como diferencia entre el target y
+   | diferencia incluía valor   | - lag_1_global(t-1)      | se detecta    | su lag, conteniendo el target mismo.
+   | del target actual          |                          |               |
+---|----------------------------|--------------------------|---------------|--------------------------------------------
+ 6 | Leakage temporal en        | tendencia_global         | R² inflado    | Reescribir con expanding window estricta:
+   | features de tendencia y    | tendencia_prueba         | ~0.10 puntos  | para año t, usar solo histórico t-1, t-2,
+   | volatilidad: incluían el   | desviacion_estandar_     |               | ... (shift(1).expanding()). La pendiente
+   | valor del año actual t     | historica                |               | OLS y la std se calculan sin incluir el
+   | en el cálculo              | coeficiente_variacion    |               | valor del año t.
+-----------------------------------------------------------
+Total impacto cuantificado (R² test, baseline Lasso):
+  ANTES de corrección:  R² ≈ 0.88 (con leakage)
+  DESPUÉS de corrección: R² = 0.658 (honest baseline)
+  Diferencia: Δ = 0.22 puntos → confirmación de que los
+  leakages eran reales y estadísticamente significativos.
+
+3.5 Split de evaluación
+------------------------
+Se utiliza un split temporal estricto:
+
+  Train: años 2020, 2021, 2022, 2023 → n = 98,954 filas
+  Test:  año 2024                    → n = 28,762 filas
+
+Este split respeta la asimetría causal del problema: los modelos
+solo acceden a información histórica para predecir el año futuro.
+No se usa validación cruzada temporal clásica (TimeSeriesSplit)
+para la evaluación final; sí se usa internamente en la búsqueda
+de hiperparámetros del Lasso/Ridge (tscv con n_splits=4).
+
+Justificación del split único sobre CV:
+  El dataset tiene solo 5 años. Con TimeSeriesSplit(n_splits=4),
+  el fold de validación más pequeño tendría 1 año de datos
+  (~20,000 filas), que es suficiente estadísticamente. Sin
+  embargo, el objetivo del paper es reportar desempeño en el
+  escenario de producción real: predecir 2024 dado todo 2020–2023.
+  El split único 2020–2023/2024 es el más representativo de ese
+  escenario.
+
+3.6 Métricas de evaluación
+---------------------------
+Las métricas principales son:
+  RMSE (Root Mean Squared Error): métrica primaria, en unidades
+    de PROMEDIO_GLOBAL (puntos Saber Pro). Penaliza errores
+    grandes, relevante para detectar programas con riesgo de
+    caída abrupta en rendimiento.
+  R² (coeficiente de determinación): métrica secundaria,
+    interpretable como proporción de varianza explicada.
+  MAE (Mean Absolute Error): métrica auxiliar, robusta a
+    outliers extremos (útil dado que el dataset tiene programas
+    con N=1 y PROMEDIO_GLOBAL anómalos).
+
+Métricas por subgrupo (NBC, departamento) se reportan para
+evaluar sesgo geográfico y por área del conocimiento.

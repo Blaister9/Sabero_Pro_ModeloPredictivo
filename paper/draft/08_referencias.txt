@@ -1,0 +1,96 @@
+8. REFERENCIAS
+================================================================
+Draft v1.0 | Motor Predictivo Saber Pro
+Edwin Santiago Paz Bedoya — Código 1071010
+================================================================
+
+[1] ICFES (2024). Resultados Saber Pro 2020–2024: bases de datos
+    de resultados por programa e institución. Instituto Colombiano
+    para la Evaluación de la Educación. Bogotá, Colombia.
+    Recuperado de https://www.icfes.gov.co/resultados/saber-pro-resultados
+
+[2] Chen, T., & Guestrin, C. (2016). XGBoost: A scalable tree
+    boosting system. Proceedings of the 22nd ACM SIGKDD International
+    Conference on Knowledge Discovery and Data Mining, 785–794.
+    https://doi.org/10.1145/2939672.2939785
+
+[3] Ke, G., Meng, Q., Finley, T., Wang, T., Chen, W., Ma, W.,
+    Ye, Q., & Liu, T.-Y. (2017). LightGBM: A highly efficient
+    gradient boosting decision tree. Advances in Neural Information
+    Processing Systems, 30, 3146–3154.
+
+[4] Akiba, T., Sano, S., Yanase, T., Ohta, T., & Koyama, M. (2019).
+    Optuna: A next-generation hyperparameter optimization framework.
+    Proceedings of the 25th ACM SIGKDD International Conference on
+    Knowledge Discovery and Data Mining, 2623–2631.
+    https://doi.org/10.1145/3292500.3330701
+
+[5] Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L.,
+    Gomez, A. N., Kaiser, L., & Polosukhin, I. (2017). Attention is
+    all you need. Advances in Neural Information Processing Systems,
+    30, 5998–6008.
+
+[6] Lundberg, S. M., & Lee, S.-I. (2017). A unified approach to
+    interpreting model predictions. Advances in Neural Information
+    Processing Systems, 30, 4765–4774.
+
+[7] Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V.,
+    Thirion, B., Grisel, O., Blondel, M., Prettenhofer, P., Weiss, R.,
+    Dubourg, V., Vanderplas, J., Passos, A., Cournapeau, D., Brucher, M.,
+    Perrot, M., & Duchesnay, E. (2011). Scikit-learn: Machine learning
+    in Python. Journal of Machine Learning Research, 12, 2825–2830.
+
+[8] Ministerio de Educación Nacional de Colombia (2023). Sistema de
+    Aseguramiento de la Calidad de la Educación Superior (SACES).
+    Lineamientos para la acreditación de alta calidad de programas
+    académicos. MEN. Bogotá, Colombia.
+
+[9] Guo, C., & Berkhahn, F. (2016). Entity embeddings of categorical
+    variables. arXiv preprint arXiv:1604.06737.
+
+[10] Gorishniy, Y., Rubachev, I., Khrulkov, V., & Babenko, A. (2021).
+     Revisiting deep learning models for tabular data. Advances in
+     Neural Information Processing Systems, 34, 18932–18943.
+
+[11] Grinsztajn, L., Oyallon, E., & Varoquaux, G. (2022). Why tree-
+     based models still outperform deep learning on tabular data.
+     Advances in Neural Information Processing Systems, 35, 507–520.
+
+[12] Shwartz-Ziv, R., & Armon, A. (2022). Tabular data: Deep learning
+     is not all you need. Information Fusion, 81, 84–90.
+     https://doi.org/10.1016/j.inffus.2021.11.011
+
+[13] Cerda, P., Varoquaux, G., & Kégl, B. (2018). Similarity encoding
+     for learning with dirty categorical variables. Machine Learning,
+     107(8–10), 1477–1494.
+
+[14] Hvitfeldt, E., & Silge, J. (2021). Supervised machine learning
+     for text analysis in R. Chapman & Hall/CRC.
+
+[15] Hastie, T., Tibshirani, R., & Friedman, J. (2009). The elements
+     of statistical learning: Data mining, inference, and prediction
+     (2nd ed.). Springer. https://doi.org/10.1007/978-0-387-84858-7
+
+[16] Rangel-Mora, J. C., & Pérez-Roa, A. (2021). Predicción del
+     rendimiento académico en pruebas Saber mediante técnicas de
+     minería de datos: revisión sistemática. Revista Colombiana de
+     Educación, 82, 1–24. https://doi.org/10.17227/rce.num82-11120
+
+[17] Paszke, A., Gross, S., Massa, F., Lerer, A., Bradbury, J.,
+     Chanan, G., Killeen, T., Lin, Z., Gimelshein, N., Antiga, L.,
+     Desmaison, A., Köpf, A., Yang, E., DeVito, Z., Raison, M.,
+     Tejani, A., Chilamkurthy, S., Steiner, B., Fang, L., Bai, J.,
+     & Chintala, S. (2019). PyTorch: An imperative style, high-
+     performance deep learning library. Advances in Neural Information
+     Processing Systems, 32, 8024–8035.
+
+================================================================
+NOTAS SOBRE REFERENCIAS
+================================================================
+Las referencias [11] y [12] son particularmente relevantes para
+justificar la selección de LightGBM sobre el Transformer:
+Grinsztajn et al. (2022) demuestran sistemáticamente que los
+modelos de boosting superan a las redes neuronales en datasets
+tabulares medianos (<100k muestras) cuando las features
+categóricas son importantes, exactamente el escenario de este
+trabajo.

@@ -1,0 +1,188 @@
+4. INGENIERÍA DE FEATURES
+================================================================
+Draft v1.0 | Motor Predictivo Saber Pro
+Edwin Santiago Paz Bedoya — Código 1071010
+================================================================
+
+4.1 Unidad de panel y estructura temporal
+------------------------------------------
+La entidad de panel se define como:
+  E = (ID_INSTITUCION, ID_PROGRAMA_ACAD, NOMBRE_PRUEBA)
+
+Esto resulta en 34,319 entidades únicas. Cada entidad tiene entre
+1 y 5 observaciones anuales (2020–2024). La distribución es:
+
+  1 año:  4,700 entidades (13.7%) — programas nuevos o eliminados
+  2 años: 3,912 entidades (11.4%)
+  3 años: 4,221 entidades (12.3%)
+  4 años: 4,901 entidades (14.3%)
+  5 años: 16,585 entidades (48.3%) — panel balanceado completo
+
+El 48.3% de entidades con 5 años completos valida que el dataset
+tiene suficiente historia para calcular features de rezago ricos.
+
+4.2 Categorías de features
+---------------------------
+Las features se organizan en cuatro grupos:
+
+  A. Features de rezago temporal (causal, leakage-free)
+  B. Features de tendencia histórica (expanding, leakage-free)
+  C. Features de volatilidad histórica (expanding, leakage-free)
+  D. Features de contexto y categorización (disponibles en t)
+
+4.3 Features de rezago (Grupo A)
+---------------------------------
+Los rezagos capturan el valor de las variables de desempeño
+en años anteriores, respetando la causalidad temporal estricta.
+
+  lag_1_promedio_global : PROMEDIO_GLOBAL del año t-1
+  lag_2_promedio_global : PROMEDIO_GLOBAL del año t-2
+  lag_1_promedio_prueba : PROMEDIO_PRUEBA del año t-1
+  lag_2_promedio_prueba : PROMEDIO_PRUEBA del año t-2
+
+Implementación:
+  df.groupby(ENTITY_COLS)["PROMEDIO_GLOBAL"].shift(1)
+  df.groupby(ENTITY_COLS)["PROMEDIO_GLOBAL"].shift(2)
+
+Los rezagos son NaN para el primer año de la entidad (lag_1) y
+para los primeros dos años (lag_2). El Imputer del Pipeline
+maneja estos valores usando la mediana del conjunto de train.
+
+Importancia metodológica:
+  PROMEDIO_PRUEBA del año t (valor concurrente) fue identificado
+  como leakage de tipo 2 (ver Tabla 1, Sección 3.4) porque
+  pertenece al mismo release anual del ICFES que PROMEDIO_GLOBAL.
+  En su lugar se usa únicamente lag_1_promedio_prueba (t-1).
+
+4.4 Features de tendencia histórica (Grupo B)
+----------------------------------------------
+La tendencia captura la dirección del cambio histórico del
+rendimiento del programa hasta el año t-1 (exclusive).
+
+Implementación (expanding OLS, sin incluir año t):
+  Para cada entidad e y año t:
+    hist_g = [PROMEDIO_GLOBAL(t-1), PROMEDIO_GLOBAL(t-2), ...]
+    tendencia_global(t) = pendiente OLS sobre hist_g
+
+    hist_p = [PROMEDIO_PRUEBA(t-1), PROMEDIO_PRUEBA(t-2), ...]
+    tendencia_prueba(t) = pendiente OLS sobre hist_p
+
+  La pendiente OLS se calcula con mínimos cuadrados sobre el
+  índice temporal {0, 1, ..., k-1} como variable independiente.
+  Si hist tiene menos de 2 puntos, la pendiente es NaN.
+
+CORRECCIÓN CRÍTICA aplicada:
+  En la implementación inicial, tendencia_global(t) incluía el
+  valor del año t en el cálculo (expanding window hasta t).
+  Esto constituye leakage de tipo 6 (ver Tabla 1). La corrección
+  consiste en aplicar shift(1) antes del expanding:
+
+    def expanding_slope(group):
+        # group ordenado cronológicamente
+        for i in range(len(group)):
+            hist = group["PROMEDIO_GLOBAL"].iloc[:i].dropna()
+            # iloc[:i] excluye el año i (año t actual)
+            slope = _ols_slope(hist)
+            ...
+
+  Esto garantiza que tendencia_global(t) solo usa información
+  disponible antes de t.
+
+4.5 Features de volatilidad histórica (Grupo C)
+------------------------------------------------
+La volatilidad captura la estabilidad histórica del programa.
+
+  desviacion_estandar_historica(t):
+    Desviación estándar de PROMEDIO_GLOBAL en años t-1, t-2, ...
+    Implementación: shift(1).expanding(min_periods=2).std()
+    NaN si el programa tiene < 2 años de historia antes de t.
+
+  coeficiente_variacion(t):
+    CV = desviacion_estandar_historica / media_historica
+    Captura la volatilidad relativa (normalizada por el nivel
+    de desempeño), útil para comparar programas de distintos
+    niveles de rendimiento absoluto.
+
+CORRECCIÓN CRÍTICA aplicada (leakage tipo 6):
+  La versión inicial calculaba std() incluyendo el año t:
+    expanding().std()  # INCORRECTO
+  La versión corregida excluye el año t:
+    shift(1).expanding(min_periods=2).std()  # CORRECTO
+
+4.6 Features de contexto (Grupo D)
+-------------------------------------
+Estas features están disponibles antes de los resultados del
+examen (no son concurrentes con el target):
+
+  log_cantidadevaluados:
+    log(1 + CANTIDADEVALUADOS). Transformación logarítmica para
+    reducir la asimetría de la distribución del tamaño de cohorte.
+    CANTIDADEVALUADOS es el número de estudiantes que presentarán
+    el examen; esta información está disponible antes de que el
+    ICFES publique resultados.
+
+  AÑO:
+    Año calendario (2020–2024). Captura la tendencia temporal
+    global del sistema educativo colombiano (efectos de pandemia,
+    reformas curriculares, etc.).
+
+  cat_prueba_1 (0/1): CATEGORIAPRUEBA == 1 (prueba genérica)
+  cat_prueba_34 (0/1): CATEGORIAPRUEBA in {3, 4} (con módulo)
+    Variables OHE de la categoría de prueba. Capturan si la
+    prueba es genérica o específica, lo que correlaciona con
+    el nivel de especialización del programa.
+
+4.7 Variables categóricas con TargetEncoder (dentro del Pipeline)
+------------------------------------------------------------------
+Las variables de alta cardinalidad se codifican con TargetEncoder:
+
+  NBC (Núcleo Básico del Conocimiento): 56 categorías
+    Captura el área del conocimiento (ej. EDUCACIÓN, MEDICINA).
+    Es la variable de mayor importancia predictiva: el área del
+    conocimiento determina la dificultad relativa de las pruebas
+    Saber Pro (las pruebas de Medicina tienen escalas distintas
+    a las de Administración).
+
+  NOMBRE_PRUEBA: 47 categorías
+    Captura la prueba específica (ej. INGLÉS, LECTURA CRÍTICA).
+    Escala y distribución varía significativamente entre pruebas.
+
+  ID_DEPARTAMENTO: variable numérica tratada como categórica
+    Captura efectos geográficos (brechas regionales en calidad
+    educativa entre departamentos como Bogotá vs. Chocó).
+
+Implementación sin leakage:
+  El TargetEncoder se instancia dentro del sklearn Pipeline,
+  garantizando que el encoding se calcula solo con los datos
+  de train (o del fold de train en CV). Parámetros: smooth="auto",
+  cv=2, random_state=42.
+
+4.8 Variables excluidas explícitamente del modelo
+--------------------------------------------------
+  PROMEDIO_PRUEBA (año t):  concurrente con target (Leakage tipo 2)
+  DESVIACION      (año t):  concurrente con target (Leakage tipo 3)
+  NIVEL1-4        (año t):  concurrentes con target (Leakage tipo 4)
+  concurrent_prop_nivel*:   derivadas de NIVEL1-4, excluidas
+  delta_1_global:           eliminada (Leakage tipo 5, target leak)
+  PERCENTIL_PRUEBA:         no disponible a nivel de programa (Sección 3.2)
+
+Todas las variables "concurrent_*" se conservan en el CSV de
+features para referencia y análisis exploratorio posterior, pero
+no se pasan al modelo.
+
+4.9 Resumen de features del modelo final
+-----------------------------------------
+  Numéricas (10):
+    lag_1_promedio_global, lag_2_promedio_global
+    lag_1_promedio_prueba, lag_2_promedio_prueba
+    tendencia_global, tendencia_prueba
+    desviacion_estandar_historica, coeficiente_variacion
+    log_cantidadevaluados, AÑO
+
+  Categóricas con TargetEncoder (3):
+    NBC, NOMBRE_PRUEBA, ID_DEPARTAMENTO
+
+  OHE binarias (2):
+    cat_prueba_1, cat_prueba_34
+
+  TOTAL: 15 features de entrada al pipeline.

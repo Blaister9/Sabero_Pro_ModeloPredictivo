@@ -1,0 +1,67 @@
+======================================================================
+LOG DE LIMPIEZA — SABER PRO
+Generado: 2026-04-13 15:01:49
+======================================================================
+
+Filas post-pivot (pre-limpieza): 127,716
+Nivel de agregación elegido    : PROGRAMA_ACÁDEMICO
+Justificación                  : Es el nivel más granular que contiene
+                                 ID_INSTITUCION e ID_PROGRAMA_ACAD,
+                                 permitiendo modelar a nivel programa.
+
+C1 — Eliminadas sin evaluados (CE=0 o nulo): 0 (0.00%)
+C2 — Eliminadas por PROMEDIO_GLOBAL nulo : 0
+C2 — Eliminadas por PROMEDIO_PRUEBA nulo : 0
+C2 — Total eliminadas (targets nulos)    : 0 (0.00%)
+     NOTA: targets NUNCA imputados (Regla R2)
+
+C3 — Métricas secundarias (filas conservadas, columnas con nulos):
+  DESVIACION               : 1,987 nulos (1.6%) — fila conservada
+  NIVEL1                   : 5,967 nulos (4.7%) — fila conservada
+  NIVEL2                   : 5,967 nulos (4.7%) — fila conservada
+  NIVEL3                   : 5,967 nulos (4.7%) — fila conservada
+  NIVEL4                   : 5,967 nulos (4.7%) — fila conservada
+  Estrategia: imputación por mediana de grupo (NBC + NOMBRE_PRUEBA) en Fase 3
+
+C4 — Eliminados duplicados exactos: 0 (0.00%)
+     Clave de unicidad: ['AÑO', 'ID_INSTITUCION', 'ID_PROGRAMA_ACAD', 'NOMBRE_PRUEBA']
+
+C5 — Normalización de tipos:
+  CANTIDADEVALUADOS      → Int64
+  PROMEDIO_GLOBAL/PRUEBA → float64
+  NIVEL1-4, DESVIACION   → float64
+  IDs numéricos          → str (uso categórico)
+  Columnas de texto      → strip + upper
+
+======================================================================
+RESUMEN DE LIMPIEZA
+======================================================================
+Filas post-pivot (pre-limpieza) : 127,716
+Eliminadas C1 (sin evaluados)   : 0 (0.00%)
+Eliminadas C2 (target nulos)    : 0 (0.00%)
+Eliminadas C4 (duplicados)      : 0 (0.00%)
+Filas finales                   : 127,716 (100.0% del post-pivot)
+
+Columnas del dataset limpio     : 24
+Columnas: ['AÑO', 'ID_PAIS', 'ID_REGION', 'NOMBRE_REGION', 'ID_DEPARTAMENTO', 'NOMBRE_DEPARTAMENTO', 'ID_MUNICIPIO', 'NOMBRE_MUNICIPIO', 'ID_INSTITUCION', 'NOMBRE_INSTITUCION', 'ID_NBC', 'NBC', 'ID_PROGRAMA_ACAD', 'NOMBRE_PROGRAMA_ACAD', 'NOMBRE_PRUEBA', 'CATEGORIAPRUEBA', 'CANTIDADEVALUADOS', 'PROMEDIO_PRUEBA', 'DESVIACION', 'PROMEDIO_GLOBAL', 'NIVEL1', 'NIVEL2', 'NIVEL3', 'NIVEL4']
+
+── DECISIÓN DE NIVEL DE AGREGACIÓN ──
+Nivel elegido: PROGRAMA_ACÁDEMICO
+
+Justificación metodológica:
+  El nivel PROGRAMA_ACÁDEMICO es el más granular que simultáneamente:
+  (a) contiene ID_INSTITUCION e ID_PROGRAMA_ACAD (identificadores únicos del programa),
+  (b) tiene PUNTAJE_GLOBAL disponible (target del modelo),
+  (c) tiene PUNTAJE_PRUEBA por prueba (features de desempeño específico),
+  (d) tiene NIVEL_DESEMPEÑO_PRUEBA para distribución de niveles.
+
+  Otros niveles excluidos y razón:
+  - PAIS, REGION, DEPARTAMENTO, MUNICIPIO: demasiado agregados, pierden
+    identidad de institución y programa.
+  - NBC_INSTITUCION, NBC_SEDE: agrupan múltiples programas bajo el mismo
+    Núcleo Básico del Conocimiento, perdiendo granularidad de programa.
+  - SEDE: subunidad de institución, puede duplicar información.
+  - INSTITUCION: no discrimina por programa académico.
+
+  PERCENTIL_PRUEBA: no disponible al nivel PROGRAMA_ACÁDEMICO → excluido del pivot.
+  NIVEL5: 99.42% nulos en todo el dataset → excluido.
