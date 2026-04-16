@@ -1,0 +1,357 @@
+================================================================
+DIAGNÓSTICO DE REVISIÓN — PAPER SABER PRO
+Revisor: Nivel IEEE Trans. Learning Technologies / Computers & Education (Q1)
+Fuente revisada: C:/Users/edwin.paz/Downloads/saber_pro_paper_final.docx
+Cross-reference: paper/draft/01..08_*.txt
+Fecha: 2026-04-16
+================================================================
+
+OBSERVACIÓN GLOBAL
+------------------
+El paper tiene una base técnica sólida: las contribuciones están
+claramente enumeradas (C1-C5, TF1-TF6), los resultados son coherentes
+entre tablas y narrativa, y las figuras están correctamente referenciadas.
+La crítica metodológica (leakage, split temporal, justificación de
+modelos) es el principal activo académico y debe preservarse.
+Los problemas son mayoritariamente de ESCRITURA (densidad nominal,
+pasivas, oraciones largas, typos) y de ARGUMENTACIÓN (afirmaciones
+sin respaldo, related works superficial). No hay errores técnicos
+de fondo que requieran rehacer experimentos.
+
+
+================================================================
+A. LOS 10 PROBLEMAS MÁS GRAVES DE ESCRITURA
+================================================================
+
+P1 — TYPOS Y ERRORES DE IDIOMA (crítico para Q1)
+     - "resultou" (III-B) → lusitanismo; debe ser "resultó".
+     - "literalémente" (III-C) → "literalmente".
+     - "focalalización" (VI-E) → "focalización".
+     - "hipotesis" (VI-D) → "hipótesis" (tilde).
+     - Em-dashes inconsistentes con espacios: "—ambos cumplidos".
+     - Mayúsculas en "Acreditación de Alta Calidad (CNA)": CNA ya se
+       explica implícitamente; considerar "alta calidad (CNA)".
+     Impacto: un revisor Q1 rechaza en primera lectura por calidad idiomática.
+
+P2 — ABSTRACT SOBRECARGADO Y CON DENSIDAD NOMINAL
+     El abstract del docx tiene UNA sola oración de 72 palabras (la primera)
+     y 6 oraciones totales en 237 palabras, pero encadena cifras
+     (1.73M filas, ΔR²=0.22, 15 features, 4 modelos, 7.4%) sin jerarquía.
+     "El principal desafío metodológico fue la transformación del formato
+     long nativo a un esquema wide mediante pivot de tres capas…" →
+     tres nominalizaciones seguidas ("transformación", "pivot", "capas").
+     Debe reescribirse ~250 palabras con jerarquía: problema → método →
+     resultado → implicación.
+
+P3 — ORACIONES >45 PALABRAS (violación de R3)
+     Mínimo 6 oraciones exceden el umbral R3. Muestras:
+     (a) Abstract §1: 72 palabras.
+     (b) II. Trabajos Relacionados §1: "Para Saber 11, Caicedo et al. [16]
+         aplicaron… para PISA 2015→2018 en 13 países, Acıslı-Celik et al.
+         [40] obtuvieron R² entre 0.61 y 0.74 en regresión." (~60 palabras
+         en cadena de sujetos distintos).
+     (c) VII-A §1: "Cuatro factores cuantificables explican…" (bien
+         estructurado con enumeración, pero la oración de cierre alcanza
+         ~48 palabras).
+     (d) IV-B "La Fig. 4 muestra…" + "Los lags dominan (r=0.84)…"
+         encadena tres ideas sin punto.
+     (e) Introducción §1: una oración describe ICFES, PROMEDIO_GLOBAL,
+         MEN, CNA, fomento y comparación regional en ~55 palabras.
+     (f) III-A §1: enumeración de 5 años con cifras dentro de paréntesis
+         rompe flujo (~50 palabras).
+
+P4 — VOZ PASIVA Y "SE" IMPERSONAL EXCESIVO (R2)
+     El paper contiene ~27 formas pasivas impersonales del tipo
+     "Se construyeron / Se compararon / Se identificaron / Se utilizó /
+     Se reportan / Fue evaluado / Fue seleccionado". Este patrón es
+     típico en escritura hispánica académica, pero en inglés técnico
+     (y en español Q1 moderno) debe reducirse a <10 ocurrencias y
+     preferir sujeto activo: "El pipeline construye 15 features…",
+     "LightGBM alcanza RMSE=9.33…", "El split temporal separa…".
+
+P5 — NOMINALIZACIONES ENCADENADAS (R1)
+     Ejemplos representativos:
+     - "la publicación retrospectiva de los resultados impide la
+        identificación anticipada de programas en riesgo" (3 en 16 palabras).
+     - "la activación del Transformer está condicionada a…"
+        → "El Transformer se activa si…" o mejor: "se activa cuando…".
+     - "la selección de α mediante TimeSeriesSplit"
+        → "RidgeCV selecciona α usando TimeSeriesSplit…".
+     - "la construcción de features" (sec IV) → "Construir features…".
+     Regla: reemplazar *-ción / *-miento por verbos finitos cuando el
+     agente existe y es relevante.
+
+P6 — CITACIONES INFORMALES Y HUÉRFANAS EN RELATED WORKS
+     - "Freitas et al. [EDM 2020]" → cita no normalizada; debe
+       incorporarse a la bibliografía con número IEEE.
+     - "[40]" y "[29]" aparecen en II pero NO figuran en la lista de
+       referencias (va de [1] a [19]). Es un fallo de consistencia que
+       un revisor Q1 detecta con un scan automático.
+     - [2] Chen & Guestrin (XGBoost) aparece en bibliografía pero no se
+       cita en el cuerpo → referencia huérfana al revés.
+     - [7] Romero & Ventura y [8] Behr se citan en bloque sin comparar
+       resultados numéricos con el presente trabajo.
+     - [10] Gorishniy, [13] Pedregosa, [14] Paszke, [15] MEN, [16]
+       Rangel-Mora, [17] Guo-Berkhahn, [18] Cerda, [19] Hastie → no
+       aparecen en ninguna cita del cuerpo o son de citación dudosa.
+
+P7 — REDUNDANCIAS Y MULETILLAS
+     - "seis tipos de fuga de información (data leakage)" → repetir
+       el término traducido y en paréntesis en cada sección (≥5 veces).
+     - "modelo definitivo" y "modelo principal" usados indistintamente
+       para LightGBM (inconsistente).
+     - "cabe destacar que", "es importante mencionar", "notablemente" y
+       "exactamente el escenario de este trabajo" son rellenos.
+     - "en la comparativa de modelos" repetido 3 veces en sec VII.
+
+P8 — PÁRRAFOS SIN CONECTORES ARGUMENTATIVOS (R6)
+     El paper enumera hallazgos pero rara vez los enlaza con "por
+     consiguiente", "en consecuencia", "lo anterior implica", "esto se
+     debe a". Ejemplo crítico: el salto de III-D (split) a IV-A
+     (cobertura) es abrupto; no explica POR QUÉ las 15 features importan
+     dados el split y las 34,319 entidades.
+     Igual problema: conclusión §2 (C2) no conecta con §3 (C3); se
+     presentan como bullets aislados.
+
+P9 — AFIRMACIONES SIN ATRIBUCIÓN DE IMPACTO
+     - "ΔR² ≈ 0.22 puntos" se cita sin explicar CÓMO se midió cada
+       contribución individual (L1=0.22 sería el total, pero la tabla
+       también asigna 0.22 a L1 y 0.15 a L2; los impactos se solapan).
+     - "7.4%" de mejora sobre Lasso no se somete a test estadístico
+       (bootstrap CI o Diebold-Mariano).
+     - "~71% de la varianza" (sec VII-C) → parafrasea R² sin matizar
+       que es R² out-of-time, no R² poblacional.
+     - "el sistema anticipa…" es una afirmación de despliegue que no
+       se valida con una métrica de utilidad educativa.
+
+P10 — ESTRUCTURA: SECCIÓN VIII "ARQUITECTURA DEL SOFTWARE"
+     Aparece entre Discusión y Conclusiones, posición inusual para un
+     Q1 educativo. Convención IEEE TLT/C&E: software/reproducibilidad
+     va como apéndice o como subsección de Metodología. Además duplica
+     contenido que ya está en III-A / IV-B. Debe fusionarse con III o
+     moverse a apéndice, acortando a un párrafo.
+
+
+================================================================
+B. AFIRMACIONES QUE NECESITAN RESPALDO ADICIONAL
+================================================================
+
+S1 — "No existe a la fecha un sistema de predicción abierto que opere
+      sobre los datos públicos del ICFES a nivel de programa"
+      (Introducción §3). Afirmación de "research gap" sin evidencia:
+      añadir búsqueda sistemática en Scopus/WoS con cadena de
+      búsqueda y fecha de corte, y citar al menos un repositorio que
+      sí haya intentado predicción a nivel individual (p.ej., [16]).
+
+S2 — "ΔR² total = 0.22" como contribución C2.
+      Problema: la tabla suma impactos aproximados (0.22 + 0.15 + 0.10
+      > 0.22). Aclarar que los impactos NO son aditivos porque las
+      correcciones se aplicaron secuencialmente y algunos leakages
+      compartían varianza explicada. Reportar ΔR² por corrección
+      en orden de aplicación con baseline a inflado reportado.
+
+S3 — "Los NBCs con menor estabilidad inter-anual son más difíciles
+      de predecir" (VI-D) — hipótesis, no resultado. Aportar métrica
+      de volatilidad (CV del PROMEDIO_GLOBAL por NBC) y correlacionar
+      con RMSE de la Tabla III. Sin eso es una racionalización ex post.
+
+S4 — "Consistente con Grinsztajn [11] y Shwartz-Ziv [12]" (VII-A).
+      Actualmente es una apelación a autoridad. Debe detallarse QUÉ
+      condiciones de [11][12] se replican aquí: tamaño tabular, ratio
+      features/samples, cardinalidad categórica, ruido en features.
+
+S5 — "Las predicciones de confianza MEDIA obtienen RMSE≈9.1 vs 11.4
+      para BAJA, confirmando que los flags son informativos" (VI-G).
+      El diferencial de 2.3 puntos en RMSE no se testea contra
+      hipótesis nula (bootstrap CI). Un revisor Q1 pide al menos un
+      CI95 o un test de diferencia de medias de error.
+
+S6 — "~71% de la varianza" como implicación de política (VII-C).
+      Falta cuantificar CUÁL es el umbral de "R² útil" para
+      intervención educativa. ¿R²=0.70 basta para focalizar? El
+      paper debería citar un estándar o argumentar con un caso de uso.
+
+S7 — "El pipeline es reproducible en ~15 min CPU" (VIII-B) —
+      reportar specs del CPU de referencia (cores, RAM, modelo).
+
+S8 — "Sin Clasificar" como NBC con RMSE=17.76 (VI-D).
+      ¿Qué categorías agrupa? Si son programas sin clasificación oficial
+      del MEN, aclarar; de otro modo parece un dumpster categórico.
+
+S9 — Transformer: "51.7% padded con ceros" como explicación del fallo.
+      Demostrar con ablation: entrenar Transformer SOLO sobre entidades
+      con ≥4 años (sin padding dominante) y reportar métrica. Sin eso
+      la hipótesis queda como conjetura.
+
+S10 — Abstract reclama "pipeline completo reproducible" → SHA256 del
+      modelo final, hash del dataset, versiones exactas de dependencias.
+      Actualmente solo se referencia el repo GitHub.
+
+
+================================================================
+C. SECCIONES QUE ESTÁN BIEN — NO TOCAR (o retoque mínimo)
+================================================================
+
+OK-1   III-B "Hallazgo del Formato Long" — argumentación técnica
+       sólida; el descubrimiento de MEDIDA_AGREGACION como discriminador
+       es el aporte metodológico central y está bien narrado.
+       Retoque mínimo: corregir "resultou" → "resultó".
+
+OK-2   Tabla I — Catálogo de leakage. Es el activo más diferenciador
+       del paper. Solo retocar el texto circundante; la tabla queda igual.
+
+OK-3   Tabla II — Comparativa de los 4 modelos. Formato correcto,
+       cifras coherentes con drafts y CHANGELOG (Ridge 10.2294, Lasso
+       10.0722, LightGBM 9.3293, Transformer 16.7917).
+
+OK-4   Sec IV-B — Descripción de los 4 grupos de features (A-D).
+       Enumeración clara. Solo convertir pasivas a activas.
+
+OK-5   Tabla IV — Distribución de flags de confianza. La estructura
+       es correcta y la tabla habla por sí sola.
+
+OK-6   Conclusiones C1-C5 como LISTA. El contenido es correcto;
+       solo hay que reordenar (empezar por hallazgo → implicación),
+       promover C2 como contribución primaria, y conectar con transiciones.
+
+OK-7   Trabajo futuro TF1-TF6. Lista concreta, accionable, bien
+       priorizada. No tocar contenido; solo consolidar en prosa breve
+       si el revisor pide reducción de espacio.
+
+OK-8   Referencias [1], [3], [4], [5], [6], [9], [11], [12] —
+       núcleo bibliográfico coherente con el cuerpo; NO retirar.
+
+
+================================================================
+D. PLAN DE REVISIÓN SECCIÓN POR SECCIÓN
+================================================================
+
+TÍTULO — Sin cambio. Mantiene longitud IEEE adecuada y cubre los
+        cinco descriptores clave (Saber Pro, panel, 2020-2024,
+        LightGBM, leakage-free).
+
+ABSTRACT (español)
+        Reescribir a ~250 palabras con este esqueleto:
+        (1) Contexto+problema (2 oraciones, ≤25 palabras c/u).
+        (2) Método: pivot 3-layer + 6 leakages corregidos + 15
+            features + split temporal (2 oraciones).
+        (3) Resultados: 4 modelos con tabla mental implícita;
+            destacar LightGBM R²=0.706 y mejora 7.4% (2 oraciones).
+        (4) Aporte metodológico (leakage catalog como contribución
+            generalizable) + módulo de inferencia con 3 flags
+            (1 oración cada uno).
+        (5) Reproducibilidad y disponibilidad (1 oración de cierre).
+        Aplicar R1-R5 estrictamente. Eliminar "principal desafío
+        metodológico" y "modelo definitivo".
+
+I. INTRODUCCIÓN
+        - Cortar oración §1 en 2. Activar voz: "El ICFES publica
+          los resultados varios meses después…".
+        - §3 (research gap): añadir S1 (respaldo de búsqueda
+          sistemática) o suavizar el lenguaje.
+        - Mover contribuciones a bullets con un verbo activo al inicio
+          de cada uno ("Documentamos…", "Construimos…").
+
+II. TRABAJOS RELACIONADOS
+        - Reescribir COMPLETAMENTE. Estructura objetivo:
+          (a) §1: EDM individual en América Latina (Saber 11,
+              ENEM, Ser Bachiller) — MÉTRICAS reportadas + LIMITACIÓN.
+          (b) §2: Predicción agregada institucional — qué falta
+              (nuestro nicho).
+          (c) §3: Leakage en panel temporal — citar [9] Kaufman
+              explícitamente como gap que este trabajo llena.
+          (d) §4: Tabular deep learning — [10][11][12] JUSTIFICAN
+              la elección de LightGBM, no solo explican.
+        - Mover [11][12] de sec VII-A a sec II (§4) como parte del
+          argumento de por qué elegimos LightGBM antes de hacer
+          experimentos (evita ex-post rationalization).
+        - Renumerar [EDM 2020], [40], [29] a citas IEEE estándar
+          y añadirlas a la bibliografía.
+        - Retirar referencias huérfanas [2][10][13][14][17][18][19]
+          si no se incorporan citas en el cuerpo; o añadir sus
+          citas donde corresponde.
+
+III. DATOS Y METODOLOGÍA
+        - III-A: reducir densidad de paréntesis; ubicar cifras
+          anuales en una mini-tabla.
+        - III-B: corregir "resultou"→"resultó", "literalémente"→
+          "literalmente". Añadir J1 (justificación inner join vs
+          outer join con efecto en N).
+        - III-C: clarificar que ΔR² por leakage es secuencial, no
+          aditivo (S2).
+        - III-D: añadir J2 (por qué split temporal 2020-2023 vs
+          k-fold temporal), J3 (por qué mediana vs media en imputación).
+
+IV. INGENIERÍA DE FEATURES
+        - IV-A: sin cambios fuertes; retocar pasivas.
+        - IV-B: convertir descripción de 4 grupos a texto activo
+          ("El pipeline calcula…"). Añadir una línea sobre por qué
+          log_cantidadevaluados vs cantidadevaluados crudo.
+
+V. MODELOS Y ESTRATEGIA DE EVALUACIÓN
+        - V-B: añadir J4 (por qué Optuna 50 trials y no 100/200 —
+          saturación empírica del mejor trial).
+        - V-C: añadir J5 con jerarquía de factores que predijeron
+          el fallo del Transformer ANTES del experimento: (i) tamaño
+          efectivo, (ii) categóricas, (iii) padding, (iv) varianza.
+
+VI. RESULTADOS
+        - VI-A: añadir CI95 bootstrap para RMSE de cada modelo (S5).
+        - VI-D: aportar métrica de volatilidad por NBC para respaldar
+          la hipótesis de VI-D (S3).
+        - VI-E: corregir "focalalización"→"focalización". Evitar
+          la interpretación causal de la correlación error–desarrollo.
+        - VI-F: añadir ablación sobre entidades con ≥4 años de
+          historia (S9) o declarar que es trabajo futuro.
+        - VI-G: reportar CI95 del diferencial MEDIA vs BAJA (S5).
+
+VII. DISCUSIÓN
+        - VII-A: mover [11][12] a II (coherencia con reescritura);
+          conservar aquí las condiciones replicadas (S4).
+        - VII-B: limitaciones bien enumeradas; añadir L6 sobre
+          "Sin Clasificar" como bolsillo categórico (S8).
+        - VII-C: suavizar "anticipa el ~71%" a "explica ~71% de la
+          varianza out-of-time" y contextualizar S6.
+
+VIII. ARQUITECTURA DEL SOFTWARE
+        Decisión: FUSIONAR con III-A (un párrafo de 4 líneas) y
+        convertir el resto en apéndice A "Reproducibilidad", con
+        tabla de specs del CPU (S7) y referencia al repo + SHA256
+        del .pkl (S10).
+
+IX. CONCLUSIONES
+        - Reordenar: cada Cx empieza con el HALLAZGO, no con la
+          descripción del método.
+        - Promover C2 (catálogo de leakage) como PRIMERA conclusión
+          y señalarla como contribución transferible más allá de
+          Saber Pro.
+        - Unir las conclusiones con 1-2 oraciones de síntesis de
+          cierre antes de Trabajo Futuro.
+
+AGRADECIMIENTOS + REFERENCIAS
+        Añadir numerales romanos faltantes (X., XI.). Normalizar
+        todas las referencias a formato IEEE. Verificar que cada
+        referencia esté citada en el cuerpo y viceversa.
+
+
+================================================================
+E. CONSISTENCIA — CHECKLIST PRELIMINAR (a cerrar en STEP 6)
+================================================================
+
+[ ] RMSE/MAE/R² idénticos en Abstract, Tabla II y conclusiones:
+    Ridge 10.23/7.30/0.647 | Lasso 10.07/7.06/0.658(ó 0.657) |
+    LightGBM 9.33/6.21/0.706 | Transformer 16.79/-/0.048.
+    NOTA: draft dice Lasso R²=0.657; docx dice 0.6575; CHANGELOG
+    0.6575. Fijar a 0.658 (redondeo a 3 decimales, consistente).
+[ ] N_train=98,954 y N_test=28,762 coherentes en todo el paper.
+[ ] 34,319 entidades, 48.3% con 5 años, lag_1 en 86.3% consistentes.
+[ ] Referencias numeradas [1]..[N] sin huecos ni huérfanas.
+[ ] Todas las figuras Fig. 1..10 referenciadas en texto.
+[ ] Todas las tablas I..IV referenciadas en texto.
+[ ] Ninguna oración >45 palabras tras R3.
+[ ] Abstract ≤280 palabras (objetivo 250).
+
+
+================================================================
+FIN DEL DIAGNÓSTICO — LISTO PARA STEP 2
+================================================================
