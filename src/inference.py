@@ -1,22 +1,69 @@
-"""
-src/inference.py
-Módulo de inferencia para el Motor Predictivo Saber Pro.
-Fase 7 del pipeline — Edwin Santiago Paz Bedoya (1071010)
+"""Inference module for the Saber Pro Predictive Engine.
 
-Funciones principales:
-    load_model(model_path)          → carga el pipeline LightGBM serializado
-    predict_institution(...)        → predicciones por institución/programa
-    predict_batch(df, model)        → predicciones en lote sobre un DataFrame
-    build_inference_row(...)        → construye una fila de features para un
-                                      programa+prueba+año nuevos
+This module implements Phase 7 of the Saber Pro predictive pipeline.  It
+provides the production-facing API for generating ``PROMEDIO_GLOBAL``
+predictions from the trained LightGBM pipeline serialised during Phase 5.
 
-Reglas de confianza:
-    BAJA_CONFIANZA_MUESTRA_PEQUEÑA = True  cuando CANTIDADEVALUADOS < 5
-    BAJA_CONFIANZA_SIN_HISTORIAL   = True  cuando no hay lag_1 disponible
-    BAJA_CONFIANZA_EXTRAPOLACION   = True  cuando AÑO > max(año visto en train)
+Three usage patterns are supported:
 
-El resultado de predict_institution() es siempre un dict estructurado con
-la predicción, los flags de confianza y metadatos explicativos.
+1. **Single-entity prediction** (``predict_institution``): generates a
+   fully-structured result dictionary for one program-exam-year combination,
+   including the predicted score, three confidence flags, and an audit trail
+   of the feature values used.  Intended for interactive dashboards or REST
+   API endpoints.
+
+2. **Batch prediction** (``predict_batch``): applies the trained pipeline to
+   a DataFrame with the required feature columns and appends prediction and
+   confidence columns.  Intended for scoring large cohorts at once.
+
+3. **Feature row construction** (``build_inference_row``): translates raw
+   institutional inputs (NBC, exam name, year, cohort size, historical scores)
+   into a one-row DataFrame with exactly the columns the sklearn Pipeline
+   expects.  All unknown feature values can be left as ``None``; they will
+   be imputed by the ``SimpleImputer(strategy="median")`` step inside the
+   Pipeline.
+
+Confidence assessment is based on three independent flags:
+
+- ``BAJA_CONFIANZA_MUESTRA_PEQUEÑA``: ``CANTIDADEVALUADOS < 5``.  Programmes
+  with very small cohorts have highly variable mean scores that are sensitive
+  to individual outliers (documented in ``analisis_outliers.txt``).
+- ``BAJA_CONFIANZA_SIN_HISTORIAL``: ``lag_1_promedio_global`` is null.
+  The model's strongest feature is the prior-year score; without it the
+  pipeline falls back to median imputation and accuracy degrades substantially.
+- ``BAJA_CONFIANZA_EXTRAPOLACION``: ``AÑO > 2023`` (the last training year).
+  Predictions for years beyond the training horizon may be inaccurate if the
+  higher-education system changes materially.
+
+Usage example::
+
+    from src.inference import load_model, predict_institution, format_prediction_report
+
+    model = load_model("outputs/lgbm_model.pkl")
+
+    result = predict_institution(
+        model=model,
+        año=2025,
+        nbc="INGENIERIA",
+        nombre_prueba="RAZONAMIENTO CUANTITATIVO",
+        id_departamento="11",
+        cantidadevaluados=120,
+        lag_1_promedio_global=158.4,
+        lag_2_promedio_global=155.0,
+        tendencia_global=1.7,
+        nombre_institucion="UNIVERSIDAD NACIONAL",
+        nombre_programa="INGENIERIA DE SISTEMAS",
+    )
+
+    print(format_prediction_report(result))
+
+Warning:
+    The pipeline expects features produced by Phase 3 (``features.build_features``).
+    Passing raw or partially-engineered data to ``predict_batch`` will cause
+    incorrect predictions or KeyErrors.  Always ensure that log-transformed
+    cohort size (``log_cantidadevaluados``), lag features, and OHE columns
+    (``cat_prueba_1``, ``cat_prueba_34``) are present or will be constructed
+    by ``build_inference_row``.
 """
 
 from __future__ import annotations
@@ -34,8 +81,22 @@ warnings.filterwarnings("ignore")
 
 # ── Constantes ────────────────────────────────────────────────────────────────
 
-UMBRAL_MUESTRA_PEQUENA = 5      # CANTIDADEVALUADOS < 5 → baja confianza
-MAX_AÑO_TRAIN          = 2023   # Último año del conjunto de entrenamiento
+UMBRAL_MUESTRA_PEQUENA = 5
+"""int: Minimum ``CANTIDADEVALUADOS`` before triggering the small-sample flag.
+
+Programmes with fewer than 5 evaluated students have ``PROMEDIO_GLOBAL``
+values that are highly sensitive to individual outlier scores.  A threshold
+of 5 was chosen based on the outlier analysis documented in
+``outputs/analisis_outliers.txt``.
+"""
+
+MAX_AÑO_TRAIN = 2023
+"""int: Last year included in the training set.
+
+Predictions for years beyond this value trigger the temporal extrapolation
+flag.  The model was trained on data from 2020 through 2023 with 2024 as the
+held-out test set.
+"""
 
 # Columnas que el pipeline LightGBM espera como entrada
 NUMERIC_COLS = [
@@ -45,10 +106,21 @@ NUMERIC_COLS = [
     "desviacion_estandar_historica", "coeficiente_variacion",
     "log_cantidadevaluados",  "AÑO",
 ]
+"""list[str]: Numeric feature columns expected by the LightGBM Pipeline.
+
+These are the same columns defined in ``NUMERIC_FEATURE_COLS`` in
+``models/baseline.py``.  They are duplicated here so the inference module
+has no import dependency on the training modules.
+"""
+
 CAT_COLS = ["NBC", "NOMBRE_PRUEBA", "ID_DEPARTAMENTO"]
+"""list[str]: Categorical columns processed by the TargetEncoder inside the Pipeline."""
+
 OHE_COLS = ["cat_prueba_1", "cat_prueba_34"]
+"""list[str]: One-hot encoded columns derived from ``CATEGORIAPRUEBA`` in Phase 3."""
 
 ALL_FEATURE_COLS = NUMERIC_COLS + CAT_COLS + OHE_COLS
+"""list[str]: Complete ordered list of feature columns the trained Pipeline expects."""
 
 # Mapeo de CATEGORIAPRUEBA a columnas OHE (derivado de Fase 3)
 # cat_prueba_1 = CATEGORIAPRUEBA == 1, cat_prueba_34 = CATEGORIAPRUEBA in {3,4}
@@ -58,22 +130,35 @@ CATEGORIA_TO_OHE = {
     3:  {"cat_prueba_1": 0, "cat_prueba_34": 1},
     4:  {"cat_prueba_1": 0, "cat_prueba_34": 1},
 }
+"""dict: Mapping from integer ``CATEGORIAPRUEBA`` value to OHE column values.
+
+Category 1 activates ``cat_prueba_1``; categories 3 and 4 jointly activate
+``cat_prueba_34``; category 2 (the most common — generic Saber Pro component)
+activates neither.  Unknown categories default to both zeros.
+"""
 
 
 # ── Carga del modelo ──────────────────────────────────────────────────────────
 
 def load_model(model_path: str) -> Any:
-    """
-    Carga el pipeline LightGBM serializado con joblib.
+    """Load a serialised LightGBM sklearn Pipeline from disk.
 
     Args:
-        model_path: Ruta al archivo .pkl (ej. 'outputs/lgbm_model.pkl')
+        model_path: Path to the ``joblib``-serialised ``.pkl`` file produced
+            by ``fase5_boosting.py`` (e.g. ``"outputs/lgbm_model.pkl"``).
 
     Returns:
-        Pipeline de sklearn entrenado.
+        A fitted ``sklearn.pipeline.Pipeline`` whose steps are
+        ``("preprocessor", ColumnTransformer)`` and ``("model", LGBMRegressor)``.
 
     Raises:
-        FileNotFoundError si el archivo no existe.
+        FileNotFoundError: If no file exists at ``model_path``.  The error
+            message includes a reminder to run ``fase5_boosting.py`` first.
+
+    Example:
+        >>> model = load_model("outputs/lgbm_model.pkl")
+        >>> type(model).__name__
+        'Pipeline'
     """
     if not os.path.exists(model_path):
         raise FileNotFoundError(
@@ -102,30 +187,66 @@ def build_inference_row(
     desviacion_estandar_historica: Optional[float]  = None,
     coeficiente_variacion:       Optional[float]     = None,
 ) -> pd.DataFrame:
-    """
-    Construye una fila de features lista para pasar al pipeline LightGBM.
-    Todos los valores None se dejan como NaN → el Imputer del Pipeline
-    los imputará con la mediana del conjunto de entrenamiento.
+    """Build a single-row feature DataFrame ready for the LightGBM Pipeline.
+
+    Translates raw institutional inputs into the feature representation
+    expected by the trained sklearn Pipeline.  ``cantidadevaluados`` is
+    log-transformed (``log1p``) internally.  ``categoriaprueba`` is mapped to
+    the two OHE binary columns via ``CATEGORIA_TO_OHE``.  All lag and trend
+    values that are ``None`` are stored as ``NaN`` and will be imputed by
+    the ``SimpleImputer(strategy="median")`` step inside the Pipeline.
 
     Args:
-        año                 : Año de la predicción (ej. 2025)
-        nbc                 : Núcleo Básico del Conocimiento (ej. 'EDUCACIÓN')
-        nombre_prueba       : Nombre de la prueba Saber Pro (ej. 'INGLÉS')
-        id_departamento     : ID del departamento (int o str)
-        cantidadevaluados   : Número de estudiantes que presentarán el examen
-        categoriaprueba     : Categoría de la prueba (1=genérica, 2=específica,
-                              3=genérica con módulo, 4=específica con módulo)
-        lag_1_promedio_global : PROMEDIO_GLOBAL del año anterior (t-1)
-        lag_2_promedio_global : PROMEDIO_GLOBAL de hace 2 años (t-2)
-        lag_1_promedio_prueba : PROMEDIO_PRUEBA del año anterior (t-1)
-        lag_2_promedio_prueba : PROMEDIO_PRUEBA de hace 2 años (t-2)
-        tendencia_global    : Pendiente OLS del PROMEDIO_GLOBAL histórico
-        tendencia_prueba    : Pendiente OLS del PROMEDIO_PRUEBA histórico
-        desviacion_estandar_historica : Std del PROMEDIO_GLOBAL histórico
-        coeficiente_variacion : CV del PROMEDIO_GLOBAL histórico
+        año: Target prediction year (e.g. ``2025``).  Values greater than
+            ``MAX_AÑO_TRAIN`` will trigger the extrapolation confidence flag
+            in ``predict_institution``.
+        nbc: Nucleo Basico del Conocimiento string (e.g. ``"INGENIERIA"``).
+            Must match the values seen during training for accurate target
+            encoding; unseen values receive the global mean encoding.
+        nombre_prueba: Saber Pro component name (e.g.
+            ``"RAZONAMIENTO CUANTITATIVO"``).
+        id_departamento: Integer or string department ID.  Treated as a
+            categorical variable by the Pipeline's TargetEncoder.
+        cantidadevaluados: Number of students expected to sit the exam.
+            Transformed to ``log1p(cantidadevaluados)`` before being passed
+            to the model.
+        categoriaprueba: Integer category of the exam component.  Valid values
+            are ``1`` (generic), ``2`` (specific), ``3`` (generic with module),
+            ``4`` (specific with module).  Defaults to ``2``.
+        lag_1_promedio_global: ``PROMEDIO_GLOBAL`` from the previous year (t-1).
+            Pass ``None`` if unavailable; the Pipeline will impute the training
+            median.
+        lag_2_promedio_global: ``PROMEDIO_GLOBAL`` from two years prior (t-2).
+            Pass ``None`` if unavailable.
+        lag_1_promedio_prueba: ``PROMEDIO_PRUEBA`` from the previous year (t-1).
+            Pass ``None`` if unavailable.
+        lag_2_promedio_prueba: ``PROMEDIO_PRUEBA`` from two years prior (t-2).
+            Pass ``None`` if unavailable.
+        tendencia_global: OLS slope of ``PROMEDIO_GLOBAL`` over historical
+            years (computed by ``features._ols_slope``).  Pass ``None`` if
+            the entity has fewer than 2 prior observations.
+        tendencia_prueba: OLS slope of ``PROMEDIO_PRUEBA`` over historical
+            years.  Pass ``None`` if unavailable.
+        desviacion_estandar_historica: Historical standard deviation of
+            ``PROMEDIO_GLOBAL`` up to t-1.  Pass ``None`` for new entities.
+        coeficiente_variacion: Coefficient of variation of ``PROMEDIO_GLOBAL``
+            up to t-1.  Pass ``None`` for new entities.
 
     Returns:
-        DataFrame de 1 fila con todas las columnas que espera el pipeline.
+        A single-row ``pd.DataFrame`` with columns matching ``ALL_FEATURE_COLS``
+        in the correct order.
+
+    Example:
+        >>> row = build_inference_row(
+        ...     año=2025, nbc="INGENIERIA",
+        ...     nombre_prueba="RAZONAMIENTO CUANTITATIVO",
+        ...     id_departamento="11", cantidadevaluados=120,
+        ...     lag_1_promedio_global=158.4,
+        ... )
+        >>> row.shape
+        (1, 15)
+        >>> row.columns.tolist()
+        ['lag_1_promedio_global', ..., 'cat_prueba_34']
     """
     ohe = CATEGORIA_TO_OHE.get(categoriaprueba, {"cat_prueba_1": 0, "cat_prueba_34": 0})
 
@@ -160,15 +281,42 @@ def _evaluate_confidence_flags(
     lag_1_global:      Optional[float],
     año:               int,
 ) -> dict:
-    """
-    Evalúa los flags de confianza de la predicción.
+    """Evaluate the three confidence flags for a single prediction.
 
-    Returns dict con:
-        baja_confianza_muestra_pequeña : bool
-        baja_confianza_sin_historial   : bool
-        baja_confianza_extrapolacion   : bool
-        confianza_global               : str  ('ALTA', 'MEDIA', 'BAJA')
-        advertencias                   : list[str]
+    Computes boolean flags for three independent sources of prediction
+    uncertainty and derives an overall confidence level from their combination.
+
+    Args:
+        cantidadevaluados: Number of evaluated students.  Values below
+            ``UMBRAL_MUESTRA_PEQUENA`` trigger the small-sample flag.
+        lag_1_global: Prior-year ``PROMEDIO_GLOBAL`` value, or ``None`` /
+            ``NaN`` if unavailable.  Absence triggers the no-history flag.
+        año: Prediction year.  Values above ``MAX_AÑO_TRAIN`` trigger the
+            temporal extrapolation flag.
+
+    Returns:
+        A dictionary with the following keys:
+
+        - ``"baja_confianza_muestra_pequena"`` (bool): True when cohort is
+          smaller than ``UMBRAL_MUESTRA_PEQUENA``.
+        - ``"baja_confianza_sin_historial"`` (bool): True when lag_1 is
+          unavailable.
+        - ``"baja_confianza_extrapolacion"`` (bool): True when predicting
+          beyond the training time horizon.
+        - ``"confianza_global"`` (str): ``"ALTA"`` when no flags are set,
+          ``"MEDIA"`` when exactly one non-sample-size flag is set, ``"BAJA"``
+          in all other cases.
+        - ``"advertencias"`` (list[str]): Human-readable explanations for
+          each active flag.
+
+    Example:
+        >>> flags = _evaluate_confidence_flags(
+        ...     cantidadevaluados=3, lag_1_global=None, año=2024
+        ... )
+        >>> flags["confianza_global"]
+        'BAJA'
+        >>> len(flags["advertencias"])
+        2
     """
     flags = {
         "baja_confianza_muestra_pequeña": False,
@@ -239,48 +387,84 @@ def predict_institution(
     nombre_institucion: Optional[str]    = None,
     nombre_programa:    Optional[str]    = None,
 ) -> dict:
-    """
-    Genera una predicción de PROMEDIO_GLOBAL para un programa-prueba-año,
-    con flags de confianza y metadatos de diagnóstico.
+    """Generate a PROMEDIO_GLOBAL prediction with confidence flags for one program-exam-year.
+
+    This is the primary single-entity inference function.  It wraps
+    ``build_inference_row``, ``model.predict``, and ``_evaluate_confidence_flags``
+    into a single call that returns a fully structured result dictionary
+    suitable for display, logging, or serialisation.
 
     Args:
-        model             : Pipeline LightGBM cargado con load_model()
-        año               : Año para el que se predice (ej. 2025)
-        nbc               : Núcleo Básico del Conocimiento
-        nombre_prueba     : Nombre de la prueba Saber Pro
-        id_departamento   : ID del departamento
-        cantidadevaluados : Número estimado de estudiantes a evaluar
-        categoriaprueba   : Categoría de prueba (1-4)
-        lag_1_promedio_global  : PROMEDIO_GLOBAL año anterior (None si no hay)
-        lag_2_promedio_global  : PROMEDIO_GLOBAL hace 2 años (None si no hay)
-        lag_1_promedio_prueba  : PROMEDIO_PRUEBA año anterior (None si no hay)
-        lag_2_promedio_prueba  : PROMEDIO_PRUEBA hace 2 años (None si no hay)
-        tendencia_global       : Pendiente OLS del PROMEDIO_GLOBAL histórico
-        tendencia_prueba       : Pendiente OLS del PROMEDIO_PRUEBA histórico
-        desviacion_estandar_historica : Std del PROMEDIO_GLOBAL histórico
-        coeficiente_variacion  : CV del PROMEDIO_GLOBAL histórico
-        nombre_institucion     : Nombre descriptivo de la institución (metadato)
-        nombre_programa        : Nombre descriptivo del programa (metadato)
+        model: Fitted sklearn Pipeline loaded via ``load_model``.
+        año: Prediction year (e.g. ``2025``).
+        nbc: Nucleo Basico del Conocimiento (e.g. ``"CIENCIAS DE LA SALUD"``).
+        nombre_prueba: Saber Pro component name (e.g. ``"INGLES"``).
+        id_departamento: Department identifier (int or str).
+        cantidadevaluados: Estimated number of students to be evaluated.
+        categoriaprueba: Exam component category (1-4).  Defaults to ``2``.
+        lag_1_promedio_global: PROMEDIO_GLOBAL from year t-1.
+            Pass ``None`` if unknown.
+        lag_2_promedio_global: PROMEDIO_GLOBAL from year t-2.
+            Pass ``None`` if unknown.
+        lag_1_promedio_prueba: PROMEDIO_PRUEBA from year t-1.
+            Pass ``None`` if unknown.
+        lag_2_promedio_prueba: PROMEDIO_PRUEBA from year t-2.
+            Pass ``None`` if unknown.
+        tendencia_global: OLS slope of PROMEDIO_GLOBAL history.
+            Pass ``None`` for entities with fewer than 2 prior years.
+        tendencia_prueba: OLS slope of PROMEDIO_PRUEBA history.
+            Pass ``None`` if unknown.
+        desviacion_estandar_historica: Historical std of PROMEDIO_GLOBAL.
+            Pass ``None`` for new entities.
+        coeficiente_variacion: CV of PROMEDIO_GLOBAL history.
+            Pass ``None`` for new entities.
+        nombre_institucion: Optional descriptive institution name included
+            in the result for display purposes only (not used by the model).
+        nombre_programa: Optional descriptive programme name included in the
+            result for display purposes only.
 
     Returns:
-        dict con los siguientes campos:
-            prediccion_promedio_global : float   (valor predicho)
-            año                        : int
-            nbc                        : str
-            nombre_prueba              : str
-            id_departamento            : Any
-            cantidadevaluados          : int
-            nombre_institucion         : str | None
-            nombre_programa            : str | None
-            # Flags de confianza
-            baja_confianza_muestra_pequeña : bool  ← True si CANTIDADEVALUADOS < 5
-            baja_confianza_sin_historial   : bool
-            baja_confianza_extrapolacion   : bool
-            confianza_global               : str   ('ALTA', 'MEDIA', 'BAJA')
-            advertencias                   : list[str]
-            # Features usadas (para auditoría)
-            features_usadas            : dict
-            timestamp                  : str
+        A dictionary containing:
+
+        - ``"prediccion_promedio_global"`` (float): The model's predicted
+          ``PROMEDIO_GLOBAL`` score.
+        - ``"año"``, ``"nbc"``, ``"nombre_prueba"``, ``"id_departamento"``,
+          ``"cantidadevaluados"``, ``"nombre_institucion"``,
+          ``"nombre_programa"``: Input metadata echoed back.
+        - ``"baja_confianza_muestra_pequeña"`` (bool): Small-sample flag.
+        - ``"baja_confianza_sin_historial"`` (bool): No-history flag.
+        - ``"baja_confianza_extrapolacion"`` (bool): Temporal extrapolation flag.
+        - ``"confianza_global"`` (str): Overall confidence level
+          (``"ALTA"``, ``"MEDIA"``, or ``"BAJA"``).
+        - ``"advertencias"`` (list[str]): Human-readable flag explanations.
+        - ``"features_usadas"`` (dict): The feature values passed to the model
+          (useful for auditing and explainability).
+        - ``"timestamp"`` (str): ISO 8601 timestamp of when the prediction was
+          generated.
+
+    Raises:
+        ValueError: If the model pipeline raises an error during prediction
+            (e.g. unexpected column type).
+
+    Example:
+        >>> model = load_model("outputs/lgbm_model.pkl")
+        >>> result = predict_institution(
+        ...     model=model, año=2025, nbc="INGENIERIA",
+        ...     nombre_prueba="RAZONAMIENTO CUANTITATIVO",
+        ...     id_departamento="11", cantidadevaluados=120,
+        ...     lag_1_promedio_global=158.4,
+        ... )
+        >>> result["prediccion_promedio_global"]
+        161.2
+        >>> result["confianza_global"]
+        'MEDIA'
+
+    Note:
+        For predictions on the 2024 test set the ``baja_confianza_extrapolacion``
+        flag will be ``True`` because 2024 > ``MAX_AÑO_TRAIN`` (2023).  This is
+        expected and does not indicate a bug; it is a deliberate design choice to
+        flag all predictions beyond the training window regardless of how close
+        they are to it.
     """
     # 1. Construir fila de features
     X = build_inference_row(
@@ -340,25 +524,48 @@ def predict_batch(
     df:    pd.DataFrame,
     model: Any,
 ) -> pd.DataFrame:
-    """
-    Predicciones en lote sobre un DataFrame con las columnas del pipeline.
+    """Generate predictions and confidence flags for all rows in a DataFrame.
 
-    El DataFrame debe contener al mínimo:
-        - Todas las columnas de ALL_FEATURE_COLS (NaN permitido en lags/tendencias)
-        - CANTIDADEVALUADOS (para evaluar los flags de confianza)
-        - AÑO
+    Vectorised version of ``predict_institution`` intended for scoring large
+    DataFrames in a single pass.  If the OHE columns (``cat_prueba_1``,
+    ``cat_prueba_34``) are absent from ``df``, they are added with a default
+    value of 0.0 (equivalent to ``CATEGORIAPRUEBA == 2``).
 
-    Columnas opcionales que se incluirán en el resultado si están presentes:
-        ID_INSTITUCION, ID_PROGRAMA_ACAD, NOMBRE_INSTITUCION,
-        NOMBRE_PROGRAMA_ACAD, NBC, NOMBRE_PRUEBA, AÑO
+    The confidence flags are computed element-wise using pandas operations
+    rather than the scalar helper, making this function suitable for DataFrames
+    of arbitrary size without a Python loop.
+
+    Args:
+        df: DataFrame whose rows represent program-exam-year entities to score.
+            Must contain at minimum all columns in ``ALL_FEATURE_COLS``.
+            ``CANTIDADEVALUADOS`` and ``AÑO`` are also required for confidence
+            flag computation (they may overlap with ``ALL_FEATURE_COLS``).
+        model: Fitted sklearn Pipeline loaded via ``load_model``.
 
     Returns:
-        DataFrame con las columnas originales más:
-            prediccion_promedio_global
-            baja_confianza_muestra_pequeña
-            baja_confianza_sin_historial
-            baja_confianza_extrapolacion
-            confianza_global
+        A copy of ``df`` with five new columns appended:
+
+        - ``"prediccion_promedio_global"`` (float): Model prediction for each row.
+        - ``"baja_confianza_muestra_pequeña"`` (bool): Vectorised small-sample flag.
+        - ``"baja_confianza_sin_historial"`` (bool): Vectorised no-history flag.
+        - ``"baja_confianza_extrapolacion"`` (bool): Vectorised extrapolation flag.
+        - ``"confianza_global"`` (str): Overall confidence level per row.
+
+    Raises:
+        KeyError: If any column in ``ALL_FEATURE_COLS`` is absent from ``df``
+            (and not one of the OHE columns auto-filled with 0.0).
+
+    Example:
+        >>> model = load_model("outputs/lgbm_model.pkl")
+        >>> df_test_feats = df_feat[df_feat["AÑO"] == 2024].copy()
+        >>> df_scored = predict_batch(df_test_feats, model)
+        >>> df_scored[["NOMBRE_PRUEBA", "prediccion_promedio_global",
+        ...             "confianza_global"]].head()
+
+    Note:
+        ``predict_batch`` does not generate per-row ``advertencias`` text.
+        Use ``predict_institution`` when a human-readable explanation of each
+        flag is required (e.g. for dashboard tooltips or API responses).
     """
     df = df.copy()
 
@@ -405,8 +612,35 @@ def predict_batch(
 # ── Helpers de formato ────────────────────────────────────────────────────────
 
 def format_prediction_report(result: dict) -> str:
-    """
-    Formatea el resultado de predict_institution() como texto legible.
+    """Format the output of predict_institution as a human-readable text report.
+
+    Produces a fixed-width text block summarising the prediction, its
+    confidence level, all active warning flags, and a timestamp.  Long
+    warning messages are word-wrapped to 56 characters.
+
+    Args:
+        result: Dictionary returned by ``predict_institution``.  Must contain
+            at minimum the keys ``"prediccion_promedio_global"``,
+            ``"confianza_global"``, ``"advertencias"``, and ``"timestamp"``.
+
+    Returns:
+        A multi-line string suitable for printing to stdout or writing to a
+        log file.  Lines are separated by ``"\\n"``.
+
+    Example:
+        >>> model = load_model("outputs/lgbm_model.pkl")
+        >>> result = predict_institution(model=model, año=2025,
+        ...     nbc="INGENIERIA", nombre_prueba="INGLES",
+        ...     id_departamento="11", cantidadevaluados=80)
+        >>> print(format_prediction_report(result))
+        ============================================================
+        PREDICCION MOTOR SABER PRO
+        ============================================================
+        NBC          : INGENIERIA
+        ...
+        PROMEDIO_GLOBAL predicho : 155.32
+        Confianza global         : MEDIA
+        ...
     """
     flag_si_no = lambda b: "SÍ ⚠" if b else "no"
 

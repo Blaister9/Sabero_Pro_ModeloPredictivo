@@ -1,17 +1,68 @@
-"""
-src/features.py
-Feature engineering temporal para el dataset Saber Pro.
-Fase 3 del pipeline — Motor Predictivo Saber Pro.
-Autor: Edwin Santiago Paz Bedoya — Código 1071010
+"""Temporal feature engineering for the Saber Pro predictive pipeline.
 
-Notas de diseño:
-  - Entidad de panel: ID_INSTITUCION + ID_PROGRAMA_ACAD + NOMBRE_PRUEBA
-  - NIVEL1-4 están en escala 0-100 (porcentajes). Su suma es ~100.
-  - Target encoding de categóricos (NBC, NOMBRE_PRUEBA) se calcula aquí
-    sobre el dataset completo para generar el feature. En el pipeline de
-    modelado (Fase 4-5) se recalculará con TimeSeriesSplit para evitar leakage.
-  - No hay target leak: ningún feature usa información de AÑO actual del target;
-    los lags solo usan años estrictamente anteriores.
+This module implements Phase 3 of the Saber Pro predictive pipeline.  It
+receives the cleaned wide-format DataFrame produced by ``cleaning.clean_dataset``
+and constructs all predictive features required by the downstream model phases.
+
+The pipeline treats each ``(ID_INSTITUCION, ID_PROGRAMA_ACAD, NOMBRE_PRUEBA)``
+triple as a **panel entity** that may be observed across multiple years
+(2020-2024).  All features that summarise historical performance (lags,
+trend slope, volatility) are computed using an **expanding window that
+excludes the current year t**, so that a model trained on year t can only
+"see" information from years strictly before t.  This design prevents the
+six categories of temporal leakage identified during the Fase 2 audit.
+
+Seven feature families are constructed:
+
+1. **Lag features** (``_build_lags``): ``lag_1`` and ``lag_2`` of both
+   ``PROMEDIO_GLOBAL`` and ``PROMEDIO_PRUEBA``, using ``groupby + shift``.
+2. **Trend features** (``_build_trend``): OLS slope of ``PROMEDIO_GLOBAL``
+   and ``PROMEDIO_PRUEBA`` over all years strictly before t, computed via an
+   expanding window.  ``delta_1_global`` was removed in a prior audit because
+   it directly encoded the target change (leakage type 1).
+3. **Performance-level proportions** (``_build_nivel_features``): ``NIVEL1``
+   through ``NIVEL4`` normalised to proportions.  These are tagged with the
+   ``concurrent_`` prefix because they originate from the same ICFES release
+   as ``PROMEDIO_GLOBAL`` and must **not** be used as model inputs for same-
+   year prediction.
+4. **Volatility features** (``_build_volatility``): historical standard
+   deviation and coefficient of variation of ``PROMEDIO_GLOBAL`` up to t-1,
+   using ``shift(1).expanding(min_periods=2).std()``.
+5. **Context features** (``_build_context``): ``log_cantidadevaluados =
+   log1p(CANTIDADEVALUADOS)``, available before exam results are published.
+6. **Year as a feature**: ``AÑO`` is included directly as a numeric column
+   to capture cross-sectional time trends in the Colombian higher-education
+   system.
+7. **Categorical encoding**: ``CATEGORIAPRUEBA`` receives one-hot encoding
+   (at most 20 categories; no target signal used).  ``NBC``,
+   ``NOMBRE_PRUEBA``, and ``ID_DEPARTAMENTO`` are left as raw strings for
+   ``TargetEncoder`` inside the sklearn ``Pipeline`` in Phase 4/5, where the
+   encoding is recomputed on train-only data for each cross-validation fold.
+
+Usage example::
+
+    from src.ingestion import load_years
+    from src.cleaning import clean_dataset
+    from src.features import build_features
+
+    df_raw   = load_years([2020, 2021, 2022, 2023, 2024], "data/raw/")
+    df_clean, _ = clean_dataset(df_raw)
+    df_feat, report = build_features(df_clean)
+
+    print(df_feat[["lag_1_promedio_global", "tendencia_global",
+                   "desviacion_estandar_historica"]].describe())
+
+    with open("outputs/feature_report.txt", "w") as f:
+        f.write("\\n".join(report))
+
+Warning:
+    Target encoding of ``NBC``, ``NOMBRE_PRUEBA``, and ``ID_DEPARTAMENTO``
+    is intentionally **deferred** to the sklearn ``Pipeline`` in Phase 4/5.
+    Calling ``_target_encode`` directly on the full dataset (including test
+    rows) would leak test-set label information into the train encoding,
+    inflating cross-validated performance metrics.  The ``_target_encode``
+    helper is retained for exploratory analysis only and should never be
+    used in the main modelling Pipeline.
 """
 
 import warnings
@@ -23,22 +74,74 @@ import pandas as pd
 warnings.filterwarnings("ignore")
 
 # ── Columnas de identidad ────────────────────────────────────────────────────
-ENTITY_COLS = ["ID_INSTITUCION", "ID_PROGRAMA_ACAD", "NOMBRE_PRUEBA"]  # panel entity
+ENTITY_COLS = ["ID_INSTITUCION", "ID_PROGRAMA_ACAD", "NOMBRE_PRUEBA"]
+"""list[str]: Columns that together identify a panel entity.
+
+The combination ``(ID_INSTITUCION, ID_PROGRAMA_ACAD, NOMBRE_PRUEBA)``
+uniquely identifies one academic programme's performance on one Saber Pro
+exam component.  All temporal features (lags, trend, volatility) are
+computed within groups defined by these three columns.
+"""
+
 KEY3        = ["AÑO", "ID_INSTITUCION", "ID_PROGRAMA_ACAD"]
 KEY4        = ["AÑO", "ID_INSTITUCION", "ID_PROGRAMA_ACAD", "NOMBRE_PRUEBA"]
 
 
 def _log(msg: str) -> None:
+    """Print a timestamped log message to stdout.
+
+    Args:
+        msg: The message text to print.
+
+    Example:
+        >>> _log("Building lag features")
+        [10:22:05] Building lag features
+    """
     print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}")
 
 
 # ── Imputación ───────────────────────────────────────────────────────────────
 
 def _impute_grouped_median(df: pd.DataFrame, cols: list, group_cols: list) -> pd.DataFrame:
-    """
-    Imputa nulos en `cols` con la mediana del grupo definido por `group_cols`.
-    Si el grupo entero tiene nulos, usa la mediana global de la columna.
-    No modifica el DataFrame original.
+    """Impute nulls in selected columns using the grouped median with global fallback.
+
+    For each column in ``cols``, null values are filled with the median of the
+    group defined by ``group_cols``.  If an entire group consists of nulls (so
+    the group median is itself NaN), the global column median is used as a
+    fallback.  The original DataFrame is not modified.
+
+    This function corresponds to Regla C3 of the cleaning strategy: secondary
+    metrics (``DESVIACION``, ``NIVEL1``-``NIVEL4``) are retained as rows even
+    when null, then imputed here with group context rather than being dropped.
+
+    Args:
+        df: Input DataFrame.  Not modified in place.
+        cols: List of column names to impute.  Columns absent from ``df`` are
+            silently skipped.
+        group_cols: Columns to group by when computing the median
+            (e.g. ``["NBC", "NOMBRE_PRUEBA"]``).
+
+    Returns:
+        A copy of ``df`` with null values in ``cols`` filled by group or
+        global medians.
+
+    Raises:
+        KeyError: If any column in ``group_cols`` is absent from ``df``.
+
+    Example:
+        >>> df_imp = _impute_grouped_median(
+        ...     df, cols=["DESVIACION", "NIVEL1"], group_cols=["NBC", "NOMBRE_PRUEBA"]
+        ... )
+        >>> df_imp["DESVIACION"].isnull().sum()
+        0
+
+    Note:
+        This imputation is performed on the full dataset before the train/test
+        split.  That means group statistics can include test-year rows.
+        However, this only affects secondary metrics (``DESVIACION``,
+        ``NIVEL1``-``NIVEL4``) that are not used as model features (they are
+        tagged ``concurrent_`` or used for descriptive analysis only), so there
+        is no consequential leakage into the predictive targets or lag features.
     """
     df = df.copy()
     for col in cols:
@@ -61,9 +164,44 @@ def _impute_grouped_median(df: pd.DataFrame, cols: list, group_cols: list) -> pd
 # ── Lags temporales ──────────────────────────────────────────────────────────
 
 def _build_lags(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Construye features de lag temporal por entidad panel.
-    Solo usa años estrictamente anteriores al año actual (sin leakage).
+    """Construct one- and two-year lag features for global and sub-test scores.
+
+    For each panel entity (``ENTITY_COLS``), the DataFrame is sorted
+    chronologically and ``pandas.Series.shift`` is applied within each group
+    to produce:
+
+    - ``lag_1_promedio_global``: ``PROMEDIO_GLOBAL`` at t-1
+    - ``lag_2_promedio_global``: ``PROMEDIO_GLOBAL`` at t-2
+    - ``lag_1_promedio_prueba``: ``PROMEDIO_PRUEBA`` at t-1
+    - ``lag_2_promedio_prueba``: ``PROMEDIO_PRUEBA`` at t-2
+
+    Entities that first appear in 2020 will have NaN for both lags.
+    Entities that first appear in 2021 will have NaN only for lag_2.
+    These NaNs are handled by the ``SimpleImputer(strategy="median")`` inside
+    the sklearn Pipeline in Phase 4/5.
+
+    Args:
+        df: Wide-format DataFrame with at least ``ENTITY_COLS``, ``AÑO``,
+            ``PROMEDIO_GLOBAL``, and ``PROMEDIO_PRUEBA`` columns.
+
+    Returns:
+        A copy of ``df`` with four new lag columns appended.  Row count is
+        unchanged.
+
+    Example:
+        >>> df_lags = _build_lags(df_clean)
+        >>> df_lags[["AÑO", "lag_1_promedio_global", "lag_2_promedio_global"]].head()
+           AÑO  lag_1_promedio_global  lag_2_promedio_global
+        0  2020                   NaN                    NaN
+        1  2021                 152.3                    NaN
+        2  2022                 155.1                  152.3
+
+    Note:
+        ``shift(1)`` inside a ``groupby`` guarantees that the lag for year t
+        is the value from the immediately preceding year available in the
+        dataset for that entity.  If data for 2021 is missing for a given
+        entity, ``lag_1`` in 2022 will be the 2020 value, not NaN —
+        this is the correct behaviour for an irregular panel.
     """
     df = df.sort_values(ENTITY_COLS + ["AÑO"]).copy()
 
@@ -83,7 +221,26 @@ def _build_lags(df: pd.DataFrame) -> pd.DataFrame:
 # ── Features de tendencia ────────────────────────────────────────────────────
 
 def _ols_slope(values: pd.Series) -> float:
-    """Pendiente OLS de una serie numérica contra su índice temporal."""
+    """Compute the OLS slope of a numeric series against its integer index.
+
+    Uses the closed-form OLS formula to fit y = a + b*x where x = 0, 1, ..., n-1
+    and returns only the slope b.  NaN values in ``values`` are dropped before
+    fitting.  Returns NaN if fewer than two non-null observations are available.
+
+    Args:
+        values: A pandas Series of numeric observations in chronological order.
+            The index of the series is ignored; position is used as x.
+
+    Returns:
+        The OLS slope as a float, or ``np.nan`` if the series has fewer than
+        two valid observations or if the denominator is zero (constant series).
+
+    Example:
+        >>> _ols_slope(pd.Series([100.0, 102.0, 104.0]))
+        2.0
+        >>> _ols_slope(pd.Series([np.nan, np.nan]))
+        nan
+    """
     valid = values.dropna()
     n = len(valid)
     if n < 2:
@@ -98,22 +255,60 @@ def _ols_slope(values: pd.Series) -> float:
 
 
 def _build_trend(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    tendencia_global / tendencia_prueba: slope OLS usando SOLO los años
-    estrictamente anteriores al año de la fila (historia t-1 y antes).
+    """Build OLS-slope trend features using only historical data strictly before year t.
 
-    Corrección de leakage:
-    - delta_1_global = PROMEDIO_GLOBAL - lag_1 fue eliminado: codificaba
-      directamente el target (leakage directo).
-    - La versión anterior calculaba el slope incluyendo el año t del target.
-      Ahora se usa expanding window que excluye la observación actual.
-    - PROMEDIO_PRUEBA del año t es concurrent → se usa PROMEDIO_PRUEBA de
-      años anteriores (via lag_1/lag_2_promedio_prueba ya construidos).
+    For each row (entity, year t), computes the OLS slope of ``PROMEDIO_GLOBAL``
+    and ``PROMEDIO_PRUEBA`` over all years **before** t that are available for
+    that entity.  The first observation for any entity always yields NaN because
+    there is no prior history.
+
+    The expanding-window approach is implemented by iterating over each entity's
+    sorted time series and, for position i, passing only ``iloc[:i]`` to
+    ``_ols_slope``.  This is equivalent to a ``shift(1).expanding()`` pattern
+    but allows per-entity irregular panels without alignment issues.
+
+    Args:
+        df: Wide-format DataFrame with ``ENTITY_COLS``, ``AÑO``,
+            ``PROMEDIO_GLOBAL``, and ``PROMEDIO_PRUEBA``.
+
+    Returns:
+        A copy of ``df`` with two new columns:
+
+        - ``tendencia_global``: OLS slope of ``PROMEDIO_GLOBAL`` history up to t-1.
+        - ``tendencia_prueba``: OLS slope of ``PROMEDIO_PRUEBA`` history up to t-1.
+
+    Example:
+        >>> df_trend = _build_trend(df_lags)
+        >>> df_trend[["AÑO", "tendencia_global"]].dropna().head(3)
+           AÑO  tendencia_global
+        2  2022              1.4
+        3  2023              1.1
+        4  2024              1.7
+
+    Note:
+        An earlier version of this feature computed the slope over the full
+        entity time series including year t.  That version was removed during
+        the leakage audit because the slope at year t depends on
+        ``PROMEDIO_GLOBAL[t]``, which is the prediction target.  The current
+        expanding-window implementation excludes year t from all slope
+        computations, making ``tendencia_global`` leakage-free.
+
+        ``delta_1_global = PROMEDIO_GLOBAL[t] - lag_1`` was also removed
+        because it is a direct linear transformation of the target and
+        constitutes leakage type 1 (direct target encoding).
     """
     df = df.sort_values(ENTITY_COLS + ["AÑO"]).copy()
 
     def expanding_slope(group: pd.DataFrame) -> pd.DataFrame:
-        """Para fila i, slope OLS de PROMEDIO_GLOBAL en años 0..i-1."""
+        """Compute per-row OLS slope using only rows before the current row.
+
+        Args:
+            group: Sub-DataFrame for one panel entity, sorted chronologically.
+
+        Returns:
+            A DataFrame indexed like ``group`` with columns
+            ``tendencia_global`` and ``tendencia_prueba``.
+        """
         group = group.sort_values("AÑO").reset_index(drop=False)
         s_global, s_prueba = [], []
         for i in range(len(group)):
@@ -134,20 +329,47 @@ def _build_trend(df: pd.DataFrame) -> pd.DataFrame:
 # ── Features de distribución por niveles ─────────────────────────────────────
 
 def _build_nivel_features(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    NIVEL1-4 están en escala 0-100 (porcentajes). Suma ~100 por fila.
-    Se calculan las proporciones y se almacenan en el CSV como referencia
-    analítica, pero están marcadas con prefijo 'concurrent_' para indicar
-    que NO deben usarse en el modelo predictivo de producción.
+    """Compute performance-level proportion features from NIVEL1-NIVEL4.
 
-    RAZÓN DE EXCLUSIÓN DEL MODELO:
-    NIVEL1-4 provienen de MEDIDA_AGREGACION=NIVEL_DESEMPEÑO_PRUEBA del mismo
-    año que PROMEDIO_GLOBAL (mismo release del ICFES). En producción, ambas
-    métricas se publican juntas → usarlas como features para predecir
-    PROMEDIO_GLOBAL del mismo año es leakage temporal.
+    ``NIVEL1`` through ``NIVEL4`` represent the percentage of evaluated
+    students who fall into each performance band (0-100 scale; the four
+    values sum to approximately 100 per row).  This function normalises them
+    to true proportions (dividing by their row-wise sum) and computes two
+    aggregate indices: the proportion of students in low performance bands
+    (NIVEL1 + NIVEL2) and in high performance bands (NIVEL3 + NIVEL4).
 
-    Son útiles para análisis descriptivo y como contexto histórico (vía lags
-    en futuras versiones del pipeline), pero no para predicción del año actual.
+    All output columns are prefixed with ``concurrent_`` to mark them as
+    **concurrent with the prediction target** and therefore unsuitable as
+    model inputs for same-year prediction.
+
+    Args:
+        df: Wide-format DataFrame that may contain ``NIVEL1`` through
+            ``NIVEL4`` columns.  If fewer than two NIVEL columns are present,
+            the function returns ``df`` unchanged.
+
+    Returns:
+        A copy of ``df`` with the following new columns (when NIVEL data is
+        available):
+
+        - ``concurrent_prop_nivel1`` through ``concurrent_prop_nivel4``
+        - ``concurrent_prop_niveles_bajos`` (NIVEL1 + NIVEL2 proportion)
+        - ``concurrent_prop_niveles_altos`` (NIVEL3 + NIVEL4 proportion)
+
+    Example:
+        >>> df_niv = _build_nivel_features(df_imputed)
+        >>> df_niv["concurrent_prop_niveles_bajos"].describe()
+        count    38450.000000
+        mean         0.512300
+        ...
+
+    Note:
+        These features are tagged ``concurrent_`` because ``NIVEL1``-``NIVEL4``
+        originate from ``MEDIDA_AGREGACION = NIVEL_DESEMPEÑO_PRUEBA`` in the
+        same ICFES data release as ``PROMEDIO_GLOBAL``.  In a real deployment
+        scenario both metrics become available simultaneously, so using them
+        to predict ``PROMEDIO_GLOBAL`` for the **same** year constitutes
+        temporal leakage.  They can safely be used as lagged features in
+        future pipeline versions (e.g. ``lag_1_prop_nivel1``).
     """
     df = df.copy()
     nivel_cols = [c for c in ["NIVEL1", "NIVEL2", "NIVEL3", "NIVEL4"] if c in df.columns]
@@ -172,18 +394,44 @@ def _build_nivel_features(df: pd.DataFrame) -> pd.DataFrame:
 # ── Features de volatilidad ──────────────────────────────────────────────────
 
 def _build_volatility(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Std histórica y CV usando SOLO años estrictamente anteriores al año t.
+    """Build historical volatility features for PROMEDIO_GLOBAL up to year t-1.
 
-    Corrección de leakage: la versión anterior usaba std(PROMEDIO_GLOBAL de
-    todos los años del panel), incluyendo el año t cuyo target estamos
-    prediciendo. Ahora se usa expanding window con shift(1) para excluir
-    la observación actual.
+    Computes two volatility measures for each panel entity using only data
+    from years strictly before t:
 
-    Implementación:
-    - shift(1) dentro del grupo mueve el valor del año t a la posición t+1,
-      de modo que expanding().std() en la posición t solo usa años 0..t-1.
-    - min_periods=2 para std (requiere al menos 2 puntos históricos).
+    - ``desviacion_estandar_historica``: standard deviation of ``PROMEDIO_GLOBAL``
+      over the expanding window of years 0..t-1, requiring at least 2 points.
+    - ``coeficiente_variacion``: ratio of ``desviacion_estandar_historica`` to
+      the expanding mean of ``PROMEDIO_GLOBAL`` up to t-1.
+
+    The ``shift(1).expanding()`` pattern moves each value one position forward
+    within its group before applying the expanding aggregation, ensuring that
+    the aggregation at position i only includes positions 0..i-1.
+
+    Args:
+        df: Wide-format DataFrame with ``ENTITY_COLS``, ``AÑO``, and
+            ``PROMEDIO_GLOBAL`` columns.
+
+    Returns:
+        A copy of ``df`` with two new columns:
+
+        - ``desviacion_estandar_historica``: ``float64``, NaN for entities
+          with fewer than 2 prior observations.
+        - ``coeficiente_variacion``: ``float64``, NaN when standard deviation
+          or mean is undefined or when the mean is zero.
+
+    Example:
+        >>> df_vol = _build_volatility(df_trend)
+        >>> df_vol[["AÑO", "desviacion_estandar_historica",
+        ...          "coeficiente_variacion"]].dropna().head(3)
+
+    Note:
+        A prior version of this feature computed the standard deviation over
+        the full panel time series for each entity, including year t.  This
+        was identified as leakage type 3 in the Fase 2 audit: the standard
+        deviation over a window that includes year t encodes information about
+        ``PROMEDIO_GLOBAL[t]``.  The ``shift(1)`` correction ensures the
+        expanding window always excludes the current observation.
     """
     df = df.sort_values(ENTITY_COLS + ["AÑO"]).copy()
 
@@ -206,8 +454,30 @@ def _build_volatility(df: pd.DataFrame) -> pd.DataFrame:
 # ── Features de contexto ─────────────────────────────────────────────────────
 
 def _build_context(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    log_cantidadevaluados: escala logarítmica para CANTIDADEVALUADOS.
+    """Build log-scale cohort size feature from CANTIDADEVALUADOS.
+
+    Applies ``numpy.log1p`` to ``CANTIDADEVALUADOS`` to produce a
+    normally-distributed proxy for cohort size that is available **before**
+    exam results are published (it reflects enrolled/registered students).
+
+    Args:
+        df: Wide-format DataFrame that may contain a ``CANTIDADEVALUADOS``
+            column.  If the column is absent the function returns ``df``
+            unchanged.
+
+    Returns:
+        A copy of ``df`` with a new ``log_cantidadevaluados`` column.
+        Zero-evaluated-student rows are handled by ``log1p(0) = 0``
+        (they were already removed by cleaning rule C1, so this is a
+        safety fallback).
+
+    Example:
+        >>> df_ctx = _build_context(df_vol)
+        >>> df_ctx["log_cantidadevaluados"].describe()
+        count    38450.000000
+        mean         3.218400
+        std          1.042100
+        ...
     """
     df = df.copy()
     if "CANTIDADEVALUADOS" in df.columns:
@@ -224,12 +494,47 @@ def _target_encode(
     target: str = "PROMEDIO_GLOBAL",
     smoothing: float = 10.0,
 ) -> pd.DataFrame:
-    """
-    Target encoding con smoothing (evita overfitting en categorías raras).
-    Formula: enc = (n_cat * mean_cat + smoothing * global_mean) / (n_cat + smoothing)
+    """Apply smoothed target encoding to a categorical column.
 
-    ADVERTENCIA: calculado sobre el conjunto completo. En Fase 4 se recalculará
-    dentro del Pipeline con TimeSeriesSplit para evaluación sin leakage.
+    Replaces each category's raw mean with a smoothed estimate that shrinks
+    towards the global mean when the category has few observations:
+
+        enc = (n_cat * mean_cat + smoothing * global_mean) / (n_cat + smoothing)
+
+    Categories absent from ``df[col]`` (e.g. during inference on new data)
+    receive the global mean as their encoded value.
+
+    Args:
+        df: DataFrame containing both ``col`` and ``target``.
+        col: Name of the categorical column to encode.
+        target: Name of the numeric target column.  Defaults to
+            ``"PROMEDIO_GLOBAL"``.
+        smoothing: Additive smoothing factor.  Higher values shrink more
+            aggressively towards the global mean, reducing overfitting for
+            rare categories.  Defaults to ``10.0``.
+
+    Returns:
+        A copy of ``df`` with a new column named ``te_{col.lower()}``
+        containing the smoothed target-encoded values.
+
+    Example:
+        >>> df_enc = _target_encode(df_train, col="NBC", smoothing=10.0)
+        >>> df_enc["te_nbc"].describe()
+        count    30000.000000
+        mean       152.830000
+        ...
+
+    Warning:
+        This function computes the encoding over the **entire** DataFrame
+        passed to it.  If ``df`` includes both training and test rows, the
+        encoding will leak test-set label information into the training
+        features, inflating cross-validated performance estimates.
+
+        For the main modelling pipeline, target encoding of ``NBC``,
+        ``NOMBRE_PRUEBA``, and ``ID_DEPARTAMENTO`` is performed exclusively
+        inside the sklearn ``Pipeline`` via ``TargetEncoder``, which is
+        fitted only on train data within each ``TimeSeriesSplit`` fold.
+        Use this function only for exploratory analysis on the training set.
     """
     df = df.copy()
     if col not in df.columns or target not in df.columns:
@@ -251,20 +556,64 @@ def _target_encode(
 # ── Función principal ────────────────────────────────────────────────────────
 
 def build_features(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
-    """
-    Construye todas las features a partir del dataset limpio.
+    """Orchestrate all feature engineering steps and return the enriched dataset.
 
-    Parameters
-    ----------
-    df : pd.DataFrame
-        Dataset limpio (output de clean_dataset).
+    This is the main entry point for Phase 3 of the pipeline.  It applies the
+    eight feature-engineering steps in sequence, accumulates a detailed report,
+    and performs a final row-count assertion to guarantee that no rows are
+    inadvertently added or removed during feature construction.
 
-    Returns
-    -------
-    df_feat : pd.DataFrame
-        Dataset con features construidas.
-    report_lines : list[str]
-        Reporte de features para exportar.
+    Steps executed in order:
+
+    0. Imputation of secondary metrics (``DESVIACION``, ``NIVEL1``-``NIVEL4``)
+       using grouped median by ``(NBC, NOMBRE_PRUEBA)`` with global-median
+       fallback (Regla C3).
+    1. Lag features: ``lag_1/2_promedio_global``, ``lag_1/2_promedio_prueba``.
+    2. Trend features: ``tendencia_global``, ``tendencia_prueba`` (OLS slopes
+       over expanding history, excluding year t).
+    3. Performance-level proportions (``concurrent_prop_*``; excluded from
+       model inputs).
+    4. Volatility: ``desviacion_estandar_historica``, ``coeficiente_variacion``.
+    5. Context: ``log_cantidadevaluados``.
+    6. ``AÑO`` is already numeric; included directly in the report.
+    7. One-hot encoding of ``CATEGORIAPRUEBA`` (if ≤ 20 categories).
+    8. Anti-leakage validation summary in the report.
+
+    Args:
+        df: Cleaned wide-format DataFrame produced by
+            ``cleaning.clean_dataset``.  Must contain at minimum:
+            ``ENTITY_COLS``, ``AÑO``, ``PROMEDIO_GLOBAL``, ``PROMEDIO_PRUEBA``,
+            ``CANTIDADEVALUADOS``, ``NBC``, ``NOMBRE_PRUEBA``.
+
+    Returns:
+        A tuple ``(df_feat, report_lines)`` where:
+
+        - ``df_feat`` is a copy of ``df`` with all engineered feature columns
+          appended.  The row count is guaranteed to be identical to the input.
+        - ``report_lines`` is a list of strings forming a human-readable feature
+          engineering report suitable for writing to ``outputs/feature_report.txt``.
+
+    Raises:
+        AssertionError: If the number of rows in ``df_feat`` differs from the
+            number of rows in the input ``df``.  This indicates a bug in one of
+            the feature-building helpers.
+
+    Example:
+        >>> df_feat, report = build_features(df_clean)
+        >>> len(df_feat) == len(df_clean)
+        True
+        >>> "lag_1_promedio_global" in df_feat.columns
+        True
+        >>> df_feat["tendencia_global"].isnull().mean() < 0.5
+        True
+
+    Note:
+        The temporal train/test split (train 2020-2023, test 2024) must be
+        applied **after** calling this function, not before.  Many features
+        (especially lag_2 and trend features) require a full entity history
+        to be non-null; splitting before feature engineering would cause all
+        2022 entities to have NaN lag_2 values when only 2020-2021 data is
+        used, inflating apparent null rates and degrading model performance.
     """
     report_lines = []
     report_lines.append("=" * 70)
