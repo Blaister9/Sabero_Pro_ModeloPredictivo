@@ -9,9 +9,10 @@ build/
 
 # ── Entornos virtuales ─────────────────────────────────────────
 .env
-.venv
+.venv/
 venv/
 env/
+.pytest_cache/
 
 # ── Jupyter ────────────────────────────────────────────────────
 .ipynb_checkpoints/
@@ -39,6 +40,17 @@ outputs/transformer_model.pt
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Archivos temporales locales
+*.log
+*.tmp
+*.bak
+~$*
+.~lock.*
+
+# Temporales de Office
+*.wbk
+*.asd
 
 # ── IDEs ───────────────────────────────────────────────────────
 .vscode/

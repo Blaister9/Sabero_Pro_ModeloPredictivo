@@ -15,7 +15,7 @@ TABLA 2. Comparativa de cuatro modelos en el conjunto de test
   │ Ridge           │  10.2294  │   7.2967  │ 0.6467 │ α=auto (RidgeCV), baseline   │
   │ Lasso           │  10.0722  │   7.0622  │ 0.6575 │ α=auto (LassoCV), baseline   │
   │ LightGBM ★      │   9.3293  │   6.2109  │ 0.7062 │ Optuna 50 trials, n_est=500  │
-  │ Transformer     │  16.7917  │     n/a   │ 0.0481 │ CPU 4.6 min, early stop ep53 │
+  │ Transformer     │  16.8588  │     n/a   │ 0.0405 │ CPU 2.7 min, early stop ep53 │
   └─────────────────┴───────────┴───────────┴────────┴──────────────────────────────┘
   ★ Modelo final seleccionado para producción.
 
@@ -130,14 +130,14 @@ TABLA 4. Métricas del Transformer (convergencia y comparativa)
 
   Convergencia:
     Épocas hasta early stopping: 53 (de 200 posibles)
-    Tiempo total: 4.6 minutos (dentro del presupuesto)
-    Mejor época: 33, mejor val_RMSE = 10.3777
+    Tiempo total: 2.7 minutos (dentro del presupuesto)
+    Mejor época: 33, mejor val_RMSE = 10.3860
 
   Métricas finales:
-    RMSE train: 10.8475   R² train: 0.5997
-    RMSE test:  16.7917   R² test:  0.0481
+    RMSE train: 10.8532   R² train: 0.5993
+    RMSE test:  16.8588   R² test:  0.0405
 
-  Brecha val/test: val_RMSE=10.38 vs test_RMSE=16.79
+  Brecha val/test: val_RMSE=10.39 vs test_RMSE=16.86
     Esta brecha significativa indica que el Transformer
     generaliza pobremente a entidades del test no vistas
     en entrenamiento. Ver Sección 6.3 para análisis detallado.

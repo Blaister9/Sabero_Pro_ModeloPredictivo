@@ -357,7 +357,7 @@ decision = (
     f"Mejora       : {mejora_pct:+.1f}%\n\n"
     f"Modelo seleccionado como modelo productivo: "
     f"{'LightGBM' if supera else 'Lasso (mejor baseline)'}\n"
-    f"Modelo serializado: outputs/lgbm_model.pkl\n"
+    f"Modelo serializado generado por Fase 5: outputs/lgbm_model.pkl (no versionado en Git)\n"
 )
 dec_path = os.path.join(OUTPUTS_REPORTS, "decision_modelo_final.txt")
 with open(dec_path, "w", encoding="utf-8") as f:

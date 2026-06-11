@@ -68,8 +68,8 @@
 │  R²=0.647  │ │                  │ │  nhead=4, layers=2, ffn=128            │
 │            │ │  RMSE=9.33  ★    │ │  CPU budget: 20 min                   │
 │  Lasso     │ │  R²=0.706   ★    │ │                                        │
-│  RMSE=10.07│ │                  │ │  RMSE=16.79                            │
-│  R²=0.658  │ │  lgbm_model.pkl  │ │  R²=0.048                             │
+│  RMSE=10.07│ │                  │ │  RMSE=16.86                            │
+│  R²=0.658  │ │  lgbm_model.pkl  │ │  R²=0.041                             │
 └────────────┘ └────────┬─────────┘ └────────────────────────────────────────┘
                         │ modelo final seleccionado
                         ▼
@@ -91,6 +91,11 @@
 | 5 LightGBM | features.csv | `lgbm_model.pkl`, SHAP figs | 733 KB |
 | 6 Transformer | features.csv | `transformer_model.pt` | 288 KB |
 | 7 Inferencia | `lgbm_model.pkl` + input row | Dict predicción + flags | — |
+
+Los modelos `.pkl` y `.pt` son artefactos regenerables y no se versionan en Git.
+La fuente de verdad versionada para Ridge/Lasso/LightGBM es
+`outputs/metrics/baseline_metrics.csv`; el Transformer queda documentado como
+comparación experimental en `outputs/reports/decision_transformer.txt`.
 
 ---
 
@@ -384,19 +389,19 @@ df["desviacion_estandar_historica"] = grp.transform(
 Paso 1: Descargar datos
   → data/raw/saber_pro_2025.xlsx  (estructura idéntica a años previos)
 
-Paso 2: Actualizar main.py
-  YEARS = [2020, 2021, 2022, 2023, 2024, 2025]
-  TRAIN_YEARS = [2020, 2021, 2022, 2023, 2024]
-  TEST_YEAR = 2025
+Paso 2: Validar ubicacion del archivo
+  python main.py --years 2020 2021 2022 2023 2024 2025 --dry-run
 
-Paso 3: Ejecutar pipeline completo
-  python main.py --years 2020 2021 2022 2023 2024 2025
+Paso 3: Parametrizar fases antes de publicar metricas 2025
+  Los scripts fase1..fase6 actuales estan calibrados para el experimento
+  academico 2020-2024 y el split train 2020-2023 / test 2024.
+  Antes de reentrenar con 2025 se deben parametrizar YEARS, YEAR_TEST,
+  reportes y nombres de salida.
 ```
 
-El pipeline es automáticamente compatible porque:
-- `load_years()` concatena dinámicamente todos los xlsx disponibles
-- Los lags y expanding windows se recalculan para el nuevo año
-- El TargetEncoder dentro del Pipeline se refit sobre el nuevo train
+`main.py` acepta `--years` para preflight, pero bloquea la ejecucion de fases de
+modelado con anios distintos a 2020-2024 hasta que esa parametrizacion exista.
+Esto evita generar metricas con documentacion o splits inconsistentes.
 
 ### 6.2 Agregar un Nuevo Feature — Checklist Anti-Leakage
 

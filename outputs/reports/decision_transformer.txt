@@ -1,5 +1,5 @@
 ANÁLISIS COMPARATIVO TRANSFORMER vs MODELOS ANTERIORES — FASE 6
-Fecha: 2026-04-13 16:44:56
+Fecha: 2026-06-10 21:50:43
 Autor: Edwin Santiago Paz Bedoya — Código 1071010
 =================================================================
 
@@ -39,30 +39,32 @@ Autor: Edwin Santiago Paz Bedoya — Código 1071010
 2. RESULTADOS DEL ENTRENAMIENTO
 ---------------------------------
   Estado:             CONVERGIDO
-  Tiempo total:       277.7s (4.6 min)
+  Tiempo total:       167.4s (2.8 min)
   Épocas completadas: 53
   Mejor época:        33
-  Mejor val RMSE:     10.3777
+  Mejor val RMSE:     10.3860
 
   Métricas finales (mejor modelo restaurado):
-    RMSE train:   10.8475
-    R²   train:   0.5997
-    RMSE test:    16.7917
-    R²   test:    0.0481
+    RMSE train:   10.8532
+    R²   train:   0.5993
+    RMSE test:    16.8588
+    R²   test:    0.0405
 
 3. COMPARATIVA DE MODELOS — TEST 2024
 -----------------------------------------
   | Modelo           | RMSE test | R² test | Notas                          |
   |------------------|-----------|---------|--------------------------------|
-  | Ridge (baseline) | 10.4142   | 0.6467  | Regularización L2              |
-  | Lasso (baseline) | 10.0722   | 0.6580  | Selección de features L1       |
+  | Ridge (baseline) |  10.2294   |  0.6467 | Regularización L2              |
+  | Lasso (baseline) |  10.0722   |  0.6575 | Selección de features L1       |
   | LightGBM         |  9.3293   |  0.7062 | Optuna 50 trials, SHAP         |
-  | Transformer      |  16.7917   |  0.0481 | CONVERGIDO                     |
+  | Transformer      |  16.8588   |  0.0405 | CONVERGIDO                     |
+
+  Fuente Ridge/Lasso/LightGBM: outputs/metrics/baseline_metrics.csv
 
 4. ANÁLISIS Y DECISIÓN
 -----------------------
   4.1 ¿Supera el Transformer a LightGBM?
-      NO: LightGBM sigue siendo el mejor modelo (+7.4624 puntos RMSE).
+      NO: LightGBM sigue siendo el mejor modelo (+7.5295 puntos RMSE).
 
   4.2 Ventajas del Transformer en este contexto:
       - Captura dependencias temporales entre años de forma explícita
@@ -95,9 +97,9 @@ Autor: Edwin Santiago Paz Bedoya — Código 1071010
   LIGHTGBM (sigue siendo el mejor modelo)
 
   Justificación:
-  LightGBM ofrece mejor RMSE (9.3293 vs 16.7917), menor complejidad, tiempo de entrenamiento << 20 min, e interpretabilidad SHAP. El Transformer no justifica su complejidad adicional para este dataset en este momento.
+  LightGBM ofrece mejor RMSE (9.3293 vs 16.8588), menor complejidad, tiempo de entrenamiento << 20 min, e interpretabilidad SHAP. El Transformer no justifica su complejidad adicional para este dataset en este momento.
   Para la Fase 7 (inferencia) y la Fase 8 (paper), el modelo primario es
-  LightGBM (outputs/lgbm_model.pkl). El Transformer queda documentado
+  LightGBM (outputs/lgbm_model.pkl, generado por Fase 5 y no versionado en Git). El Transformer queda documentado
   como experimento adicional con potencial para datasets más grandes.
 
 =================================================================

@@ -7,7 +7,7 @@ Edwin Santiago Paz Bedoya — Código 1071010
 6.1 Por qué LightGBM supera al Transformer en este contexto
 -------------------------------------------------------------
 El resultado de que LightGBM (RMSE=9.33, R²=0.706) supera
-ampliamente al Transformer encoder (RMSE=16.79, R²=0.048) no
+ampliamente al Transformer encoder (RMSE=16.86, R²=0.041) no
 es sorpresivo dados los siguientes factores estructurales del
 problema. Este análisis tiene implicaciones generales para el
 diseño de sistemas de predicción sobre datos de panel educativo.
@@ -93,8 +93,8 @@ para cada arquitectura.
   de train (32,422), y debe generalizar a las 28,762 entidades
   de test.
 
-  La brecha val/test del Transformer (val_RMSE=10.38 vs.
-  test_RMSE=16.79, diferencia de 6.41 puntos) indica que el
+  La brecha val/test del Transformer (val_RMSE=10.39 vs.
+  test_RMSE=16.86, diferencia de 6.47 puntos) indica que el
   modelo sobreajusta a las entidades de validación y no
   generaliza bien fuera de ellas. LightGBM no tiene este
   problema porque opera a nivel de features individuales, no
@@ -104,7 +104,7 @@ para cada arquitectura.
 -------------------------------
   LightGBM: búsqueda Optuna completa en ~7 min (50 trials × 8s)
              + entrenamiento final en ~2 min.
-  Transformer: 4.6 min hasta early stopping (convergencia parcial,
+  Transformer: 2.7 min hasta early stopping,
                53 de 200 épocas posibles).
 
   Ambos son viables en CPU en el presupuesto de 20 minutos, pero
