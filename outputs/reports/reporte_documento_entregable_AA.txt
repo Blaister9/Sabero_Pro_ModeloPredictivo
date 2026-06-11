@@ -1,0 +1,116 @@
+Reporte de generacion del documento entregable A&A
+Proyecto: Sabero_Pro_ModeloPredictivo
+Rama: codex/reproducibilidad-academica
+Fecha local: 2026-06-10
+
+1. Archivos usados como entrada
+
+- Plantilla institucional/revista detectada:
+  docs/templates/Plantilla_A&A.docx
+- Documento academico base de contenido:
+  outputs/saber_pro_paper_OPUS47_FINAL.docx
+- Fuente estructurada usada para reconstruir el contenido:
+  paper/revised/paper_content.py
+- Metricas oficiales de modelos clasicos:
+  outputs/metrics/baseline_metrics.csv
+- Figuras fuente:
+  outputs/figures/
+
+2. Archivos generados
+
+- outputs/saber_pro_paper_OPUS47_ENTREGABLE_AA.docx
+
+No se sobrescribieron los documentos originales:
+
+- outputs/saber_pro_paper_OPUS47.docx
+- outputs/saber_pro_paper_OPUS47_FINAL.docx
+
+3. Resultado de aplicacion de plantilla
+
+El documento entregable fue generado sobre la plantilla A&A. Se conservaron el tamano de pagina, margenes, encabezado/pie y el recurso grafico de encabezado de la plantilla. Se reemplazo el contenido de muestra de la plantilla por el contenido academico del proyecto Saber Pro.
+
+El titulo en ingles fue derivado del titulo espanol porque la fuente base no tenia un titulo ingles explicito.
+
+4. Correcciones documentales aplicadas en el entregable
+
+- Se eliminaron textos de muestra de la plantilla.
+- Se corrigieron metricas antiguas del Transformer en el documento entregable.
+- Se corrigieron caracteres corruptos generados durante la conversion, especialmente bullets y la palabra "ano" con ene.
+- Se quitaron lineas de guiones bajos que podian interpretarse como placeholders.
+- Se agrego una nota explicita de reproducibilidad sobre ejecucion desde CSVs procesados, no versionamiento de modelos .pkl/.pt y uso de 2024 como prueba temporal.
+
+5. Metricas validadas en el entregable
+
+Metricas oficiales verificadas contra outputs/metrics/baseline_metrics.csv:
+
+- Ridge: RMSE 10.2294, MAE 7.2967, R2 0.6467.
+- Lasso: RMSE 10.0722, MAE 7.0622, R2 0.6575.
+- LightGBM: RMSE 9.3293, MAE 6.2109, R2 0.7062.
+
+Metricas Transformer corregidas en el entregable:
+
+- RMSE test 16.8588.
+- R2 test 0.0405.
+
+El QA textual del DOCX encontro las metricas actuales presentes y no encontro las metricas antiguas:
+
+- Ausentes: 16,7917; 16.7917; 16,79; 16.79; 0,0481; 0.0481; 0,048; 0.048.
+- Presentes: 16,8588; 0,0405; 16,86; 0,041.
+
+6. QA textual y estructural
+
+Resultado de inspeccion automatica con python-docx:
+
+- Parrafos: 159.
+- Tablas: 5.
+- Figuras inline: 11.
+- Archivos media dentro del DOCX: 13.
+- Caracteres de reemplazo Unicode: 0.
+- Lineas con signos de interrogacion corruptos al inicio: 0.
+- Placeholders detectados: 0.
+- Textos de muestra de plantilla detectados: 0.
+- Lineas de guiones bajos tipo placeholder: 0.
+
+Los dos signos de interrogacion restantes corresponden a titulos reales de referencias bibliograficas:
+
+- "Why do tree-based models still outperform deep learning on typical tabular data?"
+- "Where to aim? Factors that influence the performance of Brazilian secondary schools..."
+
+7. Figuras y tablas incluidas
+
+Se incluyeron figuras del pipeline en outputs/figures, incluyendo:
+
+- Nulidad 2024.
+- Distribucion post-limpieza.
+- Cobertura temporal.
+- Correlacion de features con target.
+- LightGBM predicho vs real.
+- SHAP beeswarm.
+- Curva de aprendizaje LightGBM.
+- Error por NBC.
+- Error por departamento.
+- Curva de aprendizaje Transformer.
+- Scatter de Transformer en test.
+
+El documento contiene tabla de tamano de dataset, tabla de leakage, tabla comparativa de modelos y tablas asociadas al modulo de inferencia/confianza.
+
+8. PDF
+
+Se intento exportar PDF con Microsoft Word instalado en:
+
+C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE
+
+La automatizacion COM de Word no respondio dentro de 120 segundos y no genero PDF. La instancia oculta de Word iniciada por el intento fue cerrada. No se instalo LibreOffice ni se agregaron dependencias para convertir el documento.
+
+Estado: PDF no generado en esta fase por limitacion operativa del entorno.
+
+9. Riesgos pendientes
+
+- Falta revision visual humana en Word del DOCX final antes de entrega oficial.
+- Falta exportar PDF desde Word manualmente o desde un entorno con conversor DOCX/PDF estable.
+- La plantilla A&A usada como base conserva metadatos visuales de ejemplo de revista; si la institucion exige una plantilla diferente, debe aplicarse antes de la entrega final.
+- El titulo ingles fue derivado, no provino de una fuente aprobada por el autor.
+
+10. Recomendacion para Fase 4
+
+Abrir outputs/saber_pro_paper_OPUS47_ENTREGABLE_AA.docx en Word, revisar visualmente portada/encabezado/tablas/figuras/saltos de pagina y exportar manualmente a PDF. Si la revision visual es aprobada, usar este DOCX como base final de entrega; si la institucion entrega una plantilla distinta, migrar este contenido a esa plantilla antes de generar el PDF definitivo.

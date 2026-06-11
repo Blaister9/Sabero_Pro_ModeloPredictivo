@@ -1,0 +1,261 @@
+AUDITORIA DOCUMENTO FINAL ACADEMICO - FASE 3A
+Proyecto: Sabero_Pro_ModeloPredictivo
+Fecha: 2026-06-10
+
+================================================================
+1. DOCUMENTOS EVALUADOS
+================================================================
+
+Documentos detectados:
+  - outputs/saber_pro_paper_OPUS47.docx
+    Tamano: 52,766 bytes
+    Estructura extraida: 153 parrafos, 5 tablas, 0 imagenes embebidas.
+    Observacion: contiene captions con placeholders de figuras y no incluye
+    figuras reales. No es la mejor base de entrega.
+
+  - outputs/saber_pro_paper_OPUS47_FINAL.docx
+    Tamano: 984,555 bytes
+    Estructura extraida: 174 parrafos, 5 tablas, 11 formas/imagenes inline,
+    11 imagenes reales embebidas.
+    Observacion: es mas completo, incluye figuras reales, abstract bilingue,
+    tablas, referencias y apendice. Es el documento base recomendado.
+
+Documento base recomendado:
+  outputs/saber_pro_paper_OPUS47_FINAL.docx
+
+Razon:
+  Es el documento mas apto como base visual porque contiene figuras embebidas,
+  tablas y una estructura academica completa. Sin embargo, NO esta listo para
+  entrega definitiva porque conserva metricas antiguas del Transformer y no
+  incorpora las aclaraciones de reproducibilidad/versionamiento cerradas en
+  Fase 2B.
+
+================================================================
+2. INTEGRIDAD TEXTUAL
+================================================================
+
+Extraccion de texto:
+  El texto del documento FINAL se extrajo correctamente sin modificar el DOCX.
+
+Acentos, enies y caracteres:
+  - No se detecto corrupcion general de tildes ni de la letra enie.
+  - Las palabras con acentos aparecen legibles: introduccion, metodologia,
+    discusion, conclusiones, desempeno, prediccion, educacion, etc.
+  - Los signos '?' encontrados corresponden a titulos de referencias en ingles
+    ("Do tree-based models still outperform deep learning on typical tabular
+    data?" y "Where to aim?") y no a corrupcion de palabras en espaniol.
+
+Campos vacios / placeholders:
+  - En el DOCX FINAL no se detectaron placeholders literales tipo PLACEHOLDER,
+    INSERTAR, FALTA, XXX o por completar.
+  - El DOCX no final si conserva placeholders de figuras, por lo cual no debe
+    usarse como documento entregable.
+
+Limitacion de auditoria visual:
+  Se intento renderizar el DOCX FINAL a PNG/PDF para inspeccion visual, pero el
+  entorno no tiene disponible LibreOffice/soffice. La auditoria visual completa
+  de layout queda pendiente para Fase 3B en un entorno con Word o LibreOffice.
+
+================================================================
+3. METRICAS: COMPARACION CONTRA FUENTE OFICIAL
+================================================================
+
+Fuente oficial actual:
+  outputs/metrics/baseline_metrics.csv
+
+Metricas oficiales:
+  Ridge:    RMSE 10.2294 | MAE 7.2967 | R2 0.6467
+  Lasso:    RMSE 10.0722 | MAE 7.0622 | R2 0.6575
+  LightGBM: RMSE  9.3293 | MAE 6.2109 | R2 0.7062
+  Transformer: RMSE test 16.8588 | R2 test 0.0405
+
+Estado del DOCX FINAL:
+  - Ridge/Lasso/LightGBM aparecen correctos en la tabla principal:
+      Ridge    10,2294 | 7,2967 | 0,6467
+      Lasso    10,0722 | 7,0622 | 0,6575
+      LightGBM  9,3293 | 6,2109 | 0,7062
+  - En resumen y abstract aparecen redondeados correctamente para modelos
+    clasicos y LightGBM:
+      Ridge 10,23 / 0,647
+      Lasso 10,07 / 0,658
+      LightGBM 9,33 / 0,706
+  - Problema critico: el Transformer esta desactualizado en el DOCX FINAL.
+    El documento reporta:
+      RMSE 16,79 / R2 0,048
+    Debe actualizarse a:
+      RMSE 16,8588 / R2 0,0405
+      o redondeado: RMSE 16,86 / R2 0,041
+
+Ubicaciones conceptuales donde corregir Transformer:
+  - Resumen en espaniol.
+  - Abstract en ingles.
+  - Tabla comparativa de modelos, si incluye fila Transformer.
+  - Seccion de resultados del Transformer.
+  - Discusion LightGBM vs Transformer.
+  - Conclusiones, si mencionan R2 del Transformer.
+  - Captions de Fig. 10 si mencionan val/test y RMSE test.
+
+================================================================
+4. FIGURAS Y TABLAS
+================================================================
+
+DOCX FINAL:
+  Figuras embebidas:
+    - 11 imagenes reales embebidas en word/media.
+    - Dimensiones inspeccionadas incluyen imagenes de 1485x1721, 2090x1520,
+      1784x740, 1485x1031, 1034x1031, 1177x1107, 1484x732, 1485x1293,
+      1200x600 y 900x900 px.
+    - La estructura indica que las figuras principales estan presentes.
+
+  Captions detectadas:
+    - Fig. 1: nulidad dataset crudo.
+    - Fig. 2: dataset post-pivot y limpieza.
+    - Fig. 3: cobertura temporal.
+    - Fig. 4: correlacion de features.
+    - Fig. 5: LightGBM predicho vs real.
+    - Fig. 6: SHAP beeswarm.
+    - Fig. 7: curva de aprendizaje LightGBM.
+    - Fig. 8: RMSE por NBC.
+    - Fig. 9: RMSE por departamento.
+    - Fig. 10: Transformer encoder.
+
+  Tablas detectadas:
+    - Tabla I: tamano del dataset crudo por anio.
+    - Tabla II: fuga de informacion identificada/corregida.
+    - Tabla III: comparativa de modelos.
+    - Tabla IV: RMSE/MAE por NBC.
+    - Tabla V: distribucion de flags/confianza.
+
+Observaciones:
+  - La comparacion de modelos esta presente.
+  - Resultados LightGBM estan presentes.
+  - SHAP/feature importance esta presente via Fig. 6 y discusion.
+  - Comparacion Transformer vs modelos clasicos esta presente.
+  - Split temporal 2020-2023 entrenamiento / 2024 prueba esta presente.
+  - No se pudo confirmar visualmente si alguna figura esta cortada, solapada,
+    borrosa o mal posicionada por falta de renderizador en el entorno.
+
+Correccion requerida:
+  - Actualizar captions/textos de Fig. 10 y cualquier parrafo asociado para
+    usar RMSE 16.8588 / R2 0.0405.
+  - En Fase 3B hacer QA visual pagina por pagina en Word/LibreOffice.
+
+================================================================
+5. ESTRUCTURA ACADEMICA
+================================================================
+
+Presente en DOCX FINAL:
+  [OK] Titulo.
+  [OK] Autor.
+  [OK] Afiliacion / especializacion / codigo / modalidad.
+  [OK] Repositorio.
+  [OK] Resumen.
+  [OK] Terminos de indexacion.
+  [OK] Abstract.
+  [OK] Index Terms.
+  [OK] Introduccion.
+  [OK] Trabajos relacionados.
+  [OK] Datos y metodologia.
+  [OK] Ingenieria de features.
+  [OK] Modelos y estrategia de evaluacion.
+  [OK] Resultados.
+  [OK] Discusion.
+  [OK] Conclusiones y trabajo futuro.
+  [OK] Referencias.
+  [OK] Apendice de arquitectura/software.
+
+Brechas o riesgos:
+  - No hay portada institucional formal; el documento tiene encabezado tipo
+    articulo/paper, no formato institucional de entrega.
+  - No se detecto logo, acta, portada normalizada, facultad, universidad,
+    asesor/jurado o campos institucionales.
+  - Los encabezados parecen texto formateado manualmente; la extraccion OOXML
+    no detecto estilos de Heading. Esto puede afectar tabla de contenido,
+    accesibilidad y navegacion del documento.
+  - El DOCX no menciona claramente en el apendice las aclaraciones cerradas en
+    Fase 2B: modelos .pkl/.pt no versionados, reproduccion minima desde CSVs
+    procesados y reproduccion completa desde raw con Excel ICFES.
+
+================================================================
+6. PLANTILLA INSTITUCIONAL
+================================================================
+
+Busqueda realizada en:
+  - outputs/
+  - docs/
+  - paper/
+  - raiz del proyecto
+
+Resultado:
+  No se detecto plantilla institucional separada (.dotx/.docx/.pdf) dentro del
+  repositorio. Los unicos DOCX relevantes son:
+    - outputs/saber_pro_paper_OPUS47.docx
+    - outputs/saber_pro_paper_OPUS47_FINAL.docx
+
+Caminos posibles para Fase 3B:
+  A. Usar outputs/saber_pro_paper_OPUS47_FINAL.docx como base visual y corregir
+     metricas, reproducibilidad y metadatos academicos.
+  B. Esperar una plantilla institucional externa y aplicar el contenido
+     corregido sobre esa plantilla.
+
+Recomendacion:
+  Si existe exigencia institucional de formato, usar camino B. Si no existe,
+  usar camino A con QA visual riguroso.
+
+================================================================
+7. RIESGOS PARA ENTREGA
+================================================================
+
+Riesgo alto:
+  - Metricas antiguas del Transformer en el DOCX FINAL.
+    Impacto: inconsistencias con outputs/reports/decision_transformer.txt,
+    paper/draft actualizado y resultados reproducidos en Fase 2B.
+
+Riesgo medio:
+  - Falta de portada/plantilla institucional formal.
+  - Apendice de reproducibilidad no refleja completamente el estado actual:
+    modelos no versionados, CSVs procesados versionados y raw requerido para
+    reproduccion completa.
+  - No se pudo hacer QA visual por falta de LibreOffice/soffice.
+  - Encabezados sin estilos Heading detectables; posible problema de TOC y
+    accesibilidad.
+
+Riesgo bajo:
+  - Metadatos del DOCX indican author "Un-named" y fechas internas antiguas
+    respecto al flujo actual. Deben normalizarse en la version entregable.
+
+================================================================
+8. RECOMENDACION EXACTA PARA FASE 3B
+================================================================
+
+Usar outputs/saber_pro_paper_OPUS47_FINAL.docx como base, pero no entregarlo
+todavia. En Fase 3B se debe generar una copia nueva versionada con nombre claro,
+por ejemplo:
+  outputs/saber_pro_paper_OPUS47_ENTREGABLE.docx
+
+Correcciones minimas obligatorias:
+  1. Actualizar todas las menciones del Transformer:
+       RMSE 16,79 / R2 0,048
+       -> RMSE 16,8588 / R2 0,0405
+       o redondeado consistente: RMSE 16,86 / R2 0,041.
+  2. Confirmar que Ridge/Lasso/LightGBM coincidan con
+       outputs/metrics/baseline_metrics.csv.
+  3. Incorporar aclaracion de reproducibilidad:
+       - reproducible desde CSVs procesados versionados,
+       - reproduccion completa desde raw requiere Excel ICFES en data/raw/,
+       - modelos .pkl/.pt son regenerables y no se versionan.
+  4. Decidir plantilla:
+       - aplicar plantilla institucional externa si existe,
+       - o mantener estilo paper actual y completar portada/metadatos.
+  5. Normalizar metadatos del DOCX: autor, titulo, asunto/palabras clave.
+  6. Hacer render/QA visual pagina por pagina en Word o LibreOffice:
+       verificar figuras, tablas, saltos, captions, referencias, cabeceras,
+       pie de pagina y posibles solapamientos.
+
+Estado final de esta auditoria:
+  El DOCX FINAL puede usarse como base, pero no como entregable definitivo sin
+  correcciones.
+
+================================================================
+FIN DE AUDITORIA
+================================================================
