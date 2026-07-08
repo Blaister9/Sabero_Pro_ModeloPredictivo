@@ -1,0 +1,75 @@
+Reporte de cierre del paquete de entrega de congreso
+Proyecto: Sabero_Pro_ModeloPredictivo
+Fecha local: 2026-07-08
+
+1. Documento validado
+
+- outputs/Saber_pro_paper_CONGRESO_10P_FINAL.docx
+
+Validacion previa con Microsoft Word COM:
+
+- El documento abre sin error COM.
+- Paginas: 10.
+- Tablas: 1.
+- Imagenes inline: 5.
+- Formas flotantes: 0.
+- Campos Word: 0.
+- Errores visibles de campo: no detectados.
+- Texto visible de plantilla o placeholders: no detectado.
+
+2. PDF final
+
+PDF exportado manualmente desde Microsoft Word:
+
+- outputs/Saber_pro_paper_CONGRESO_10P_FINAL.pdf
+- entrega_congreso/Saber_pro_paper_CONGRESO_10P_FINAL.pdf
+
+Validacion del PDF:
+
+- Existe en outputs/.
+- Existe en entrega_congreso/.
+- Tamano: 620019 bytes.
+- Cabecera valida: %PDF-1.7.
+- Marcador EOF presente.
+- Paginas segun pypdf: 10.
+
+3. Carpeta de entrega
+
+Carpeta:
+
+- entrega_congreso/
+
+Archivos incluidos:
+
+- entrega_congreso/Saber_pro_paper_CONGRESO_10P_FINAL.docx
+- entrega_congreso/Saber_pro_paper_CONGRESO_10P_FINAL.pdf
+- entrega_congreso/reporte_revision_asesora_congreso.txt
+- entrega_congreso/LEEME_ENTREGA.txt
+
+Estado: carpeta de entrega completa.
+
+4. QA textual rapido
+
+Validaciones sobre el DOCX:
+
+- No contiene [Autores].
+- No contiene placeholders detectables.
+- No contiene metricas antiguas 16,79 ni 0,048.
+- Contiene Edwin Santiago Paz Bedoya.
+- Contiene LightGBM.
+- Contiene RMSE 9,33 / metricas oficiales de LightGBM.
+- Contiene RMSE 16,86 / Transformer corregido.
+- Contiene R2 0,041 / Transformer corregido.
+
+5. Estado final
+
+El paquete final de entrega queda listo para revision visual humana y envio. No se hizo push ni deploy.
+
+6. Recomendacion antes del envio
+
+Abrir entrega_congreso/Saber_pro_paper_CONGRESO_10P_FINAL.pdf y revisar visualmente:
+
+- que sean 10 paginas,
+- que figuras y tabla no tengan cortes,
+- que autores y afiliacion sean los definitivos,
+- que el archivo PDF sea el que se va a cargar al sistema del congreso.

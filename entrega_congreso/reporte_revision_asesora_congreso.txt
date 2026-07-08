@@ -1,0 +1,125 @@
+Reporte de revision de version asesora para congreso
+Proyecto: Sabero_Pro_ModeloPredictivo
+Rama: codex/reproducibilidad-academica
+Fecha local: 2026-07-08
+
+1. Archivos de entrada
+
+Se copiaron al repositorio, sin modificar los originales en Downloads:
+
+- paper/incoming_advisora/Saber pro paper.docx
+- paper/incoming_advisora/Saber_pro_plantilla_V_4docx.docx
+
+El documento usado como base principal fue:
+
+- paper/incoming_advisora/Saber_pro_plantilla_V_4docx.docx
+
+El documento extenso se uso solo como referencia comparativa.
+
+2. Diferencias relevantes encontradas
+
+La version extensa tiene aproximadamente 6.303 palabras, 5 tablas y 11 figuras inline. La version V4 de la asesora reduce el documento a aproximadamente 3.531 palabras, 1 tabla y 7 figuras inline, manteniendo el eje central del trabajo: prediccion del PROMEDIO_GLOBAL de Saber Pro, auditoria de fuga temporal, evaluacion de modelos y seleccion de LightGBM.
+
+La asesora resumio o elimino material detallado de:
+
+- Tablas ampliadas de leakage y arquitectura.
+- Explicaciones extensas de feature engineering.
+- Detalles de curvas, errores y modulo de inferencia.
+- Anexo de arquitectura de software.
+
+La asesora agrego o reforzo:
+
+- Marco teorico del examen Saber Pro y modelo de Rasch.
+- Relacion con mineria de datos educativa.
+- Discusion sobre fuga de informacion en paneles temporales.
+- Justificacion de modelos supervisados para datos tabulares.
+- Implicaciones para politica educativa.
+
+El contenido agregado es coherente con el enfoque del proyecto y mejora la version de congreso, porque contextualiza el aporte metodologico sin convertir el documento en un informe tecnico largo.
+
+3. Resultados imprescindibles conservados
+
+La version final de congreso conserva:
+
+- Problema y motivacion institucional.
+- Datos Saber Pro 2020-2024.
+- Split temporal: entrenamiento 2020-2023 y prueba 2024.
+- Comparacion de Ridge, Lasso, LightGBM y Transformer.
+- Tabla principal de metricas.
+- LightGBM como modelo final.
+- Explicacion corta de por que Transformer no fue competitivo.
+- Interpretabilidad mediante SHAP.
+- Limitaciones.
+- Nota breve de reproducibilidad desde CSVs procesados.
+
+4. Correcciones aplicadas
+
+Se genero:
+
+- outputs/Saber_pro_paper_CONGRESO_10P_FINAL.docx
+
+Cambios principales sobre V4:
+
+- Se reemplazo el placeholder [Autores] por Edwin Santiago Paz Bedoya.
+- Se corrigio la fila Transformer de la Tabla 1:
+  - RMSE: 16,8588.
+  - R2: 0,0405.
+  - MAE se conserva como n/d porque no hay metrica oficial indicada para Transformer.
+- Se corrigieron menciones redondeadas del Transformer:
+  - RMSE: 16,86.
+  - R2: 0,041.
+- Se corrigio numeracion de figuras antes del recorte final.
+- Se elimino la figura del Transformer y la figura geografica para cumplir el limite de 10 paginas, manteniendo ambos resultados en texto.
+- Se agrego una frase breve de reproducibilidad en conclusiones.
+- Se corrigieron signos corruptos introducidos durante la edicion local.
+
+5. Contenido dejado fuera por limite de paginas
+
+Para respetar el limite de maximo 10 paginas no se recuperaron desde la version extensa:
+
+- Tabla completa de leakage.
+- Anexo de arquitectura del software.
+- Figuras adicionales de Transformer.
+- Figura geografica por departamento.
+- Explicaciones largas de feature engineering y despliegue.
+- Detalles ampliados de validacion futura.
+
+Estas exclusiones son razonables para una version de congreso porque los resultados principales quedan representados en la tabla de metricas, las figuras de LightGBM y SHAP, y la discusion tecnica.
+
+6. QA textual y tecnico
+
+Validaciones automatizadas sobre outputs/Saber_pro_paper_CONGRESO_10P_FINAL.docx:
+
+- Paginas contadas con Microsoft Word COM: 10.
+- Parrafos: 107.
+- Tablas: 1.
+- Figuras inline: 5.
+- Palabras aproximadas: 3.479.
+- Placeholders detectados: 0.
+- Metricas antiguas detectadas: 0.
+- Caracteres Unicode de reemplazo: 0.
+- Signos de interrogacion restantes: 2, ambos pertenecen a titulos reales de referencias bibliograficas.
+
+Metricas oficiales presentes:
+
+- Ridge: RMSE 10,2294; MAE 7,2967; R2 0,6467.
+- Lasso: RMSE 10,0722; MAE 7,0622; R2 0,6575.
+- LightGBM: RMSE 9,3293; MAE 6,2109; R2 0,7062.
+- Transformer: RMSE 16,8588; R2 0,0405.
+
+7. Render visual
+
+Se intento renderizar el DOCX con el script del skill de documentos, pero el entorno no encontro soffice/LibreOffice y no pudo generar PNGs de QA visual. Microsoft Word si permitio contar paginas mediante COM.
+
+Estado de extension: verificado en Word COM como 10 paginas.
+
+8. Riesgos pendientes
+
+- Revisar visualmente en Word antes de enviar, especialmente saltos de pagina, posicion de figuras, encabezados y tabla de metricas.
+- Confirmar si el congreso exige nombres completos de todos los autores, correos o afiliaciones adicionales; V4 tenia placeholder [Autores] y se reemplazo por el autor disponible en el repositorio.
+- Confirmar si la plantilla del congreso exige PDF final; esta fase solo genera DOCX.
+- Si la asesora desea conservar la figura geografica o la curva del Transformer, habria que recortar texto adicional para no superar 10 paginas.
+
+9. Recomendacion antes de enviar
+
+Usar outputs/Saber_pro_paper_CONGRESO_10P_FINAL.docx como base final de revision. Abrirlo en Word, confirmar visualmente que marca 10 paginas, completar autores/afiliaciones si aplica, revisar que las figuras se vean correctamente y exportar a PDF solo despues de esa revision.
