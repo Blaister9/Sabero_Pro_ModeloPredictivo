@@ -37,7 +37,7 @@ Las conclusiones más relevantes son:
   lineales en este dominio.
 
   C4 — El Transformer encoder no es competitivo en este dataset
-  específico: R²=0.048 vs. R²=0.706 de LightGBM. Los factores
+  específico: R²=0.041 vs. R²=0.706 de LightGBM. Los factores
   determinantes son el reducido número de muestras efectivas
   (32,422 secuencias vs. 98,954 filas), la ausencia de features
   categóricas de alta señal y la alta proporción de entidades

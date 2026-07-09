@@ -6,22 +6,24 @@ RMSE Lasso   : 10.0722
 Mejora       : +7.4%
 
 Modelo seleccionado como modelo productivo: LightGBM
-Modelo serializado: outputs/lgbm_model.pkl
+Modelo serializado generado por Fase 5: outputs/lgbm_model.pkl (no versionado en Git)
 
 =================================================================
-ACTUALIZACIÓN FASE 6 — 2026-04-13 16:44:56
+ACTUALIZACIÓN FASE 6 — 2026-06-10 21:50:43
 =================================================================
 Transformer evaluado:
-  RMSE test: 16.7917  R²: 0.0481
+  RMSE test: 16.8588  R²: 0.0405
   Estado:    CONVERGIDO
   Épocas:    53 / 200
 
 Comparativa final (test 2024):
-  Ridge:       RMSE=10.4142  R²=0.6467
-  Lasso:       RMSE=10.0722  R²=0.6580
+  Ridge:       RMSE=10.2294  R²=0.6467
+  Lasso:       RMSE=10.0722  R²=0.6575
   LightGBM:    RMSE=9.3293  R²=0.7062  ← MEJOR MODELO PARA PRODUCCIÓN
-  Transformer: RMSE=16.7917  R²=0.0481
+  Transformer: RMSE=16.8588  R²=0.0405
+
+Fuente Ridge/Lasso/LightGBM: outputs/metrics/baseline_metrics.csv
 
 MODELO FINAL SELECCIONADO: LIGHTGBM
-Ruta: outputs/lgbm_model.pkl
+Ruta generada: outputs/lgbm_model.pkl
 Ver detalle: outputs/reports/decision_transformer.txt

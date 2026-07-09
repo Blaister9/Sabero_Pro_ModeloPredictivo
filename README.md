@@ -36,14 +36,14 @@ Este motor predictivo cambia esa dinámica: al estimar el `PROMEDIO_GLOBAL` de c
 
 ## Características
 
-- **Pipeline reproducible de 8 fases** ejecutable con un solo script (`main.py`)
+- **Pipeline reproducible de 8 fases** orquestado por `main.py`, con preflight de datos y artefactos
 - **127.716 observaciones** post-pivot (1.73M filas crudas ICFES 2020–2024 procesadas)
 - **6 tipos de data leakage identificados y corregidos** — impacto total ΔR²=0.22 en test
 - **Comparativa de 4 modelos**: Ridge · Lasso · LightGBM (Optuna 50 trials) · Transformer encoder
 - **Módulo de inferencia deployable** (`src/inference.py`) con 3 flags de confianza empíricos
 - **Interpretabilidad SHAP** (TreeExplainer, beeswarm, feature importance gain)
 - Split temporal estricto 2020–2023 (train) / 2024 (test) — sin información futura en train
-- **Extensible** a nuevos años ICFES sin cambios de código (ver [Agregar un Nuevo Año](#agregar-un-nuevo-año))
+- **Preparado para extenderse** a nuevos años ICFES, dejando claro qué partes requieren parametrización adicional (ver [Agregar un Nuevo Año](#agregar-un-nuevo-año))
 
 ---
 
@@ -56,9 +56,12 @@ Evaluación sobre el conjunto de test temporal 2024 (n=28.762, split estricto):
 | Ridge | 10.23 | 7.30 | 0.647 | Baseline regularización L2 |
 | Lasso | 10.07 | 7.06 | 0.658 | Baseline selección L1 |
 | **LightGBM** ⭐ | **9.33** | **6.21** | **0.706** | Optuna 50 trials, SHAP |
-| Transformer | 16.79 | — | 0.048 | CPU 4.6 min, early stop ep.53 |
+| Transformer | 16.86 | — | 0.041 | CPU 2.7 min, early stop ep.53 |
 
-> **Modelo final seleccionado**: LightGBM (`outputs/lgbm_model.pkl`)
+Fuente de verdad para Ridge/Lasso/LightGBM: `outputs/metrics/baseline_metrics.csv`.
+Transformer se documenta en `outputs/reports/decision_transformer.txt` como comparación experimental, no como modelo final.
+
+> **Modelo final seleccionado**: LightGBM. El archivo serializado `outputs/lgbm_model.pkl` se genera con la Fase 5 y no se versiona en Git por seguridad/tamaño.
 > Mejora sobre mejor baseline: **−7.4% RMSE**, **+4.9% R²**
 >
 > El Transformer no es competitivo en este dataset (32k secuencias vs. 98k filas, sin features categóricas NBC/NOMBRE_PRUEBA). Ver [`paper/draft/06_discusion.txt`](paper/draft/06_discusion.txt) para análisis detallado.
@@ -111,11 +114,11 @@ Sabero_Pro_ModeloPredictivo/
 │
 ├── outputs/
 │   ├── CHECKLIST_FINAL.txt            # Verificación completa del pipeline
-│   ├── lgbm_model.pkl                 # Modelo final (NO en git, usar LFS)
+│   ├── lgbm_model.pkl                 # Generado por Fase 5 (NO en git)
 │   ├── lgbm_best_params.json          # Hiperparámetros Optuna óptimos
 │   ├── figures/                       # 23 gráficas PNG (SHAP, scatter, etc.)
-│   ├── metrics/                       # 6 CSVs de métricas por NBC/depto
-│   └── reports/                       # 9 reportes TXT (análisis, narrativas)
+│   ├── metrics/                       # 8 CSVs de métricas y errores
+│   └── reports/                       # 11 reportes TXT (análisis, narrativas)
 │
 ├── paper/
 │   └── draft/                         # 8 secciones del artículo académico
@@ -148,20 +151,57 @@ pip install -r requirements.txt
 > pip install torch --index-url https://download.pytorch.org/whl/cpu
 > ```
 
-Los archivos de datos crudos (`data/raw/saber_pro_YYYY.xlsx`) no están en el repositorio por tamaño. Ver [Descarga de Datos](#agregar-un-nuevo-año) para obtenerlos del ICFES.
+### Artefactos no versionados
+
+Los archivos de datos crudos (`data/raw/saber_pro_YYYY.xlsx`) no están en Git por tamaño. Deben descargarse del ICFES y ubicarse con estos nombres:
+
+```text
+data/raw/saber_pro_2020.xlsx
+data/raw/saber_pro_2021.xlsx
+data/raw/saber_pro_2022.xlsx
+data/raw/saber_pro_2023.xlsx
+data/raw/saber_pro_2024.xlsx
+```
+
+Los modelos serializados tampoco se versionan: `outputs/ridge_model.pkl`, `outputs/lasso_model.pkl`, `outputs/lgbm_model.pkl` y `outputs/transformer_model.pt`. Se regeneran ejecutando las fases 4, 5 y 6. El repositorio sí incluye CSVs procesados, métricas, figuras, reportes y documentos académicos generados.
 
 ---
 
 ## Uso Rápido
 
-### a) Pipeline completo (8 fases)
+### a) Ver preflight y ayuda
 
 ```bash
-# Ejecuta todas las fases en secuencia con los años especificados
+python main.py --help
+python main.py --list-phases
+```
+
+### b) Pipeline completo desde datos raw
+
+Requiere los cinco Excel en `data/raw/`. Si faltan, `main.py` termina con código de salida distinto de cero y muestra qué archivos debe descargar/renombrar.
+
+```bash
 python main.py --years 2020 2021 2022 2023 2024
 ```
 
-O por fases individuales:
+### c) Continuar desde CSVs procesados
+
+El repositorio versiona `data/processed/saber_pro_limpio.csv` y `data/processed/saber_pro_features.csv`. Si no tiene los Excel raw, puede continuar desde fases posteriores:
+
+```bash
+# Regenerar features desde saber_pro_limpio.csv
+python main.py --only 3
+
+# Entrenar modelos desde saber_pro_features.csv
+python main.py --from-phase 4 --to-phase 6
+
+# Generar el paper reproducible desde fuentes livianas
+python main.py --only 8
+```
+
+La demo de inferencia (`fase 7`) requiere `outputs/lgbm_model.pkl`; si no existe, ejecútese primero la Fase 5.
+
+### d) Fases individuales
 
 ```bash
 python fase1_auditoria.py          # ~2 min
@@ -173,7 +213,11 @@ python fase6_transformer.py        # ~5-20 min (presupuesto CPU)
 python demo_inference.py           # ~1 min
 ```
 
-### b) Predicción individual
+Los scripts `fase*.py` actuales están calibrados para la ventana de referencia 2020-2024. `main.py` acepta `--years` para validar nombres esperados, pero no ejecuta fases de modelado con años distintos hasta parametrizar internamente los scripts por fase.
+
+### e) Predicción individual
+
+Requiere `outputs/lgbm_model.pkl`, generado por `python main.py --only 5`.
 
 ```python
 from src.inference import load_model, predict_institution, format_prediction_report
@@ -206,7 +250,7 @@ print(format_prediction_report(resultado))
 # Flags: muestra_pequeña=False, sin_historial=False, extrapolacion=True
 ```
 
-### c) Predicción en lote
+### f) Predicción en lote
 
 ```python
 import pandas as pd
@@ -266,18 +310,13 @@ Para incorporar datos de un año nuevo (ej. 2025):
 - Sección: *Bases de datos de resultados por programa* → año 2025
 - Renombra el archivo a `data/raw/saber_pro_2025.xlsx`
 
-**Paso 2.** Actualiza la lista de años en `main.py`:
-```python
-YEARS = [2020, 2021, 2022, 2023, 2024, 2025]  # agregar 2025
-TRAIN_YEARS = [2020, 2021, 2022, 2023, 2024]  # el nuevo año se vuelve train
-TEST_YEAR   = 2025
+**Paso 2.** Valida que el archivo está ubicado correctamente:
+
+```bash
+python main.py --years 2020 2021 2022 2023 2024 2025 --dry-run
 ```
 
-**Paso 3.** Ejecuta el pipeline completo:
-```bash
-python main.py --years 2020 2021 2022 2023 2024 2025
-```
-El pipeline detecta automáticamente el nuevo año, recalcula todos los lags y re-entrena el modelo.
+**Estado actual:** los scripts de fase (`fase1` a `fase6`) están calibrados para el experimento académico 2020-2024 y el split train 2020-2023 / test 2024. Para publicar resultados con 2025 se debe parametrizar `YEARS`, `YEAR_TEST`, reportes y nombres de salida en esas fases antes de reentrenar. `main.py` falla de forma explícita si se intenta ejecutar modelado con años distintos para evitar métricas engañosas.
 
 ---
 

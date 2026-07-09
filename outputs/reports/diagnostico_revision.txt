@@ -202,7 +202,7 @@ OK-2   Tabla I — Catálogo de leakage. Es el activo más diferenciador
 
 OK-3   Tabla II — Comparativa de los 4 modelos. Formato correcto,
        cifras coherentes con drafts y CHANGELOG (Ridge 10.2294, Lasso
-       10.0722, LightGBM 9.3293, Transformer 16.7917).
+       10.0722, LightGBM 9.3293, Transformer 16.8588).
 
 OK-4   Sec IV-B — Descripción de los 4 grupos de features (A-D).
        Enumeración clara. Solo convertir pasivas a activas.
@@ -340,7 +340,7 @@ E. CONSISTENCIA — CHECKLIST PRELIMINAR (a cerrar en STEP 6)
 
 [ ] RMSE/MAE/R² idénticos en Abstract, Tabla II y conclusiones:
     Ridge 10.23/7.30/0.647 | Lasso 10.07/7.06/0.658(ó 0.657) |
-    LightGBM 9.33/6.21/0.706 | Transformer 16.79/-/0.048.
+    LightGBM 9.33/6.21/0.706 | Transformer 16.86/-/0.041.
     NOTA: draft dice Lasso R²=0.657; docx dice 0.6575; CHANGELOG
     0.6575. Fijar a 0.658 (redondeo a 3 decimales, consistente).
 [ ] N_train=98,954 y N_test=28,762 coherentes en todo el paper.

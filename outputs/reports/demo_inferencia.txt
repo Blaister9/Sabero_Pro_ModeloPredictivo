@@ -1,5 +1,5 @@
 REPORTE DEMO INFERENCIA — MOTOR PREDICTIVO SABER PRO
-Fecha: 2026-04-14 08:33:06
+Fecha: 2026-06-10 21:51:04
 ============================================================
 
 CASOS INDIVIDUALES:

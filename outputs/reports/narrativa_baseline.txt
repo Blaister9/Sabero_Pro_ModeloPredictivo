@@ -1,5 +1,5 @@
 NARRATIVA METODOLÓGICA — MODELOS BASELINE (RIDGE Y LASSO)
-Generado: 2026-04-13 16:11:59
+Generado: 2026-06-10 21:10:28
 ============================================================
 
 SPLIT TEMPORAL

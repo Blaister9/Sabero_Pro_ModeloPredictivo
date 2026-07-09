@@ -1,0 +1,22 @@
+Paquete de entrega - Paper de congreso Saber Pro
+
+Archivo DOCX final:
+- Saber_pro_paper_CONGRESO_10P_FINAL.docx
+
+Archivo PDF final:
+- Saber_pro_paper_CONGRESO_10P_FINAL.pdf
+
+Estado del documento:
+- Ajustado a 10 paginas segun Microsoft Word COM.
+- PDF exportado manualmente desde Microsoft Word.
+- PDF validado como archivo PDF 1.7, con marcador EOF y 10 paginas.
+- Modelo final: LightGBM.
+- Metricas principales sincronizadas con el repositorio local:
+  - LightGBM: RMSE 9,3293; MAE 6,2109; R2 0,7062.
+  - Ridge: RMSE 10,2294; MAE 7,2967; R2 0,6467.
+  - Lasso: RMSE 10,0722; MAE 7,0622; R2 0,6575.
+  - Transformer: RMSE 16,8588; R2 0,0405.
+
+Nota:
+- Los resultados tecnicos estan sincronizados con el repositorio local.
+- Antes del envio definitivo, hacer una ultima revision visual humana del PDF y confirmar datos de autores/afiliacion.

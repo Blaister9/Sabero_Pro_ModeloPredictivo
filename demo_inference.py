@@ -4,7 +4,8 @@ Demostración del módulo de inferencia — Motor Predictivo Saber Pro.
 Fase 7 del pipeline — Edwin Santiago Paz Bedoya (1071010)
 
 Escenarios demostrados:
-  1. Programa con historial completo (5 años) → confianza ALTA
+  1. Programa con historial completo en test 2024 → confianza MEDIA
+     (activa extrapolacion porque 2024 no pertenece al train 2020-2023)
   2. Programa con muestra pequeña (N<5)       → flag BAJA_CONFIANZA_MUESTRA_PEQUEÑA
   3. Programa nuevo sin historial             → flag BAJA_CONFIANZA_SIN_HISTORIAL
   4. Predicción para año 2025 (extrapolación) → flag BAJA_CONFIANZA_EXTRAPOLACION
@@ -20,6 +21,10 @@ import sys
 
 import numpy as np
 import pandas as pd
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, PROJECT_ROOT)
@@ -43,17 +48,34 @@ print("MOTOR PREDICTIVO SABER PRO — DEMO DE INFERENCIA")
 print("=" * 60)
 
 # ── Carga del modelo ──────────────────────────────────────────────────────────
+if not os.path.exists(MODEL_PATH):
+    print("\nERROR: no se encontro el modelo entrenado.")
+    print(f"Ruta esperada: {MODEL_PATH}")
+    print("Este archivo no se versiona en Git. Genere el modelo con:")
+    print("  python main.py --only 5")
+    print("o ejecute las fases 4-5 despues de tener data/processed/saber_pro_features.csv.")
+    sys.exit(2)
+
+if not os.path.exists(DATA_PATH):
+    print("\nERROR: no se encontro el CSV de features.")
+    print(f"Ruta esperada: {DATA_PATH}")
+    print("Genere este archivo con:")
+    print("  python main.py --only 3")
+    print("o ejecute el pipeline desde la fase 3 si ya existe saber_pro_limpio.csv.")
+    sys.exit(2)
+
 print("\nCargando modelo LightGBM...")
 model = load_model(MODEL_PATH)
 print("  Modelo cargado correctamente.")
 
 # ── CASO 1: Programa con historial completo ───────────────────────────────────
-print("\n" + "─" * 60)
-print("CASO 1: Historial completo — Confianza ALTA esperada")
-print("─" * 60)
+print("\n" + "-" * 60)
+print("CASO 1: Historial completo — Confianza MEDIA esperada")
+print("-" * 60)
 print("Institución: TECNOLÓGICO DE ANTIOQUIA")
 print("Programa   : INGENIERÍA AMBIENTAL")
 print("Prueba     : INGLÉS | Año objetivo: 2024")
+print("Nota       : 2024 es test temporal; el train termina en 2023.")
 
 r1 = predict_institution(
     model=model,
@@ -78,9 +100,9 @@ r1 = predict_institution(
 print(format_prediction_report(r1))
 
 # ── CASO 2: Muestra pequeña (N < 5) ──────────────────────────────────────────
-print("\n" + "─" * 60)
+print("\n" + "-" * 60)
 print("CASO 2: Muestra pequeña (N=3) — BAJA_CONFIANZA_MUESTRA_PEQUEÑA esperado")
-print("─" * 60)
+print("-" * 60)
 print("Institución: POLITÉCNICO COLOMBIANO")
 print("Programa   : INGENIERÍA AGROPECUARIA")
 print("Prueba     : FORMULACIÓN DE PROYECTOS DE INGENIERÍA | Año: 2024")
@@ -107,9 +129,9 @@ r2 = predict_institution(
 print(format_prediction_report(r2))
 
 # ── CASO 3: Sin historial (primer año del programa) ───────────────────────────
-print("\n" + "─" * 60)
+print("\n" + "-" * 60)
 print("CASO 3: Sin historial — BAJA_CONFIANZA_SIN_HISTORIAL esperado")
-print("─" * 60)
+print("-" * 60)
 print("Institución: TECNOLÓGICO DE ANTIOQUIA")
 print("Programa   : INGENIERÍA AMBIENTAL (prueba nueva, sin historia previa)")
 
@@ -136,9 +158,9 @@ r3 = predict_institution(
 print(format_prediction_report(r3))
 
 # ── CASO 4: Extrapolación a 2025 ─────────────────────────────────────────────
-print("\n" + "─" * 60)
+print("\n" + "-" * 60)
 print("CASO 4: Extrapolación a AÑO=2025 — BAJA_CONFIANZA_EXTRAPOLACION esperado")
-print("─" * 60)
+print("-" * 60)
 print("Escenario: misma institución del Caso 1, prediciendo para 2025")
 
 r4 = predict_institution(
@@ -163,9 +185,9 @@ r4 = predict_institution(
 print(format_prediction_report(r4))
 
 # ── CASO 5: Outlier documentado — UMB Programa 742 ───────────────────────────
-print("\n" + "─" * 60)
+print("\n" + "-" * 60)
 print("CASO 5: Outlier documentado (N=1, PROMEDIO=31.0 en 2024)")
-print("─" * 60)
+print("-" * 60)
 print("Institución: UNIVERSIDAD MANUELA BELTRÁN")
 print("Programa   : LIC. ED. BÁSICA ÉNFASIS TECNOLOGÍA E INFORMÁTICA")
 print("Nota: PROMEDIO_GLOBAL=31.0 en 2024 fue N=1. Ver analisis_outliers.txt")
@@ -196,9 +218,9 @@ print("sesgada. Recomendar usar lag_2=154.0 como mejor estimador del nivel")
 print("real del programa. En producción: flag automático activa revisión manual.")
 
 # ── CASO 6: Predicción en lote (batch) sobre test 2024 ───────────────────────
-print("\n" + "─" * 60)
+print("\n" + "-" * 60)
 print("CASO 6: Predicción en lote — Muestra aleatoria del test 2024")
-print("─" * 60)
+print("-" * 60)
 
 df = pd.read_csv(DATA_PATH, low_memory=False)
 df_test = df[df["AÑO"] == 2024].copy()
@@ -223,9 +245,9 @@ print(f"\nMétricas muestra (n=10): RMSE={rmse:.4f}  R²={r2_sample:.4f}")
 print("(Nota: muestra aleatoria de 10 — no comparable con RMSE global=9.3293)")
 
 # ── Métricas completas sobre test 2024 ───────────────────────────────────────
-print("\n" + "─" * 60)
+print("\n" + "-" * 60)
 print("MÉTRICAS COMPLETAS — TEST 2024 (n=28,762)")
-print("─" * 60)
+print("-" * 60)
 
 full_batch = predict_batch(df_test, model)
 y_tr = full_batch["PROMEDIO_GLOBAL"].values
@@ -248,7 +270,7 @@ print(f"  Confianza MEDIA:     {n_media:,} ({n_media/len(full_batch)*100:.1f}%)"
 print(f"  Confianza BAJA:      {n_baja:,} ({n_baja/len(full_batch)*100:.1f}%)")
 print(f"  Flag muestra pequeña:{n_mues:,} ({n_mues/len(full_batch)*100:.2f}%)")
 print(f"  Flag sin historial:  {n_sinhis:,} ({n_sinhis/len(full_batch)*100:.1f}%)")
-print(f"  Flag extrapolación:  {n_extrap:,} (año 2024 está en test, no extrapolación)")
+print(f"  Flag extrapolación:  {n_extrap:,} (2024 es test temporal fuera del train 2020-2023)")
 
 # RMSE solo sobre predicciones de confianza ALTA
 alta_mask = full_batch["confianza_global"] == "ALTA"

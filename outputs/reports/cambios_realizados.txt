@@ -216,7 +216,7 @@ Métricas — coincidencia exacta entre Abstract, Tabla III y texto:
   Ridge          RMSE=10,2294  MAE=7,2967  R²=0,6467
   Lasso          RMSE=10,0722  MAE=7,0622  R²=0,6575 (redondeado 0,658)
   LightGBM       RMSE= 9,3293  MAE=6,2109  R²=0,7062 (redondeado 0,706)
-  Transformer    RMSE=16,7917  MAE=n/d     R²=0,0481 (redondeado 0,048)
+  Transformer    RMSE=16,8588  MAE=n/d     R²=0,0405 (redondeado 0,041)
 
   Nota: el draft original usaba R²_Lasso = 0,657 mientras que la
   fuente de verdad (outputs/metrics/baseline_metrics.csv) reporta

@@ -41,6 +41,7 @@ DATA_PATH    = os.path.join(PROJECT_ROOT, "data", "processed", "saber_pro_featur
 OUTPUTS_DIR  = os.path.join(PROJECT_ROOT, "outputs")
 REPORTS_DIR  = os.path.join(OUTPUTS_DIR, "reports")
 FIGURES_DIR  = os.path.join(OUTPUTS_DIR, "figures")
+METRICS_DIR  = os.path.join(OUTPUTS_DIR, "metrics")
 
 os.makedirs(REPORTS_DIR, exist_ok=True)
 os.makedirs(FIGURES_DIR, exist_ok=True)
@@ -63,6 +64,13 @@ def _r2(y_true, y_pred):
     ss_res = np.sum((y_true - y_pred) ** 2)
     ss_tot = np.sum((y_true - np.mean(y_true)) ** 2)
     return float(1 - ss_res / ss_tot) if ss_tot > 0 else 0.0
+
+
+def _metric_value(metrics_df: pd.DataFrame, model_name: str, metric_name: str) -> float:
+    rows = metrics_df[metrics_df["modelo"] == model_name]
+    if rows.empty:
+        raise ValueError(f"No se encontro el modelo {model_name!r} en baseline_metrics.csv")
+    return float(rows.iloc[0][metric_name])
 
 
 # ── 1. Carga de datos ─────────────────────────────────────────────────────────
@@ -139,9 +147,19 @@ _log(f"  RMSE test:      {results['rmse_test']:.4f}")
 _log(f"  R²   test:      {results['r2_test']:.4f}")
 _log(f"{'='*60}")
 
-# Comparativa con LightGBM
-LGBM_RMSE = 9.3293
-LGBM_R2   = 0.7062
+# Comparativa con modelos previos generados por Fase 5
+METRICS_PATH = os.path.join(METRICS_DIR, "baseline_metrics.csv")
+if not os.path.exists(METRICS_PATH):
+    raise FileNotFoundError(
+        "No existe outputs/metrics/baseline_metrics.csv. Ejecute primero la Fase 5."
+    )
+baseline_metrics = pd.read_csv(METRICS_PATH)
+RIDGE_RMSE = _metric_value(baseline_metrics, "Ridge", "RMSE")
+RIDGE_R2 = _metric_value(baseline_metrics, "Ridge", "R2")
+LASSO_RMSE = _metric_value(baseline_metrics, "Lasso", "RMSE")
+LASSO_R2 = _metric_value(baseline_metrics, "Lasso", "R2")
+LGBM_RMSE = _metric_value(baseline_metrics, "LightGBM", "RMSE")
+LGBM_R2 = _metric_value(baseline_metrics, "LightGBM", "R2")
 _log("\nCOMPARATIVA TRANSFORMER vs LightGBM (test 2024):")
 _log(f"  LightGBM  RMSE={LGBM_RMSE:.4f}  R²={LGBM_R2:.4f}")
 _log(f"  Transformer RMSE={results['rmse_test']:.4f}  R²={results['r2_test']:.4f}")
@@ -270,10 +288,12 @@ Autor: Edwin Santiago Paz Bedoya — Código 1071010
 -----------------------------------------
   | Modelo           | RMSE test | R² test | Notas                          |
   |------------------|-----------|---------|--------------------------------|
-  | Ridge (baseline) | 10.4142   | 0.6467  | Regularización L2              |
-  | Lasso (baseline) | 10.0722   | 0.6580  | Selección de features L1       |
+  | Ridge (baseline) |  {RIDGE_RMSE:.4f}   |  {RIDGE_R2:.4f} | Regularización L2              |
+  | Lasso (baseline) |  {LASSO_RMSE:.4f}   |  {LASSO_R2:.4f} | Selección de features L1       |
   | LightGBM         |  {LGBM_RMSE:.4f}   |  {LGBM_R2:.4f} | Optuna 50 trials, SHAP         |
   | Transformer      |  {results['rmse_test']:.4f}   |  {results['r2_test']:.4f} | {status_str[:30]:30s} |
+
+  Fuente Ridge/Lasso/LightGBM: outputs/metrics/baseline_metrics.csv
 
 4. ANÁLISIS Y DECISIÓN
 -----------------------
@@ -313,7 +333,7 @@ Autor: Edwin Santiago Paz Bedoya — Código 1071010
   Justificación:
   {"El Transformer ofrece mejor RMSE en test y captura la dinámica temporal explícitamente, justificando su mayor complejidad." if delta_rmse < 0 else f"LightGBM ofrece mejor RMSE ({LGBM_RMSE:.4f} vs {results['rmse_test']:.4f}), menor complejidad, tiempo de entrenamiento << 20 min, e interpretabilidad SHAP. El Transformer no justifica su complejidad adicional para este dataset en este momento."}
   Para la Fase 7 (inferencia) y la Fase 8 (paper), el modelo primario es
-  LightGBM (outputs/lgbm_model.pkl). El Transformer queda documentado
+  LightGBM (outputs/lgbm_model.pkl, generado por Fase 5 y no versionado en Git). El Transformer queda documentado
   como experimento adicional con potencial para datasets más grandes.
 
 {'='*65}
@@ -339,13 +359,15 @@ Transformer evaluado:
   Épocas:    {len(results['train_losses'])} / 200
 
 Comparativa final (test 2024):
-  Ridge:       RMSE=10.4142  R²=0.6467
-  Lasso:       RMSE=10.0722  R²=0.6580
+  Ridge:       RMSE={RIDGE_RMSE:.4f}  R²={RIDGE_R2:.4f}
+  Lasso:       RMSE={LASSO_RMSE:.4f}  R²={LASSO_R2:.4f}
   LightGBM:    RMSE={LGBM_RMSE:.4f}  R²={LGBM_R2:.4f}  ← MEJOR MODELO PARA PRODUCCIÓN
   Transformer: RMSE={results['rmse_test']:.4f}  R²={results['r2_test']:.4f}
 
+Fuente Ridge/Lasso/LightGBM: outputs/metrics/baseline_metrics.csv
+
 MODELO FINAL SELECCIONADO: {final_model}
-Ruta: outputs/{'lgbm_model.pkl' if final_model == 'LIGHTGBM' else 'transformer_model.pt'}
+Ruta generada: outputs/{'lgbm_model.pkl' if final_model == 'LIGHTGBM' else 'transformer_model.pt'}
 Ver detalle: outputs/reports/decision_transformer.txt
 """
 

@@ -52,7 +52,7 @@ Se compararon cuatro modelos: Ridge (baseline, RMSE=10.23,
 R²=0.647), Lasso (RMSE=10.07, R²=0.657), LightGBM con
 optimización Optuna de 50 trials (RMSE=9.33, R²=0.706) y un
 Transformer encoder con secuencias temporales por entidad
-(RMSE=16.79, R²=0.048). LightGBM resultó ser el modelo
+(RMSE=16.86, R²=0.041). LightGBM resultó ser el modelo
 definitivo, mejorando el mejor baseline en un 7.4% en RMSE.
 
 El módulo de inferencia implementado incluye tres flags de
@@ -96,7 +96,7 @@ Four models were compared: Ridge (baseline, RMSE=10.23,
 R²=0.647), Lasso (RMSE=10.07, R²=0.657), LightGBM with
 50-trial Optuna search (RMSE=9.33, R²=0.706), and a
 Transformer encoder operating on per-entity temporal sequences
-(RMSE=16.79, R²=0.048). LightGBM was selected as the final
+(RMSE=16.86, R²=0.041). LightGBM was selected as the final
 model, improving the best baseline by 7.4% in RMSE.
 
 The inference module includes three confidence flags:

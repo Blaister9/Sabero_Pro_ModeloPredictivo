@@ -63,7 +63,7 @@ ABSTRACT_ES = (
     "temporal estricto entrena en 2020–2023 (n=98 954) y evalúa en 2024 "
     "(n=28 762). Cuatro modelos compiten: Ridge (RMSE=10,23; R²=0,647), "
     "Lasso (RMSE=10,07; R²=0,658), LightGBM con Optuna (RMSE=9,33; "
-    "R²=0,706) y un Transformer encoder (RMSE=16,79; R²=0,048). LightGBM "
+    "R²=0,706) y un Transformer encoder (RMSE=16,86; R²=0,041). LightGBM "
     "queda como modelo final y supera al mejor baseline en 7,4 % de RMSE. "
     "El catálogo de seis fugas temporales, con impacto conjunto medido "
     "de ΔR²≈0,22, constituye la contribución metodológica principal y es "
@@ -86,7 +86,7 @@ ABSTRACT_EN = (
     "temporal split trains on 2020–2023 (n=98,954) and tests on 2024 "
     "(n=28,762). Four models compete: Ridge (RMSE=10.23; R²=0.647), "
     "Lasso (RMSE=10.07; R²=0.658), LightGBM with Optuna (RMSE=9.33; "
-    "R²=0.706), and a Transformer encoder (RMSE=16.79; R²=0.048). "
+    "R²=0.706), and a Transformer encoder (RMSE=16.86; R²=0.041). "
     "LightGBM wins as the final model and improves the best baseline "
     "by 7.4 % in RMSE. The catalogue of six temporal leakages, with a "
     "measured joint impact of ΔR²≈0.22, is the main methodological "
@@ -937,10 +937,11 @@ APPENDICES = [
                 "código fuente, la documentación y los artefactos están "
                 "disponibles en "
                 "https://github.com/Blaister9/Sabero_Pro_ModeloPredictivo. "
-                "Para agregar datos de un nuevo año (p. ej., 2025) basta "
-                "con copiar el archivo .xlsx a data/raw/ y actualizar la "
-                "lista de años en la línea de comandos; no se requiere "
-                "modificar el código."
+                "Los datos raw y los modelos serializados no se versionan "
+                "por tamaño y seguridad; se regeneran desde las fases "
+                "documentadas. Para agregar datos de un nuevo año (p. ej., "
+                "2025) se debe parametrizar el split temporal y los scripts "
+                "de fase antes de publicar nuevas métricas."
             ),
         ],
     },

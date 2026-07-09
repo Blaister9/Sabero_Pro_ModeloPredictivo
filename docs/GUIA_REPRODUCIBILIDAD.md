@@ -2,8 +2,10 @@
 
 **Versión**: 1.0.0 | **Autor**: Edwin Santiago Paz Bedoya
 
-Esta guía permite reproducir los resultados del pipeline desde cero
-(datos crudos → RMSE=9.33, R²=0.706) en una máquina limpia.
+Esta guía permite reproducir los resultados del pipeline en una máquina limpia.
+La ruta completa desde datos crudos requiere los Excel ICFES en `data/raw/`; si
+solo se usan los CSVs procesados versionados, la ruta mínima validada reproduce
+modelos y métricas desde `data/processed/saber_pro_features.csv`.
 
 ---
 
@@ -76,7 +78,7 @@ print('Todos los modulos OK')
 **Salida esperada** (versiones exactas pueden variar dentro del mismo major):
 ```
 pandas:      2.3.3
-numpy:       2.4.0
+numpy:       2.3.5
 sklearn:     1.8.0
 lightgbm:    4.6.0
 shap:        0.51.0

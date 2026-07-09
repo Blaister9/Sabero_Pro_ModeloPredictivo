@@ -55,7 +55,7 @@ from raw ICFES data to inference module, evaluated on test year 2024.
 - `SaberProTransformer`: d_model=64, nhead=4, 2 encoder layers, ffn=128, 70,337 params
 - `SaberProSequenceDataset`: left-padded temporal sequences per entity (max_seq_len=5)
 - 20-minute CPU time budget with hard stop and partial-results documentation
-- Transformer converged at epoch 53 (4.6 min) but underperforms: RMSE=16.79, R²=0.048
+- Transformer converged at epoch 53 (2.7 min) but underperforms: RMSE=16.8588, R²=0.0405
 - `outputs/reports/analisis_outliers.txt`: analysis of Licenciatura UMB PROMEDIO=31.0 (N=1)
 - `outputs/reports/decision_transformer.txt`: model selection justification
 - `outputs/transformer_model.pt`
@@ -83,7 +83,7 @@ from raw ICFES data to inference module, evaluated on test year 2024.
 - `requirements.txt`: pinned versions of all 23 dependencies
 - `docs/ARQUITECTURA_TECNICA.md`: ASCII pipeline diagram, design decisions, leakage catalog
 - `docs/GUIA_REPRODUCIBILIDAD.md`: step-by-step reproducibility guide
-- `outputs/CHECKLIST_FINAL.txt`: 73/73 files verified on disk
+- `outputs/CHECKLIST_FINAL.txt`: reproducibility checklist for the versioned repository
 
 ### Fixed — Data Leakage Corrections
 
@@ -138,8 +138,21 @@ Total measured impact: ΔR² = +0.22 (from honest R²=0.658 to inflated R²≈0.
 
 ## [Unreleased]
 
+### Added
+- `main.py`: master orchestration script with argparse, phase selection,
+  preflight checks for raw data, processed CSVs, and non-versioned model
+  artifacts.
+
+### Changed
+- Locked `numpy==2.3.5` to avoid the yanked `numpy==2.4.0` while keeping
+  compatibility with pandas, scikit-learn, LightGBM, matplotlib, SHAP and numba.
+- Clarified that serialized models (`outputs/*.pkl`, `outputs/*.pt`) are
+  regenerated artifacts and are not versioned in Git.
+- Updated lightweight documentation to state that the current repository is
+  reproducible from the versioned processed CSVs; full raw reproducibility
+  requires the ICFES Excel files in `data/raw/`.
+
 ### Planned
-- `main.py`: master orchestration script for the complete 8-phase pipeline
 - `tests/`: unit tests for leakage detection and feature integrity checks
 - Incremental model update mechanism (annual fine-tuning)
 - FastAPI REST endpoint for production inference
