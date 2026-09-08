@@ -1,0 +1,91 @@
+1
+00:00:00,250 --> 00:00:02,833
+¿Y si una universidad pudiera estimar, con
+
+2
+00:00:02,867 --> 00:00:04,700
+su historial, cómo le va a ir
+
+3
+00:00:04,700 --> 00:00:05,633
+en el Saber Pro?
+
+4
+00:00:06,550 --> 00:00:09,525
+Hoy, con Inteligencia Artificial, ya es posible.
+
+5
+00:00:10,250 --> 00:00:12,922
+Analizamos cinco años de datos abiertos del
+
+6
+00:00:12,922 --> 00:00:16,297
+ICFES, más de ciento veintisiete mil registros,
+
+7
+00:00:17,250 --> 00:00:19,654
+y construimos un modelo con un error
+
+8
+00:00:19,750 --> 00:00:22,154
+cuadrático medio de nueve coma treinta y
+
+9
+00:00:22,231 --> 00:00:23,308
+tres puntos.
+
+10
+00:00:26,250 --> 00:00:28,469
+Pero encontramos algo más importante:
+
+11
+00:00:28,844 --> 00:00:31,688
+los mayores errores están en Sucre, Chocó
+
+12
+00:00:31,719 --> 00:00:32,516
+y Putumayo.
+
+13
+00:00:33,653 --> 00:00:36,388
+Este hallazgo orienta dónde reforzar los datos
+
+14
+00:00:36,388 --> 00:00:37,622
+y el acompañamiento.
+
+15
+00:00:40,250 --> 00:00:41,817
+Esto no es solo un modelo:
+
+16
+00:00:42,200 --> 00:00:44,217
+es una alerta temprana para que las
+
+17
+00:00:44,250 --> 00:00:47,367
+universidades actúen a tiempo, justo donde más
+
+18
+00:00:47,367 --> 00:00:48,300
+se necesita.
+
+19
+00:00:49,500 --> 00:00:52,153
+Inteligencia Artificial al servicio de la equidad
+
+20
+00:00:52,153 --> 00:00:52,778
+educativa.
+
+21
+00:00:53,450 --> 00:00:55,464
+Un trabajo de UNIMINUTO para las Misiones
+
+22
+00:00:55,506 --> 00:00:56,422
+de Conocimiento.
+
+23
+00:00:57,442 --> 00:00:58,997
+ENSIU dos mil veintiséis.

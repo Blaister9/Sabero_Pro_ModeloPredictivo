@@ -1,0 +1,13 @@
+{
+  "docs/ENSIU2026/Guion_Audiovisual_ENSIU2026.docx": "30c916cfa8a4e286939bc4d3075ab3cc3283e858c98f8f491a5ae98f989c0137",
+  "docs/ENSIU2026/Comunicacion_Ponencia_ENSIU2026.docx": "9d3a3c18d2fdd399be59d44baf42d096342dd15c721cf91446099f425f42c64e",
+  "outputs/metrics/baseline_metrics.csv": "5af476feab94cdb33ce401b6664e93c2280d827288894124f1002227b4e53ce6",
+  "outputs/metrics/metricas_lgbm_por_depto.csv": "c284cc2072314da14564db58671e5d047785497aeb22eb53911fc4255293de21",
+  "outputs/reports/decision_transformer.txt": "d01bcf71d4f6bcb4d8ebdd0e363884a0955beffde68d62ded008c1a23ef7d620",
+  "outputs/figures/lgbm_predicho_vs_real.png": "b2a64b094b220e83d6f423fd9ba09e2d322d0b6791c5ba2e7385cb4ac2cac0e4",
+  "outputs/figures/lgbm_error_por_departamento.png": "04a6c94e99d56c6415dcdd249d43538592043a381580f291035d5a859e7894a3",
+  "outputs/figures/lgbm_shap_summary.png": "b3c89df5f42275c0dc67542b691b0c97c16ad51e9ac6559459ac7fa4150ffc71",
+  "outputs/figures/lgbm_shap_beeswarm.png": "e1ab7be54305fa312471ae2202973a792730b9cc6acd1a22782f9a87157be92c",
+  "outputs/lgbm_model.pkl": "0c3094932c9f511e31e09a2b659aa787de10725ef09fa4a81c874ff320b1150d",
+  "data/processed/saber_pro_features.csv": "01d43c09f449f6868009188fddc961512e025798212129787e1f79ec9dd035ee"
+}
