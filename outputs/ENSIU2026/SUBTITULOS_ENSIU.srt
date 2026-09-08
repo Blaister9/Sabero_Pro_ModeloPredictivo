@@ -1,91 +1,71 @@
 1
-00:00:00,250 --> 00:00:02,833
-¿Y si una universidad pudiera estimar, con
+00:00:00,360 --> 00:00:02,200
+¿Y si una universidad pudiera anticipar,
 
 2
-00:00:02,867 --> 00:00:04,700
-su historial, cómo le va a ir
+00:00:02,320 --> 00:00:03,520
+con base en su propio historial,
 
 3
-00:00:04,700 --> 00:00:05,633
-en el Saber Pro?
+00:00:03,640 --> 00:00:06,120
+cómo será el desempeño de sus programas en Saber Pro?
 
 4
-00:00:06,550 --> 00:00:09,525
-Hoy, con Inteligencia Artificial, ya es posible.
+00:00:06,520 --> 00:00:09,220
+En este trabajo analizamos 127.716
 
 5
-00:00:10,250 --> 00:00:12,922
-Analizamos cinco años de datos abiertos del
+00:00:09,220 --> 00:00:11,100
+observaciones abiertas del ICFES
 
 6
-00:00:12,922 --> 00:00:16,297
-ICFES, más de ciento veintisiete mil registros,
+00:00:11,380 --> 00:00:13,120
+entre 2020 y 2024,
 
 7
-00:00:17,250 --> 00:00:19,654
-y construimos un modelo con un error
+00:00:13,400 --> 00:00:16,640
+y entrenamos varios modelos para estimar el resultado del año siguiente.
 
 8
-00:00:19,750 --> 00:00:22,154
-cuadrático medio de nueve coma treinta y
+00:00:17,160 --> 00:00:19,340
+LightGBM obtuvo el mejor desempeño,
 
 9
-00:00:22,231 --> 00:00:23,308
-tres puntos.
+00:00:19,600 --> 00:00:22,880
+con un R al cuadrado o coeficiente de determinación
 
 10
-00:00:26,250 --> 00:00:28,469
-Pero encontramos algo más importante:
+00:00:22,900 --> 00:00:24,960
+de 0,706,
 
 11
-00:00:28,844 --> 00:00:31,688
-los mayores errores están en Sucre, Chocó
+00:00:25,200 --> 00:00:28,480
+y un error cuadrático medio de 9,33 puntos,
 
 12
-00:00:31,719 --> 00:00:32,516
-y Putumayo.
+00:00:29,040 --> 00:00:31,840
+superando a Ridge, Lasso y Transformer.
 
 13
-00:00:33,653 --> 00:00:36,388
-Este hallazgo orienta dónde reforzar los datos
+00:00:32,320 --> 00:00:35,760
+Además, encontramos que el error no se distribuye igual en todo el país.
 
 14
-00:00:36,388 --> 00:00:37,622
-y el acompañamiento.
+00:00:36,180 --> 00:00:39,620
+Sucre, Chocó y Putumayo presentan los mayores valores.
 
 15
-00:00:40,250 --> 00:00:41,817
-Esto no es solo un modelo:
+00:00:40,200 --> 00:00:42,880
+Esto convierte en la predicción en algo más que una métrica.
 
 16
-00:00:42,200 --> 00:00:44,217
-es una alerta temprana para que las
+00:00:43,240 --> 00:00:46,960
+Puede funcionar como una alerta temprana para orientar acompañamiento,
 
 17
-00:00:44,250 --> 00:00:47,367
-universidades actúen a tiempo, justo donde más
+00:00:47,160 --> 00:00:50,240
+fortalecer datos y apoyar decisiones institucionales
 
 18
-00:00:47,367 --> 00:00:48,300
-se necesita.
-
-19
-00:00:49,500 --> 00:00:52,153
-Inteligencia Artificial al servicio de la equidad
-
-20
-00:00:52,153 --> 00:00:52,778
-educativa.
-
-21
-00:00:53,450 --> 00:00:55,464
-Un trabajo de UNIMINUTO para las Misiones
-
-22
-00:00:55,506 --> 00:00:56,422
-de Conocimiento.
-
-23
-00:00:57,442 --> 00:00:58,997
-ENSIU dos mil veintiséis.
+00:00:50,380 --> 00:00:52,680
+con enfoque de equidad educativa.

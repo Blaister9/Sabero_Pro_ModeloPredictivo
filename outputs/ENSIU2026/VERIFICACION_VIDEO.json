@@ -18,20 +18,12 @@
       "codec_type": "audio",
       "sample_rate": "48000",
       "r_frame_rate": "0/0",
-      "duration": "60.000000",
-      "nb_frames": "2814"
-    },
-    {
-      "index": 2,
-      "codec_name": "mov_text",
-      "codec_type": "subtitle",
-      "r_frame_rate": "0/0",
-      "duration": "58.997000",
-      "nb_frames": "42"
+      "duration": "53.247771",
+      "nb_frames": "2496"
     }
   ],
   "format": {
     "duration": "60.000000",
-    "size": "2719783"
+    "size": "2767961"
   }
 }

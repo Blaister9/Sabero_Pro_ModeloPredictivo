@@ -1,52 +1,36 @@
-# Guía de montaje ENSIU 2026
+# Montaje final con la grabación real
 
-El video ya está ensamblado: `AUDIOVISUAL_ENSIU2026_60s.mp4`. Es la versión de prueba utilizable de 60,000 s, Full HD, H.264, 30 fps, audio AAC en español y subtítulos opcionales. Para enviarlo sin cambios, reproducirlo con sonido y subir ese archivo al canal de la convocatoria. Conservar el PPTX y el PDF como soportes; no son el archivo audiovisual.
+Archivo para subir a YouTube: `AUDIOVISUAL_ENSIU2026_FINAL_YOUTUBE.mp4`. Video H.264, 1920 × 1080, progresivo, 30 fps constantes, 1800 fotogramas y 60,000 s. Audio AAC estéreo de 48 kHz copiado directamente de `Grabación (14).m4a`, sin recodificar. El archivo M4A original se conserva completo dentro de `audio/`.
 
-## Reconstruir automáticamente el mismo montaje
+## Reconstrucción exacta
 
-Requisitos locales: Python 3 y FFmpeg/FFprobe. El montaje usa únicamente archivos entregados y no necesita conexión a Internet ni volver a sintetizar la voz.
-
-1. Abrir PowerShell en `C:\Users\santi\Documents\Sabero_Pro_ModeloPredictivo`.
-2. Ejecutar:
+Desde PowerShell en el repositorio, ejecutar:
 
 ```powershell
 & 'C:\Users\santi\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' '.\outputs\ENSIU2026\ENSAMBLAR_VIDEO.py'
 ```
 
-El script sobrescribe solo el MP4 y su comprobación técnica dentro de esta entrega. Valida 1800 fotogramas, 30 fps y 60,000 s de imagen y audio; si una comprobación falla, muestra un error. Si el runtime de Codex se mueve, sustituir únicamente la ruta inicial por el Python instalado.
+Requiere Python 3 y FFmpeg/FFprobe. Usa únicamente los ocho PNG y el M4A entregados, sin conexión ni síntesis de voz. El script sobrescribe el MP4 final y sus informes de verificación dentro de esta entrega. Conserva el audio desde t=0 hasta 53,247771 s y la imagen hasta 60 s. No usar `-shortest`, filtros de audio, `atempo`, normalización, eliminación de silencios ni conversión a WAV para el montaje final.
 
-## Si se modifica la presentación
+## Marcas visuales
 
-1. Abrir `PRESENTACION_ENSIU2026.pptx` y editar el texto o la tabla. Las figuras del proyecto son PNG incrustados: para cambiarlas, sustituirlas por un gráfico realmente respaldado por el proyecto.
-2. Conservar ocho diapositivas, formato 16:9, y la tipografía Aptos. No alterar las cifras sin volver a auditarlas.
-3. Exportar las diapositivas modificadas como PNG de 1920 × 1080. Reemplazar `escenas/escena_01.png` a `escena_08.png`, conservando nombres y orden. También actualizar el PDF desde PowerPoint.
-4. Ejecutar el comando anterior para reconstruir el video. Si cambia la locución, actualizar el WAV continuo, el SRT y `CRONOMETRAJE.json` antes de hacerlo.
-
-## Montaje manual en un editor de video
-
-Crear una secuencia 1920 × 1080, 30 fps constantes, duración 00:01:00:00. Importar los ocho PNG, `audio/VOZ_ENSIU_60s.wav` y `SUBTITULOS_ENSIU.srt`. Colocar el WAV en 00:00:00:00, volumen 0 dB: ya está normalizado. Desactivar cualquier ajuste automático que recorte silencios, cambie velocidad, añada cierre o mueva clips. Colocar las imágenes en estas marcas:
-
-| PNG | Inicio de escena | Fin nominal | Duración nominal | Inicio en fotogramas |
+| Escena | Inicio | Final | Fotograma inicial | Contenido |
 |---|---|---|---|---|
-| escena_01.png | 00,00 s | 06,30 s | 06,30 s | 0 |
-| escena_02.png | 06,30 s | 10,00 s | 03,70 s | 189 |
-| escena_03.png | 10,00 s | 17,00 s | 07,00 s | 300 |
-| escena_04.png | 17,00 s | 26,00 s | 09,00 s | 510 |
-| escena_05.png | 26,00 s | 40,00 s | 14,00 s | 780 |
-| escena_06.png | 40,00 s | 49,30 s | 09,30 s | 1200 |
-| escena_07.png | 49,30 s | 53,20 s | 03,90 s | 1479 |
-| escena_08.png | 53,20 s | 60,00 s | 06,80 s | 1596 |
+| 1 | 0,000 s | 3,600 s | 0 | La pregunta |
+| 2 | 3,600 s | 6,500 s | 108 | La posibilidad |
+| 3 | 6,500 s | 17,000 s | 195 | Los datos |
+| 4 | 17,000 s | 32,200 s | 510 | La evidencia |
+| 5 | 32,200 s | 40,100 s | 966 | El territorio |
+| 6 | 40,100 s | 50,267 s | 1203 | La alerta |
+| 7 | 50,267 s | 53,267 s | 1508 | La equidad |
+| 8 | 53,267 s | 60,000 s | 1598 | La firma |
 
-Para los fundidos exactos, usar dos pistas de video alternadas. Prolongar cada PNG salvo el último 0,30 s después de su fin nominal. Colocar el siguiente en su inicio nominal; animar su opacidad de 0 a 100 % durante 0,30 s, sobre el anterior. El último termina exactamente a 60 s. No dejar huecos entre imágenes. Añadir el SRT como pista opcional, no quemarlo sobre las figuras si tapa sus rótulos.
+Cada transición comienza en la marca de entrada y dura 0,30 s. Para hacer el montaje manual, usar dos pistas de imagen alternadas. Prolongar la imagen anterior 0,30 s sobre el inicio de la siguiente; animar la opacidad de la siguiente de 0 a 100 %. El último plano termina en 60 s, sin negro final ni cola adicional. La firma final entra en el fotograma 1598 (53,266667 s), inmediatamente después del final del archivo de narración.
 
-Exportar un MP4 H.264, 1920 × 1080, 30 fps constantes, calidad alta (CRF 18 si está disponible), píxel yuv420p, audio AAC 48 kHz y 192 kbps. Fijar el rango de salida de 0 a 60 s, sin cola. El reproductor puede mostrar «1:00» redondeado; verificar con FFprobe:
+La narración manda sobre los tiempos del montaje anterior: no se fuerza a encajar en las antiguas marcas de voz sintética. El PPTX mantiene exactamente sus composiciones y tiene los nuevos avances automáticos; el PDF no cambia. Los fundidos se añaden en el MP4. El audio no está incrustado en el PPTX: se integra desde el M4A mediante copia directa en FFmpeg.
 
-```powershell
-& 'C:\ffmpeg\bin\ffprobe.exe' -v error -show_entries 'format=duration:stream=codec_type,duration,nb_frames,r_frame_rate' -of json '.\outputs\ENSIU2026\AUDIOVISUAL_ENSIU2026_60s.mp4'
-```
+## Comprobación y subida
 
-Esperado: duración 60.000000, video 1800 fotogramas y 30/1 fps, audio 60.000000. Comprobar también primera escena, cambio a sustento en 10 s, cambio a cierre en 40 s y firma final. Escuchar el minuto completo antes de enviar.
+El montaje verifica los 1800 fotogramas y los 60 s. También compara los hashes de cada paquete AAC y el hash PCM decodificado de origen y salida: ambos deben coincidir. `VERIFICACION_AUDIO_ORIGINAL.json` registra la comprobación. El archivo utiliza `faststart` para facilitar la reproducción mientras se descarga.
 
-## Subida
-
-Seleccionar `AUDIOVISUAL_ENSIU2026_60s.mp4` en el formulario o carpeta oficial que haya indicado ENSIU. Esperar a que termine la carga y reproducir la vista previa del archivo subido. Si el canal solicita un enlace, comprobar que el destinatario tenga permiso de lectura. No se presupone una plataforma ni una URL que no estén en la convocatoria recibida.
+Reproducir el archivo final con sonido y subir ese MP4 a YouTube. Revisar la vista previa después de que la plataforma termine de procesarlo. No es necesario publicar el PPTX, PDF ni los archivos de montaje. El SRT auxiliar se puede cargar por separado si se desean subtítulos; el video no los lleva impresos.

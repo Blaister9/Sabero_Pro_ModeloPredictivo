@@ -1,800 +1,189 @@
 {
-  "segments": [
-    {
-      "id": 1,
-      "start": 0.15,
-      "end": 6.15,
-      "text": "¿Y si una universidad pudiera estimar, con su historial, cómo le va a ir en el Saber Pro?",
-      "words": 18,
-      "raw_duration": 6.744,
-      "trim_start": 0.016666,
-      "trim_end": 5.659999,
-      "tempo_factor": 1.0,
-      "audio_duration": 5.63525,
-      "voice": "es-CO-GonzaloNeural",
-      "native_rate": "-25%",
-      "boundaries": [
-        {
-          "text": "¿Y",
-          "start": 0.25,
-          "end": 0.416666
-        },
-        {
-          "text": "si",
-          "start": 0.416667,
-          "end": 0.566667
-        },
-        {
-          "text": "una",
-          "start": 0.6,
-          "end": 0.7500000000000001
-        },
-        {
-          "text": "universidad",
-          "start": 0.7500000000000001,
-          "end": 1.3333329999999999
-        },
-        {
-          "text": "pudiera",
-          "start": 1.4,
-          "end": 1.7833329999999998
-        },
-        {
-          "text": "estimar,",
-          "start": 1.7833339999999998,
-          "end": 2.4
-        },
-        {
-          "text": "con",
-          "start": 2.7,
-          "end": 2.833333
-        },
-        {
-          "text": "su",
-          "start": 2.866667,
-          "end": 2.983333
-        },
-        {
-          "text": "historial,",
-          "start": 3.033334,
-          "end": 3.7
-        },
-        {
-          "text": "cómo",
-          "start": 4.016667,
-          "end": 4.216667
-        },
-        {
-          "text": "le",
-          "start": 4.266667000000001,
-          "end": 4.3333330000000005
-        },
-        {
-          "text": "va",
-          "start": 4.4,
-          "end": 4.433333
-        },
-        {
-          "text": "a",
-          "start": 4.433334,
-          "end": 4.516667000000001
-        },
-        {
-          "text": "ir",
-          "start": 4.583334000000001,
-          "end": 4.7
-        },
-        {
-          "text": "en",
-          "start": 4.7,
-          "end": 4.800000000000001
-        },
-        {
-          "text": "el",
-          "start": 4.833334000000001,
-          "end": 4.966667
-        },
-        {
-          "text": "Saber",
-          "start": 4.966667,
-          "end": 5.316667000000001
-        },
-        {
-          "text": "Pro?",
-          "start": 5.416667,
-          "end": 5.633333
-        }
-      ]
-    },
-    {
-      "id": 2,
-      "start": 6.45,
-      "end": 9.9,
-      "text": "Hoy, con Inteligencia Artificial, ya es posible.",
-      "words": 7,
-      "raw_duration": 3.984,
-      "trim_start": 0,
-      "trim_end": 3.2350000000000003,
-      "tempo_factor": 1.0,
-      "audio_duration": 3.226958,
-      "voice": "es-CO-GonzaloNeural",
-      "native_rate": "+0%",
-      "boundaries": [
-        {
-          "text": "Hoy,",
-          "start": 6.55,
-          "end": 6.775
-        },
-        {
-          "text": "con",
-          "start": 7.075,
-          "end": 7.1875
-        },
-        {
-          "text": "Inteligencia",
-          "start": 7.2,
-          "end": 7.8125
-        },
-        {
-          "text": "Artificial,",
-          "start": 7.8125,
-          "end": 8.525
-        },
-        {
-          "text": "ya",
-          "start": 8.8375,
-          "end": 8.95
-        },
-        {
-          "text": "es",
-          "start": 8.95,
-          "end": 9.025
-        },
-        {
-          "text": "posible.",
-          "start": 9.0875,
-          "end": 9.525
-        }
-      ]
-    },
-    {
-      "id": 3,
-      "start": 10.15,
-      "end": 16.9,
-      "text": "Analizamos cinco años de datos abiertos del ICFES, más de ciento veintisiete mil registros,",
-      "words": 14,
-      "raw_duration": 7.32,
-      "trim_start": 0.012499999999999997,
-      "trim_end": 6.319375,
-      "tempo_factor": 1.0,
-      "audio_duration": 6.302083,
-      "voice": "es-CO-GonzaloNeural",
-      "native_rate": "-20%",
-      "boundaries": [
-        {
-          "text": "Analizamos",
-          "start": 10.25,
-          "end": 11.0625
-        },
-        {
-          "text": "cinco",
-          "start": 11.0625,
-          "end": 11.484375
-        },
-        {
-          "text": "años",
-          "start": 11.5,
-          "end": 11.71875
-        },
-        {
-          "text": "de",
-          "start": 11.78125,
-          "end": 11.859375
-        },
-        {
-          "text": "datos",
-          "start": 11.90625,
-          "end": 12.25
-        },
-        {
-          "text": "abiertos",
-          "start": 12.25,
-          "end": 12.71875
-        },
-        {
-          "text": "del",
-          "start": 12.765625,
-          "end": 12.921875
-        },
-        {
-          "text": "ICFES,",
-          "start": 12.921875,
-          "end": 13.453125
-        },
-        {
-          "text": "más",
-          "start": 13.8125,
-          "end": 14.015625
-        },
-        {
-          "text": "de",
-          "start": 14.046875,
-          "end": 14.125
-        },
-        {
-          "text": "ciento",
-          "start": 14.15625,
-          "end": 14.546875
-        },
-        {
-          "text": "veintisiete",
-          "start": 14.59375,
-          "end": 15.25
-        },
-        {
-          "text": "mil",
-          "start": 15.296875,
-          "end": 15.453125
-        },
-        {
-          "text": "registros,",
-          "start": 15.484375,
-          "end": 16.296875
-        }
-      ]
-    },
-    {
-      "id": 4,
-      "start": 17.15,
-      "end": 25.85,
-      "text": "y construimos un modelo con un error cuadrático medio de nueve coma treinta y tres puntos.",
-      "words": 16,
-      "raw_duration": 7.608,
-      "trim_start": 0.026915999999999995,
-      "trim_end": 6.344583,
-      "tempo_factor": 1.0,
-      "audio_duration": 6.314958,
-      "voice": "es-CO-GonzaloNeural",
-      "native_rate": "-35%",
-      "boundaries": [
-        {
-          "text": "y",
-          "start": 17.25,
-          "end": 17.442290999999997
-        },
-        {
-          "text": "construimos",
-          "start": 17.538459,
-          "end": 18.307709
-        },
-        {
-          "text": "un",
-          "start": 18.326916999999998,
-          "end": 18.403833
-        },
-        {
-          "text": "modelo",
-          "start": 18.461541999999998,
-          "end": 18.826916999999998
-        },
-        {
-          "text": "con",
-          "start": 18.942334,
-          "end": 19.096166999999998
-        },
-        {
-          "text": "un",
-          "start": 19.134625,
-          "end": 19.288458
-        },
-        {
-          "text": "error",
-          "start": 19.307709,
-          "end": 19.653875
-        },
-        {
-          "text": "cuadrático",
-          "start": 19.75,
-          "end": 20.51925
-        },
-        {
-          "text": "medio",
-          "start": 20.557709,
-          "end": 20.923084
-        },
-        {
-          "text": "de",
-          "start": 20.923084,
-          "end": 21.0
-        },
-        {
-          "text": "nueve",
-          "start": 21.038459,
-          "end": 21.326916999999998
-        },
-        {
-          "text": "coma",
-          "start": 21.423084,
-          "end": 21.673084
-        },
-        {
-          "text": "treinta",
-          "start": 21.75,
-          "end": 22.076915999999997
-        },
-        {
-          "text": "y",
-          "start": 22.115375,
-          "end": 22.153833
-        },
-        {
-          "text": "tres",
-          "start": 22.230791999999997,
-          "end": 22.5385
-        },
-        {
-          "text": "puntos.",
-          "start": 22.653834,
-          "end": 23.307667
-        }
-      ]
-    },
-    {
-      "id": 5,
-      "start": 26.15,
-      "end": 39.8,
-      "text": "Pero encontramos algo más importante: los mayores errores están en Sucre, Chocó y Putumayo. Este hallazgo orienta dónde reforzar los datos y el acompañamiento.",
-      "words": 24,
-      "raw_duration": 12.624,
-      "trim_start": 0.012499999999999997,
-      "trim_end": 11.644375,
-      "tempo_factor": 1.0,
-      "audio_duration": 11.623917,
-      "voice": "es-CO-GonzaloNeural",
-      "native_rate": "-20%",
-      "boundaries": [
-        {
-          "text": "Pero",
-          "start": 26.25,
-          "end": 26.515625
-        },
-        {
-          "text": "encontramos",
-          "start": 26.515625,
-          "end": 27.203125
-        },
-        {
-          "text": "algo",
-          "start": 27.203125,
-          "end": 27.421875
-        },
-        {
-          "text": "más",
-          "start": 27.453125,
-          "end": 27.625
-        },
-        {
-          "text": "importante:",
-          "start": 27.65625,
-          "end": 28.46875
-        },
-        {
-          "text": "los",
-          "start": 28.84375,
-          "end": 29.015625
-        },
-        {
-          "text": "mayores",
-          "start": 29.0625,
-          "end": 29.5625
-        },
-        {
-          "text": "errores",
-          "start": 29.5625,
-          "end": 30.0625
-        },
-        {
-          "text": "están",
-          "start": 30.0625,
-          "end": 30.390625
-        },
-        {
-          "text": "en",
-          "start": 30.40625,
-          "end": 30.515625
-        },
-        {
-          "text": "Sucre,",
-          "start": 30.53125,
-          "end": 31.0625
-        },
-        {
-          "text": "Chocó",
-          "start": 31.375,
-          "end": 31.6875
-        },
-        {
-          "text": "y",
-          "start": 31.71875,
-          "end": 31.765625
-        },
-        {
-          "text": "Putumayo.",
-          "start": 31.84375,
-          "end": 32.515625
-        },
-        {
-          "text": "Este",
-          "start": 33.653124999999996,
-          "end": 34.012499999999996
-        },
-        {
-          "text": "hallazgo",
-          "start": 34.012499999999996,
-          "end": 34.434375
-        },
-        {
-          "text": "orienta",
-          "start": 34.434375,
-          "end": 34.8875
-        },
-        {
-          "text": "dónde",
-          "start": 34.903125,
-          "end": 35.10625
-        },
-        {
-          "text": "reforzar",
-          "start": 35.153125,
-          "end": 35.684375
-        },
-        {
-          "text": "los",
-          "start": 35.7,
-          "end": 35.840625
-        },
-        {
-          "text": "datos",
-          "start": 35.903125,
-          "end": 36.3875
-        },
-        {
-          "text": "y",
-          "start": 36.3875,
-          "end": 36.45
-        },
-        {
-          "text": "el",
-          "start": 36.465625,
-          "end": 36.575
-        },
-        {
-          "text": "acompañamiento.",
-          "start": 36.575,
-          "end": 37.621875
-        }
-      ]
-    },
-    {
-      "id": 6,
-      "start": 40.15,
-      "end": 49.15,
-      "text": "Esto no es solo un modelo: es una alerta temprana para que las universidades actúen a tiempo, justo donde más se necesita.",
-      "words": 22,
-      "raw_duration": 9.384,
-      "trim_start": 0.016666,
-      "trim_end": 8.326666,
-      "tempo_factor": 1.0,
-      "audio_duration": 8.306479,
-      "voice": "es-CO-GonzaloNeural",
-      "native_rate": "-25%",
-      "boundaries": [
-        {
-          "text": "Esto",
-          "start": 40.25,
-          "end": 40.65
-        },
-        {
-          "text": "no",
-          "start": 40.699999999999996,
-          "end": 40.8
-        },
-        {
-          "text": "es",
-          "start": 40.833334,
-          "end": 40.883334
-        },
-        {
-          "text": "solo",
-          "start": 40.883334,
-          "end": 41.166667
-        },
-        {
-          "text": "un",
-          "start": 41.166667,
-          "end": 41.233333
-        },
-        {
-          "text": "modelo:",
-          "start": 41.266667,
-          "end": 41.816666999999995
-        },
-        {
-          "text": "es",
-          "start": 42.199999999999996,
-          "end": 42.383333
-        },
-        {
-          "text": "una",
-          "start": 42.416667,
-          "end": 42.566666999999995
-        },
-        {
-          "text": "alerta",
-          "start": 42.566666999999995,
-          "end": 42.966667
-        },
-        {
-          "text": "temprana",
-          "start": 43.033333999999996,
-          "end": 43.55
-        },
-        {
-          "text": "para",
-          "start": 43.633334,
-          "end": 43.833334
-        },
-        {
-          "text": "que",
-          "start": 43.916667,
-          "end": 44.0
-        },
-        {
-          "text": "las",
-          "start": 44.033333999999996,
-          "end": 44.216667
-        },
-        {
-          "text": "universidades",
-          "start": 44.25,
-          "end": 45.083332999999996
-        },
-        {
-          "text": "actúen",
-          "start": 45.083334,
-          "end": 45.533333999999996
-        },
-        {
-          "text": "a",
-          "start": 45.55,
-          "end": 45.633333
-        },
-        {
-          "text": "tiempo,",
-          "start": 45.716667,
-          "end": 46.216667
-        },
-        {
-          "text": "justo",
-          "start": 46.55,
-          "end": 46.933333
-        },
-        {
-          "text": "donde",
-          "start": 46.983334,
-          "end": 47.166667
-        },
-        {
-          "text": "más",
-          "start": 47.199999999999996,
-          "end": 47.366665999999995
-        },
-        {
-          "text": "se",
-          "start": 47.366667,
-          "end": 47.5
-        },
-        {
-          "text": "necesita.",
-          "start": 47.55,
-          "end": 48.3
-        }
-      ]
-    },
-    {
-      "id": 7,
-      "start": 49.4,
-      "end": 53.1,
-      "text": "Inteligencia Artificial al servicio de la equidad educativa.",
-      "words": 8,
-      "raw_duration": 4.416,
-      "trim_start": 0.00554099999999999,
-      "trim_end": 3.543333,
-      "tempo_factor": 1.0,
-      "audio_duration": 3.531708,
-      "voice": "es-CO-GonzaloNeural",
-      "native_rate": "-10%",
-      "boundaries": [
-        {
-          "text": "Inteligencia",
-          "start": 49.5,
-          "end": 50.305541
-        },
-        {
-          "text": "Artificial",
-          "start": 50.333334,
-          "end": 51.069459
-        },
-        {
-          "text": "al",
-          "start": 51.069459,
-          "end": 51.180583999999996
-        },
-        {
-          "text": "servicio",
-          "start": 51.180583999999996,
-          "end": 51.694458999999995
-        },
-        {
-          "text": "de",
-          "start": 51.722249999999995,
-          "end": 51.722249999999995
-        },
-        {
-          "text": "la",
-          "start": 51.777792,
-          "end": 51.819457899999996
-        },
-        {
-          "text": "equidad",
-          "start": 51.819458999999995,
-          "end": 52.152792
-        },
-        {
-          "text": "educativa.",
-          "start": 52.152792,
-          "end": 52.777792
-        }
-      ]
-    },
-    {
-      "id": 8,
-      "start": 53.35,
-      "end": 59.7,
-      "text": "Un trabajo de UNIMINUTO para las Misiones de Conocimiento. ENSIU dos mil veintiséis.",
-      "words": 13,
-      "raw_duration": 6.696,
-      "trim_start": 0.00554099999999999,
-      "trim_end": 5.812791,
-      "tempo_factor": 1.0,
-      "audio_duration": 5.803208,
-      "voice": "es-CO-GonzaloNeural",
-      "native_rate": "-10%",
-      "boundaries": [
-        {
-          "text": "Un",
-          "start": 53.45,
-          "end": 53.658333
-        },
-        {
-          "text": "trabajo",
-          "start": 53.658334,
-          "end": 54.033334
-        },
-        {
-          "text": "de",
-          "start": 54.088917,
-          "end": 54.088917
-        },
-        {
-          "text": "UNIMINUTO",
-          "start": 54.102792,
-          "end": 54.616667
-        },
-        {
-          "text": "para",
-          "start": 54.686125000000004,
-          "end": 54.852791
-        },
-        {
-          "text": "las",
-          "start": 54.880584,
-          "end": 55.005584
-        },
-        {
-          "text": "Misiones",
-          "start": 55.061125000000004,
-          "end": 55.463916000000005
-        },
-        {
-          "text": "de",
-          "start": 55.505584,
-          "end": 55.575042
-        },
-        {
-          "text": "Conocimiento.",
-          "start": 55.630584,
-          "end": 56.42225
-        },
-        {
-          "text": "ENSIU",
-          "start": 57.441667,
-          "end": 57.844458
-        },
-        {
-          "text": "dos",
-          "start": 57.927792000000004,
-          "end": 57.983333
-        },
-        {
-          "text": "mil",
-          "start": 58.038917,
-          "end": 58.191708
-        },
-        {
-          "text": "veintiséis.",
-          "start": 58.219459,
-          "end": 58.99725
-        }
-      ]
-    }
-  ],
+  "version": "narracion_real_definitiva",
+  "audio": {
+    "file": "audio/Grabación (14).m4a",
+    "source_absolute": "C:\\Users\\santi\\Documents\\Grabaciones de sonido\\Grabación (14).m4a",
+    "sha256": "25dafe5b2c2812f6d01c4beb8cf0c940f6ba84d794791e4db5dcfacb0700af62",
+    "duration": 53.247771,
+    "start": 0,
+    "speed": 1,
+    "processing": "Copia directa de todos los paquetes AAC. Sin filtros, recodificación, cortes, normalización ni desplazamiento.",
+    "silent_closing_duration": 6.752229
+  },
+  "video": {
+    "file": "AUDIOVISUAL_ENSIU2026_FINAL_YOUTUBE.mp4",
+    "duration": 60,
+    "fps": 30,
+    "frames": 1800,
+    "width": 1920,
+    "height": 1080,
+    "transition_duration": 0.3
+  },
   "scenes": [
     {
       "id": 1,
-      "start": 0,
-      "end": 6.3,
+      "start": 0.0,
+      "end": 3.6,
       "name": "La pregunta",
-      "visual": "Pregunta editorial grande sobre fondo azul profundo. Historial de cada programa como contexto."
+      "visual": "Pregunta editorial grande sobre fondo azul profundo. Historial de cada programa como contexto.",
+      "start_frame": 0,
+      "end_frame_exclusive": 108
     },
     {
       "id": 2,
-      "start": 6.3,
-      "end": 10,
+      "start": 3.6,
+      "end": 6.5,
       "name": "La posibilidad",
-      "visual": "IA para estimar el próximo resultado. Aclaración visible: evaluación retrospectiva del siguiente año."
+      "visual": "IA para estimar el próximo resultado. Aclaración visible: evaluación retrospectiva del siguiente año.",
+      "start_frame": 108,
+      "end_frame_exclusive": 195
     },
     {
       "id": 3,
-      "start": 10,
-      "end": 17,
+      "start": 6.5,
+      "end": 17.0,
       "name": "Los datos",
-      "visual": "127.716 observaciones; 2020–2024. Entrenamiento 2020–2023 y prueba 2024: 28.762 observaciones."
+      "visual": "127.716 observaciones; 2020–2024. Entrenamiento 2020–2023 y prueba 2024: 28.762 observaciones.",
+      "start_frame": 195,
+      "end_frame_exclusive": 510
     },
     {
       "id": 4,
-      "start": 17,
-      "end": 26,
+      "start": 17.0,
+      "end": 32.2,
       "name": "La evidencia",
-      "visual": "Gráfico original Predicho vs. Real completo. R² 0,706; RMSE 9,33 puntos. Tabla editable de comparación de modelos."
+      "visual": "Gráfico original Predicho vs. Real completo. R² 0,706; RMSE 9,33 puntos. Tabla editable de comparación de modelos.",
+      "start_frame": 510,
+      "end_frame_exclusive": 966
     },
     {
       "id": 5,
-      "start": 26,
-      "end": 40,
+      "start": 32.2,
+      "end": 40.1,
       "name": "El territorio",
-      "visual": "Gráfico departamental original completo y tres resultados ampliados: Sucre 13,29; Chocó 12,03; Putumayo 11,18 puntos RMSE."
+      "visual": "Gráfico departamental original completo y tres resultados ampliados: Sucre 13,29; Chocó 12,03; Putumayo 11,18 puntos RMSE.",
+      "start_frame": 966,
+      "end_frame_exclusive": 1203
     },
     {
       "id": 6,
-      "start": 40,
-      "end": 49.3,
+      "start": 40.1,
+      "end": 50.266666666666666,
       "name": "La alerta",
-      "visual": "Alerta temprana. Intervención proactiva. Oportunidad para orientar el acompañamiento."
+      "visual": "Alerta temprana. Intervención proactiva. Oportunidad para orientar el acompañamiento.",
+      "start_frame": 1203,
+      "end_frame_exclusive": 1508
     },
     {
       "id": 7,
-      "start": 49.3,
-      "end": 53.2,
+      "start": 50.266666666666666,
+      "end": 53.266666666666666,
       "name": "La equidad",
-      "visual": "Equidad educativa. Misión 4: Inteligencia Artificial para la equidad."
+      "visual": "Equidad educativa. Misión 4: Inteligencia Artificial para la equidad.",
+      "start_frame": 1508,
+      "end_frame_exclusive": 1598
     },
     {
       "id": 8,
-      "start": 53.2,
-      "end": 60,
+      "start": 53.266666666666666,
+      "end": 60.0,
       "name": "La firma",
-      "visual": "ENSIU 2026; UNIMINUTO; autores oficiales. Cierre quieto hasta el segundo 60."
+      "visual": "ENSIU 2026; UNIMINUTO; autores oficiales. Cierre quieto hasta el segundo 60.",
+      "start_frame": 1598,
+      "end_frame_exclusive": 1800
     }
-  ]
+  ],
+  "captions": [
+    {
+      "start": 0.36,
+      "end": 2.2,
+      "text": "¿Y si una universidad pudiera anticipar,"
+    },
+    {
+      "start": 2.32,
+      "end": 3.52,
+      "text": "con base en su propio historial,"
+    },
+    {
+      "start": 3.64,
+      "end": 6.12,
+      "text": "cómo será el desempeño de sus programas en Saber Pro?"
+    },
+    {
+      "start": 6.52,
+      "end": 9.22,
+      "text": "En este trabajo analizamos 127.716"
+    },
+    {
+      "start": 9.22,
+      "end": 11.1,
+      "text": "observaciones abiertas del ICFES"
+    },
+    {
+      "start": 11.38,
+      "end": 13.12,
+      "text": "entre 2020 y 2024,"
+    },
+    {
+      "start": 13.4,
+      "end": 16.64,
+      "text": "y entrenamos varios modelos para estimar el resultado del año siguiente."
+    },
+    {
+      "start": 17.16,
+      "end": 19.34,
+      "text": "LightGBM obtuvo el mejor desempeño,"
+    },
+    {
+      "start": 19.6,
+      "end": 22.88,
+      "text": "con un R al cuadrado o coeficiente de determinación"
+    },
+    {
+      "start": 22.9,
+      "end": 24.96,
+      "text": "de 0,706,"
+    },
+    {
+      "start": 25.2,
+      "end": 28.48,
+      "text": "y un error cuadrático medio de 9,33 puntos,"
+    },
+    {
+      "start": 29.04,
+      "end": 31.84,
+      "text": "superando a Ridge, Lasso y Transformer."
+    },
+    {
+      "start": 32.32,
+      "end": 35.76,
+      "text": "Además, encontramos que el error no se distribuye igual en todo el país."
+    },
+    {
+      "start": 36.18,
+      "end": 39.62,
+      "text": "Sucre, Chocó y Putumayo presentan los mayores valores."
+    },
+    {
+      "start": 40.2,
+      "end": 42.88,
+      "text": "Esto convierte en la predicción en algo más que una métrica."
+    },
+    {
+      "start": 43.24,
+      "end": 46.96,
+      "text": "Puede funcionar como una alerta temprana para orientar acompañamiento,"
+    },
+    {
+      "start": 47.16,
+      "end": 50.24,
+      "text": "fortalecer datos y apoyar decisiones institucionales"
+    },
+    {
+      "start": 50.38,
+      "end": 52.68,
+      "text": "con enfoque de equidad educativa."
+    }
+  ],
+  "alignment": "Marcas de reconocimiento local contrastadas con frases y pausas de la grabación; transiciones cuantizadas a 30 fps. Transcripción auxiliar con grafía normalizada de nombres y cifras."
 }

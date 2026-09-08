@@ -26,3 +26,7 @@ Se mantienen UNIMINUTO, ENSIU 2026 y los autores de las fuentes oficiales. La pr
 ## Alcance de la comprobación
 
 Auditoría rápida local, sin usar el paper de congreso como autoridad y sin reentrenamiento. La comparación del Transformer se verifica en el reporte existente. Las predicciones LightGBM y la jerarquía SHAP sí se recalcularon. Las fechas de publicación, el desarrollo económico y el impacto de intervenciones no están validados por estos artefactos. El resultado validado es retrospectivo sobre 2024.
+
+## Actualización con narración real definitiva
+
+Por instrucción posterior del usuario, `Grabación (14).m4a` sustituye el texto hablado y la voz de la primera versión. El audio se incorpora completo, con su duración real de 53,247771 s y sin edición. Las ocho composiciones y sus métricas permanecen iguales. Se ajustan únicamente los tiempos para seguir la narración real; los últimos 6,752229 s del video quedan sin audio y concluyen con la firma institucional. La transcripción auxiliar normaliza la grafía de los nombres de los modelos y de las cifras, sin intervenir en la grabación. La grabación es la fuente definitiva de la voz.

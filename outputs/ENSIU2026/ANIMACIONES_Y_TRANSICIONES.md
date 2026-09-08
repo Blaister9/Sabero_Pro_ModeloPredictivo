@@ -1,19 +1,17 @@
-# Animaciones y transiciones exactas
+# Transiciones de la versión con voz real
 
-El MP4 utiliza un fundido cruzado lineal de 0,30 s (9 fotogramas) en cada cambio de escena. Los gráficos originales permanecen completos y fijos: no se dibujan puntos ficticios ni se modifican valores. El video no requiere música ni tomas de campus. La voz se mantiene continua mediante la pista de 60 segundos.
+Las composiciones originales permanecen intactas. Cada cambio del MP4 es un fundido cruzado de 0,30 s (9 fotogramas), sin zoom, paneo ni animaciones sobre los datos. Los nuevos tiempos siguen la grabación real.
 
-| Cambio | Inicio del fundido | Fin del fundido | Fotogramas de transición (base cero) |
+| Cambio | Inicio | Final | Fotogramas (base cero) |
 |---|---|---|---|
-| E1 a E2 | 06,30 s | 06,60 s | 189–197 |
-| E2 a E3 | 10,00 s | 10,30 s | 300–308 |
-| E3 a E4 | 17,00 s | 17,30 s | 510–518 |
-| E4 a E5 | 26,00 s | 26,30 s | 780–788 |
-| E5 a E6 | 40,00 s | 40,30 s | 1200–1208 |
-| E6 a E7 | 49,30 s | 49,60 s | 1479–1487 |
-| E7 a E8 | 53,20 s | 53,50 s | 1596–1604 |
+| E1 a E2 | 3,600 s | 3,900 s | 108–116 |
+| E2 a E3 | 6,500 s | 6,800 s | 195–203 |
+| E3 a E4 | 17,000 s | 17,300 s | 510–518 |
+| E4 a E5 | 32,200 s | 32,500 s | 966–974 |
+| E5 a E6 | 40,100 s | 40,400 s | 1203–1211 |
+| E6 a E7 | 50,267 s | 50,567 s | 1508–1516 |
+| E7 a E8 | 53,267 s | 53,567 s | 1598–1606 |
 
-Entre cambios, mantener la composición sin zoom ni paneo. La primera imagen está visible desde el fotograma 0. No añadir entrada desde negro ni salida a negro. La última escena permanece hasta el fotograma 1799; el archivo termina en 60,000 s.
+Mantener la última escena hasta el fotograma 1799 inclusive. La grabación termina en 53,247771 s; la firma entra en 53,266667 s y queda completamente asentada después del fundido de 0,30 s. El resto del cierre permanece silencioso y fijo. No añadir música, efectos sonoros, voz sintética ni salida a negro.
 
-En el PPTX, cada diapositiva tiene avance automático con la duración nominal indicada en el storyboard y sin transición interna. Los fundidos del MP4 se aplican durante el montaje para controlar exactamente su duración. Los PNG de `escenas/` son las composiciones asentadas exportadas por PowerPoint. La voz se entrega como WAV externo; no está incrustada en el PPTX.
-
-Para replicar el MP4, no sumar siete fundidos al minuto. Cada escena anterior conserva 0,30 s de margen sobre el cambio, y la siguiente se superpone durante esos mismos 0,30 s. El script `ENSAMBLAR_VIDEO.py` implementa ese solapamiento y corta el resultado a 1800 fotogramas. Si se trabaja en un editor con fundidos centrados, mover cada transición para que empiece en la marca de la tabla, no en la mitad de ella.
+Los avances automáticos del PPTX coinciden con las duraciones nominales del storyboard. La reproducción final debe generarse con `ENSAMBLAR_VIDEO.py`, que añade los fundidos sin incrementar la duración total. La pista M4A se integra tal cual con `-c:a copy`.

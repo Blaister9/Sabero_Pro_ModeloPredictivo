@@ -1,12 +1,13 @@
-# Verificación de la entrega
+# Verificación final con narración real
 
-- Ocho escenas exportadas mediante PowerPoint y revisadas individualmente. PDF de ocho páginas renderizado y revisado, con inspección ampliada de las páginas de resultados.
-- PPTX con texto y tabla comparativa nativos editables; figuras originales incrustadas. Avances automáticos suman 60 s. Paquete y geometría validados después del guardado final en PowerPoint.
-- Video final H.264: 1920 × 1080, 30 fps, 1800 fotogramas y 60,000 s. Audio AAC de 60,000 s. Subtítulos opcionales actualizados; datos técnicos en VERIFICACION_VIDEO.json.
-- Inspección de fotogramas decodificados del MP4, incluidos resultados y último fotograma. No se detectaron cortes de texto, elementos fuera del lienzo ni pérdida de las cifras destacadas.
-- Pista WAV: 2.880.000 muestras a 48 kHz, 60,000 s. Fragmentos suman 50,745 s. Guion final 122 palabras. El audio conserva al menos 0,11 s después de la última actividad de cada fragmento medida con umbral RMS de −42 dBFS. No se recortan finales de voz detectables a ese umbral.
-- Sonoridad medida del MP4: −16,7 LUFS integrada, pico verdadero −1,4 dBFS. Las marcas de palabras son del sintetizador; se recomienda la revisión auditiva humana previa al envío.
-- Conteos, métricas LightGBM y jerarquía SHAP contrastados con los artefactos; diferencias narrativas documentadas en AUDITORIA_CONSISTENCIA.md. Los hashes de todas las fuentes verificadas permanecen iguales.
-- Storyboard con 60 filas de segundos, guion por escena y guía de transiciones coherentes con CRONOMETRAJE.json. El script de montaje se ejecutó correctamente.
+- Video final: AUDIOVISUAL_ENSIU2026_FINAL_YOUTUBE.mp4. Full HD 1920 × 1080, H.264, 30 fps, 1800 fotogramas y 60,000 s. Decodificación completa del MP4 sin errores.
+- Narración: Grabación (14).m4a, 53,247771 s, inicio en t=0. Se copiaron los 2496 paquetes AAC originales, sin filtros, recodificación, normalización, cambios de velocidad, cortes ni desplazamientos.
+- Los hashes de todos los paquetes AAC, sus marcas temporales y el hash del PCM decodificado son idénticos entre la grabación fuente y el MP4. Comprobación detallada en VERIFICACION_AUDIO_ORIGINAL.json. El archivo M4A externo del usuario conserva su SHA-256 original.
+- El video conserva 6,752229 s posteriores sin audio. La firma institucional entra en el primer fotograma posterior al final del audio: 1598, a los 53,266667 s. Tras su fundido de 0,30 s permanece fija hasta 60 s, con ENSIU 2026, UNIMINUTO, autores y Misión 4.
+- Las ocho imágenes de escenas, las dos figuras fuente y el PDF son idénticos por SHA-256 a los de la entrega anterior. El contenido visual cSld de las ocho diapositivas del PPTX también se conserva íntegro; únicamente se actualizaron los avances automáticos y las notas de sincronización.
+- La presentación editada pasó la validación de estructura, geometría e importación del paquete. Las métricas y la tabla permanecen iguales. Se mantiene la advertencia preventiva de altura estimada de tabla de la primera entrega, ya contrastada visualmente sin solapamiento real.
+- Fotogramas decodificados del MP4 revisados en resultados, territorio, equidad y firma final. El storyboard tiene 60 filas de segundos y sus tiempos coinciden con CRONOMETRAJE.json.
+- Los hashes de los documentos oficiales y de los artefactos científicos de la auditoría permanecen iguales. No se reentrenaron modelos ni se modificaron cifras.
+- El SRT es una transcripción auxiliar con nombres propios, cifras y puntuación normalizados. Se entrega separado y no se incrusta ni imprime sobre las gráficas del MP4. La voz original es la fuente definitiva.
 
-El validador geométrico produjo una advertencia preventiva de altura estimada en la tabla de la escena 4. La exportación real de PowerPoint y el PDF muestran la tabla completa, separada de la nota inferior, sin solapamiento.
+El archivo está exportado para subirlo a YouTube; no se ha publicado ni subido automáticamente.

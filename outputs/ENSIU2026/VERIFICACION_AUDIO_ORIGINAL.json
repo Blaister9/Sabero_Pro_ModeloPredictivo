@@ -1,0 +1,18 @@
+{
+  "source_file": "audio/Grabación (14).m4a",
+  "source_sha256": "25dafe5b2c2812f6d01c4beb8cf0c940f6ba84d794791e4db5dcfacb0700af62",
+  "original_duration": 53.247771,
+  "output_audio_duration": 53.247771,
+  "aac_packet_count": 2496,
+  "all_aac_packet_hashes_identical": true,
+  "all_packet_timestamps_identical": true,
+  "decoded_pcm_source": "SHA256=cdf363ca5f633009b2d28cbb200ced5b176dca46e9b347ece6219be9a97a1d2b",
+  "decoded_pcm_final": "SHA256=cdf363ca5f633009b2d28cbb200ced5b176dca46e9b347ece6219be9a97a1d2b",
+  "decoded_pcm_identical": true,
+  "audio_filters": [],
+  "audio_codec_mode": "copy",
+  "speed": 1,
+  "audio_offset_seconds": 0,
+  "video_duration": 60,
+  "silent_closing_seconds": 6.752229
+}
