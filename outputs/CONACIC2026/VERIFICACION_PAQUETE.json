@@ -1,0 +1,35 @@
+{
+  "status": "DRAFT_VERIFIED",
+  "scientific_approval": false,
+  "original_docx_unchanged": "5657e9af580c1c555c32128930b7c98cbeb3358cbdd511cd1b7f7ab706db7bcb",
+  "template_docx_unchanged": "024d8159d545ec94355e115ae1bb43449ed88a184d1f957917abf930ebb16bb8",
+  "template_parts_preserved": [
+    "word/media/image1.png",
+    "word/media/image2.jpeg",
+    "word/theme/theme1.xml",
+    "word/numbering.xml",
+    "word/styles.xml"
+  ],
+  "scientific_media_preserved": true,
+  "table_metrics_preserved": true,
+  "author_fields_confirmed": true,
+  "pdfs": {
+    "CAMERA_READY_DRAFT.pdf": {
+      "pages": 10,
+      "sha256": "766bc61880e940ea502411bdca5cb8c410dcaa5ebd43cf14adcc3e84aebc4b4b",
+      "draft_all_pages": true
+    },
+    "PRESENTACION_CONACIC2026.pdf": {
+      "pages": 10,
+      "sha256": "02986cfce2f88d9d77d7b9a0d3b2f014d76e194f9e273fc52c4536477269c5ff",
+      "draft_all_pages": true
+    }
+  },
+  "slides": 10,
+  "notes": 10,
+  "native_metric_table": true,
+  "native_coverage_chart_with_workbook": true,
+  "script_words": 1162,
+  "planned_seconds": 510,
+  "real_voice_duration_measured": false
+}

@@ -60,3 +60,6 @@ desktop.ini
 
 # ── Claude Code internal ───────────────────────────────────────
 .claude/
+
+# Preparación local CONACIC (renders y dependencias temporales)
+tmp/conacic2026/

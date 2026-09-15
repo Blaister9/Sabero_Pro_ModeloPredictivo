@@ -1,0 +1,6 @@
+# Grabaciones futuras y videos: conservar localmente, no agregarlos por accidente
+audio/**/*.wav
+audio/**/*.mp3
+audio/**/*.m4a
+PREVIEW*.mp4
+FINAL*.mp4

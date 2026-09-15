@@ -1,0 +1,165 @@
+{
+  "scope": "Bytes locales del paquete DRAFT al preparar el commit; excluye este manifiesto y archivos temporales. Git puede normalizar finales de línea de archivos de texto al hacer checkout.",
+  "files": {
+    ".gitignore": {
+      "bytes": 151,
+      "sha256": "62af53a0a4e937056bfd29789089816ea17d8cabda5e71e69593f723ea55483c"
+    },
+    "audio/voz_real/LEEME.md": {
+      "bytes": 264,
+      "sha256": "270d229bf9f30be538552493f7044a05e71f9455c88b048fba7d90cd7674f704"
+    },
+    "AUDITORIA_CAMERA_READY.md": {
+      "bytes": 8981,
+      "sha256": "8a7472a590b8791cdb8a6bde68b8f25ec758075b6f6240f8c4e063bdc911d913"
+    },
+    "CAMBIOS_CAMERA_READY.json": {
+      "bytes": 6715,
+      "sha256": "3e2fb231811479e1b51949f4b2780689d84290ac38961184b835450f031b04dd"
+    },
+    "CAMERA_READY_DRAFT.docx": {
+      "bytes": 370656,
+      "sha256": "938bcc7b9bd0cb6e4bca89bc6052a4846edc020af933b2d7adb7aa5318d360f0"
+    },
+    "CAMERA_READY_DRAFT.pdf": {
+      "bytes": 592340,
+      "sha256": "766bc61880e940ea502411bdca5cb8c410dcaa5ebd43cf14adcc3e84aebc4b4b"
+    },
+    "CRONOMETRAJE.json": {
+      "bytes": 11658,
+      "sha256": "3495271a1b2727ae3b8826dedc331c53fea04b22ae252abff6e0213a3c837665"
+    },
+    "escenas/01.jpg": {
+      "bytes": 538866,
+      "sha256": "f6b8519b691e365ddbb2bbd4a39020f95773074050bdf687bf3f202e0cd1c5a1"
+    },
+    "escenas/02.jpg": {
+      "bytes": 493667,
+      "sha256": "a60e5e7b7c1859673797736c1fba6633ceba369594c60bc6e0ee5c2e9a3054a0"
+    },
+    "escenas/03.jpg": {
+      "bytes": 451180,
+      "sha256": "07313ec45dc40aa7135cc4f0cac06be2f27737115fab3f042334b9ef47cb0ce3"
+    },
+    "escenas/04.jpg": {
+      "bytes": 515705,
+      "sha256": "b0ca0a92d0d56275980203da5301ef987bfa72e042c9ece35a2287c909f4cff5"
+    },
+    "escenas/05.jpg": {
+      "bytes": 454687,
+      "sha256": "46f52acbfa938d3c4af3cbab66d295611faceb7e05a65cbfef25d4ae766a6501"
+    },
+    "escenas/06.jpg": {
+      "bytes": 467336,
+      "sha256": "a41f93a6621fae8d261289d50d74c2f558da6a5e92515f5a0cff1b90947822af"
+    },
+    "escenas/07.jpg": {
+      "bytes": 536352,
+      "sha256": "8fb7f9d2be30fc5b9b8006f7951833f196bc0ed18cc3218bada7be3778311d0c"
+    },
+    "escenas/08.jpg": {
+      "bytes": 503074,
+      "sha256": "488b795f7d995f0e90b801afdf44f5a2085c42e92406cb180a50748c496cf7d6"
+    },
+    "escenas/09.jpg": {
+      "bytes": 535774,
+      "sha256": "3fa391d793ffbde508e1ec243b423f3d0de558543bedca8c2ff4388b3b6ea8ed"
+    },
+    "escenas/10.jpg": {
+      "bytes": 460123,
+      "sha256": "b2efff310cd7a566b9ce05e84036ffde759ddadec3f2df033737a6872fddb504"
+    },
+    "fuentes/build_camera_ready.py": {
+      "bytes": 10881,
+      "sha256": "080eacbdab33c34ec60eaedd306582d42fd2f6a5786e3818a94a6871a2b77671"
+    },
+    "fuentes/build_deck.mjs": {
+      "bytes": 8714,
+      "sha256": "7faaa8c2fb27300b39cb38c91e217582e601ec1d6580fb311ad61a601f8ce02c"
+    },
+    "fuentes/contenido_ponencia.py": {
+      "bytes": 12871,
+      "sha256": "405129719f5324202d39c011dd53c413e9cfea79faa2b0109939bb971dd7ac99"
+    },
+    "fuentes/ensamblar_preview.py": {
+      "bytes": 5396,
+      "sha256": "e91449863d3fe7020559b2e31c1c4cbba481ed90f27428264ecd3f3b1245a775"
+    },
+    "fuentes/render_word.py": {
+      "bytes": 1444,
+      "sha256": "d460017148180559a9fb2c0b1e5f9b1570a3d8bbb2dfdffa3317163556a9182b"
+    },
+    "fuentes/REPRODUCIR.md": {
+      "bytes": 3702,
+      "sha256": "afabe5f0cf1522eeace7536c58947e703067573c1966693936bc9c468e6d523f"
+    },
+    "fuentes/verificar_modelos.py": {
+      "bytes": 2486,
+      "sha256": "0394c31b20c6775397c6d79ee1d54550673a795c0f7f69b060be9eeb14609d65"
+    },
+    "fuentes/verificar_paquete.py": {
+      "bytes": 3772,
+      "sha256": "d804409bb393357d5f1b19866c689ca255aac07d31b8533d35500298a234906b"
+    },
+    "GUIA_GRABACION_MP4.md": {
+      "bytes": 4363,
+      "sha256": "e9e05677ede4685b48cd2fdf20c5ee73701d750a513b15eb6c812acdf3ce860e"
+    },
+    "GUION_PONENCIA_8MIN.md": {
+      "bytes": 11600,
+      "sha256": "48c4163ecf9475d74f2234a27d9e4fa1d599c4231472e1b5a767f4c2a2512de5"
+    },
+    "INVENTARIO_BASE.md": {
+      "bytes": 24359,
+      "sha256": "5e337febc64cf126d7629a18a03cefa8a0ed589a9b183799d78a55854e62c446"
+    },
+    "plantillas_oficiales/CONACIC2024_PLANTILLA_PARA_PONENCIAS_SIMULTANEAS.pptx": {
+      "bytes": 1243886,
+      "sha256": "1f7ad31928150367b7d368bb8caba0bfb190008a7be4491b4166f6f4e7b5993e"
+    },
+    "plantillas_oficiales/Plantilla_A&A.docx": {
+      "bytes": 108363,
+      "sha256": "024d8159d545ec94355e115ae1bb43449ed88a184d1f957917abf930ebb16bb8"
+    },
+    "plantillas_oficiales/PROCEDENCIA.json": {
+      "bytes": 905,
+      "sha256": "f36ee662b08702f2e8da86d06e6bd865d3cd837637716080981c398737b6be28"
+    },
+    "PRESENTACION_CONACIC2026.pdf": {
+      "bytes": 733340,
+      "sha256": "02986cfce2f88d9d77d7b9a0d3b2f014d76e194f9e273fc52c4536477269c5ff"
+    },
+    "PRESENTACION_CONACIC2026.pptx": {
+      "bytes": 1592812,
+      "sha256": "dda1ddaec910250de77ac66108ab7ae4be372eb99fe4d3dc73b5f3f5f4d9e123"
+    },
+    "README_ENTREGA.md": {
+      "bytes": 5524,
+      "sha256": "85c531285cfc47c086e71fda8095764ad663b8b5d2ad2f36b6359d51adde10ce"
+    },
+    "REUNION_ASESORA.md": {
+      "bytes": 6540,
+      "sha256": "70e7f5dc4707f51b92a8e395993e1f26ae8079fe4b14dc66860d928a64dd8a44"
+    },
+    "STORYBOARD_Y_TRANSICIONES.md": {
+      "bytes": 1287,
+      "sha256": "ddb757e6e270da6045c72610aca205853c8b798864cbe124e8765200b9a315f5"
+    },
+    "VALIDACION_PRESENTACION.json": {
+      "bytes": 6734,
+      "sha256": "320036c8453ea2073690f6c2cdfc679c709a0cb01e5ed65652eb8fd0f5b311e2"
+    },
+    "VERIFICACION_DATOS_MODELOS.json": {
+      "bytes": 24429,
+      "sha256": "710f983169ba74779f83c81dc3449154e5547d09c6b5c7f94135009b8693aaee"
+    },
+    "VERIFICACION_PAQUETE.json": {
+      "bytes": 1139,
+      "sha256": "64ed09cb8426b25257d7ea29317f61158de44294f064857c6f3cdfe4577167ff"
+    },
+    "VERIFICACION_VISUAL.md": {
+      "bytes": 5162,
+      "sha256": "2d36cc52f52fddf280a33386a8d8b5c45da543bb7481e490c2eafcf7a6bbf25e"
+    }
+  }
+}

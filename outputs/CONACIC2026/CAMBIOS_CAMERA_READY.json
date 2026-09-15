@@ -1,0 +1,38 @@
+[
+  {
+    "paragraph_base": 29,
+    "before": "Los archivos ICFES usan la columna MEDIDA_AGREGACION para discriminar el tipo de estadística de cada fila. Se identificaron tres capas utilizables: (a) PUNTAJE_PRUEBA, promedio por prueba; (b) PUNTAJE_GLOBAL, target PROMEDIO_GLOBAL; y (c) NIVEL_DESEMPEÑO_PRUEBA, proporciones por nivel. Se aplicó un pivot long→wide con inner join sobre la llave (AÑO, ID_INSTITUCION, ID_PROGRAMA_ACAD, NOMBRE_PRUEBA), preservando únicamente entidades con las tres capas presentes. El resultado es 127.716 filas wide con el target disponible al 100 %.  La Figura 1 ilustra la distribución del PROMEDIO_GLOBAL resultante, el crecimiento de filas limpias por año y las pruebas y NBCs más frecuentes del panel.",
+    "after": "Los archivos ICFES usan la columna MEDIDA_AGREGACION para discriminar el tipo de estadística de cada fila. Se identificaron tres capas utilizables: PUNTAJE_PRUEBA, PUNTAJE_GLOBAL y NIVEL_DESEMPEÑO_PRUEBA. Se unieron las pruebas con el puntaje global mediante inner join por año, institución y programa; los niveles se añadieron mediante left join incluyendo NOMBRE_PRUEBA. El resultado es 127.716 filas wide con el target disponible al 100 %. La Figura 1 ilustra la distribución del PROMEDIO_GLOBAL, las filas por año y las pruebas y NBCs más frecuentes.",
+    "reason": "Corrección objetiva documentada en AUDITORIA_CAMERA_READY.md"
+  },
+  {
+    "paragraph_base": 36,
+    "before": "Se construyeron 15 features causalmente válidas: rezagos temporales lag_1 y lag_2 del PROMEDIO_GLOBAL y de cada prueba, tendencia histórica, desviación estándar histórica, logaritmo del número de evaluados, año, identificadores de NBC y departamento codificados con TargetEncoder. El split temporal estricto usa 2020–2023 para entrenamiento (98.954 filas) y 2024 para prueba (28.762 filas).",
+    "after": "Se emplearon 15 variables de entrada: rezagos lag_1 y lag_2 de las observaciones anteriores disponibles del PROMEDIO_GLOBAL y de cada prueba, tendencias, volatilidad histórica, logaritmo del número de evaluados, año y variables categóricas. Los tres modelos tabulares usan TargetEncoder; en los artefactos evaluados, su modo automático produjo codificación multiclase (135 valores del objetivo), con 417 columnas transformadas en total. El split externo usa 2020–2023 para entrenamiento (98.954 filas) y 2024 para prueba (28.762 filas).",
+    "reason": "Corrección objetiva documentada en AUDITORIA_CAMERA_READY.md"
+  },
+  {
+    "paragraph_base": 38,
+    "before": "Finalmente se evaluaron cuatro familias: (1) Ridge con α automático (RidgeCV); (2) Lasso con α automático (LassoCV); (3) LightGBM con 50 trials de búsqueda Optuna [4] y n_estimators = 500; (4) Transformer encoder con early stopping (época 53/200). Las métricas de evaluación son RMSE, MAE y R². La interpretabilidad del modelo final se obtiene con SHAP [6].",
+    "after": "Finalmente se evaluaron cuatro familias: (1) Ridge con α automático (RidgeCV); (2) Lasso con α automático (LassoCV); (3) LightGBM con 50 trials de búsqueda Optuna [4] y 188 árboles en el artefacto final (mejor iteración 168 + 20); (4) Transformer encoder con early stopping (época 53/200). Las métricas de evaluación son RMSE, MAE y R². La interpretabilidad del modelo final se obtiene con SHAP [6].",
+    "reason": "Corrección objetiva documentada en AUDITORIA_CAMERA_READY.md"
+  },
+  {
+    "paragraph_base": 100,
+    "before": "[20] Anónimo, “Where to aim? Factors that influence the performance of Brazilian secondary schools,” en Proc. EDM, 2020.",
+    "after": "[20] P. J. L. Adeodato y R. L. C. Silva Filho, “Where to aim? Factors that influence the performance of Brazilian secondary schools,” en Proc. 13th International Conference on Educational Data Mining, 2020, pp. 545–549.",
+    "reason": "Corrección objetiva documentada en AUDITORIA_CAMERA_READY.md"
+  },
+  {
+    "paragraph_base": 56,
+    "before": "La Figura 5 desagrega el RMSE de LightGBM por Núcleo Básico del Conocimiento (top 25), revelando diferencias sustanciales entre áreas disciplinares. Los programas de Salud concentran los errores más bajos (RMSE entre 4,1 y 6,2 puntos), mientras que Educación (RMSE = 11,71) y Sin Clasificar (RMSE = 17,76) concentran los más altos, explicados por la alta heterogeneidad interna de esas categorías. El análisis geográfico complementario muestra que Sucre (≈ 13), Chocó (≈ 12) y Putumayo (≈ 11) presentan los mayores errores, coincidiendo con regiones de menor desarrollo económico relativo.",
+    "after": "La Figura 5 desagrega el RMSE de LightGBM por Núcleo Básico del Conocimiento (top 25), revelando diferencias sustanciales entre áreas disciplinares. Algunas áreas de Salud presentan errores bajos (RMSE entre 4,1 y 6,2 puntos), mientras que Educación (RMSE = 11,71) y Sin Clasificar (RMSE = 17,76) concentran los más altos, explicados por la alta heterogeneidad interna de esas categorías. El análisis geográfico complementario muestra que Sucre (≈ 13), Chocó (≈ 12) y Putumayo (≈ 11) presentan los mayores errores, coincidiendo con regiones de menor desarrollo económico relativo.",
+    "reason": "Corrección objetiva documentada en AUDITORIA_CAMERA_READY.md"
+  },
+  {
+    "paragraph_base": 69,
+    "before": "El SACES colombiano incorpora Saber Pro como insumo central para registro calificado y acreditación [15]. Un sistema que anticipe el PROMEDIO_GLOBAL un año antes transforma la gestión de calidad de reactiva a proactiva. Esta lógica es análoga a la propuesta por López-García et al. [26] para detección de fracaso estudiantil en la Universidad Industrial de Santander, aunque el presente trabajo opera a nivel programa-institución, complementándola. Los NBC con SHAP negativo y los departamentos con mayor RMSE señalan prioridades concretas de intervención y de recoleción de datos socioeconómicos externos.",
+    "after": "El SACES colombiano incorpora Saber Pro como insumo central para registro calificado y acreditación [15]. Un sistema que anticipe el PROMEDIO_GLOBAL un año antes transforma la gestión de calidad de reactiva a proactiva. Esta lógica es análoga a la propuesta por López-García et al. [26] para detección de fracaso estudiantil en la Universidad Industrial de Santander, aunque el presente trabajo opera a nivel programa-institución, complementándola. Los NBC con SHAP negativo y los departamentos con mayor RMSE señalan prioridades concretas de intervención y de recolección de datos socioeconómicos externos.",
+    "reason": "Corrección objetiva documentada en AUDITORIA_CAMERA_READY.md"
+  }
+]

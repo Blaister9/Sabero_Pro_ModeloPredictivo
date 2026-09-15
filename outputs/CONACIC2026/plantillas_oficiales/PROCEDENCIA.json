@@ -1,0 +1,22 @@
+{
+  "page": "https://conacic.siycise.org/",
+  "download_date_local": "2026-09-14",
+  "timezone": "America/Bogota",
+  "files": [
+    {
+      "file": "Plantilla_A&A.docx",
+      "resource": "Artículos revista A&A",
+      "url": "https://conacic.siycise.org/docs/Plantilla_A%26A.docx",
+      "sha256": "024d8159d545ec94355e115ae1bb43449ed88a184d1f957917abf930ebb16bb8",
+      "bytes": 108363
+    },
+    {
+      "file": "CONACIC2024_PLANTILLA_PARA_PONENCIAS_SIMULTANEAS.pptx",
+      "resource": "Ponencias Simultáneas",
+      "url": "https://conacic.siycise.org/docs/CONACIC2024_PLANTILLA_PARA_PONENCIAS_SIMULTANEAS.pptx",
+      "sha256": "1f7ad31928150367b7d368bb8caba0bfb190008a7be4491b4166f6f4e7b5993e",
+      "bytes": 1243886
+    }
+  ],
+  "note": "El nombre PPTX incluye 2024; es el enlace vigente de la página CONACIC 2026. Archivos descargados por HTTP y conservados intactos."
+}
