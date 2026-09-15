@@ -1,0 +1,35 @@
+{
+  "rama": "feat/conacic-2026-camera-ready",
+  "procedencia_declarada": "Informes oficiales recibidos por el usuario; archivos localizados en Descargas. No se accedio a Turnitin ni se realizo una nueva evaluacion.",
+  "identificador_entrega": "trn:oid:::1:3645328474",
+  "archivo_evaluado_segun_portada": "CONAC2026_paper_17.docx",
+  "fecha_entrega_segun_portada": "10 sep 2026, 9:16 a.m. GMT-6",
+  "fecha_descarga_segun_portada": "10 sep 2026, 2:29 p.m. GMT-6",
+  "paginas_documento_evaluado": 10,
+  "palabras_segun_portada": 3370,
+  "caracteres_segun_portada": 18990,
+  "porcentaje_ia_reportado": 72,
+  "porcentaje_similitud_general": 5,
+  "manipulacion_texto_segun_informe": "No se han detectado manipulaciones de texto sospechosas.",
+  "archivos": [
+    {
+      "archivo": "CONAC2026_paper_17_IA_72.pdf",
+      "origen_local": "C:\\Users\\santi\\Downloads\\CONAC2026_paper_17_IA_72.pdf",
+      "tipo": "IA",
+      "paginas_pdf": 12,
+      "bytes": 921512,
+      "sha256": "0e8111069834aa54b1b7e174f9218f5e6818d167bd757b2861f39a32d5ba8f33",
+      "contenido_modificado": false
+    },
+    {
+      "archivo": "CONAC2026_paper_17_Simi_5.pdf",
+      "origen_local": "C:\\Users\\santi\\Downloads\\CONAC2026_paper_17_Simi_5.pdf",
+      "tipo": "similitud",
+      "paginas_pdf": 13,
+      "bytes": 937629,
+      "sha256": "f0f39c9b3723ab2fa5d145f8850f2c8d83c2babf59ae87e335974da79d29939f",
+      "contenido_modificado": false
+    }
+  ],
+  "limite_identidad": "El cuerpo textual se corresponde con la base local tras normalizar la extraccion; el bloque de autoria y afiliacion de la base no es visible en los PDF oficiales. No se dispone de los bytes del DOCX evaluado para afirmar identidad binaria."
+}
