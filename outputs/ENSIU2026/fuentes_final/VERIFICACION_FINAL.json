@@ -1,0 +1,195 @@
+{
+  "slides": [
+    {
+      "slide": 1,
+      "content_shape_changes": [
+        3,
+        6
+      ],
+      "same_object_count": true,
+      "content_unchanged_except_footer": false
+    },
+    {
+      "slide": 2,
+      "content_shape_changes": [
+        9
+      ],
+      "same_object_count": true,
+      "content_unchanged_except_footer": false
+    },
+    {
+      "slide": 3,
+      "content_shape_changes": [],
+      "same_object_count": true,
+      "content_unchanged_except_footer": true
+    },
+    {
+      "slide": 4,
+      "content_shape_changes": [],
+      "same_object_count": true,
+      "content_unchanged_except_footer": true
+    },
+    {
+      "slide": 5,
+      "content_shape_changes": [],
+      "same_object_count": true,
+      "content_unchanged_except_footer": true
+    },
+    {
+      "slide": 6,
+      "content_shape_changes": [],
+      "same_object_count": true,
+      "content_unchanged_except_footer": true
+    },
+    {
+      "slide": 7,
+      "content_shape_changes": [],
+      "same_object_count": true,
+      "content_unchanged_except_footer": true
+    },
+    {
+      "slide": 8,
+      "content_shape_changes": [],
+      "same_object_count": true,
+      "content_unchanged_except_footer": true
+    },
+    {
+      "slide": 9,
+      "content_shape_changes": [],
+      "same_object_count": true,
+      "content_unchanged_except_footer": true
+    },
+    {
+      "slide": 10,
+      "content_shape_changes": [
+        10
+      ],
+      "same_object_count": true,
+      "content_unchanged_except_footer": false
+    }
+  ],
+  "originals_intact": true,
+  "protected_original_count": 182,
+  "old_identity_absent_xml": true,
+  "unchanged_scientific_parts": [
+    "ppt/media/image7.png",
+    "ppt/media/image6.png",
+    "ppt/charts/chart1.xml",
+    "ppt/media/image1.png",
+    "ppt/charts/_rels/chart1.xml.rels",
+    "ppt/media/image5.png",
+    "ppt/embeddings/Microsoft_Excel_Worksheet.xlsx"
+  ],
+  "removed_brand_media": [
+    "ppt/media/image2.emf",
+    "ppt/media/image3.png",
+    "ppt/media/image4.png"
+  ],
+  "table_byte_identical": true,
+  "powerpoint_version": "16.0",
+  "pdf_pages": 10,
+  "expected_figures_and_names_in_pdf": true,
+  "sha256_pptx": "9df73d8e937fe5d1783e96190e9aede506b8ad1213b62cee8c3752b7f69760fd",
+  "sha256_pdf": "bdb704c7bb6366ccee8ef0d3d4655d822997c4c1e1771eaab4fb1ff18bbadb64",
+  "pixel_comparisons": [
+    {
+      "slide": 3,
+      "body_pixel_identical": true
+    },
+    {
+      "slide": 4,
+      "body_pixel_identical": true
+    },
+    {
+      "slide": 5,
+      "body_pixel_identical": true
+    },
+    {
+      "slide": 6,
+      "body_pixel_identical": true
+    },
+    {
+      "slide": 7,
+      "body_pixel_identical": true
+    },
+    {
+      "slide": 8,
+      "body_pixel_identical": true
+    },
+    {
+      "slide": 9,
+      "body_pixel_identical": true
+    }
+  ],
+  "pdf_pptx_render_equivalence": [
+    {
+      "slide": 1,
+      "mean_channel_difference_0_255": 2.5787
+    },
+    {
+      "slide": 2,
+      "mean_channel_difference_0_255": 1.97
+    },
+    {
+      "slide": 3,
+      "mean_channel_difference_0_255": 1.883
+    },
+    {
+      "slide": 4,
+      "mean_channel_difference_0_255": 2.1402
+    },
+    {
+      "slide": 5,
+      "mean_channel_difference_0_255": 2.0985
+    },
+    {
+      "slide": 6,
+      "mean_channel_difference_0_255": 1.893
+    },
+    {
+      "slide": 7,
+      "mean_channel_difference_0_255": 2.0269
+    },
+    {
+      "slide": 8,
+      "mean_channel_difference_0_255": 2.6291
+    },
+    {
+      "slide": 9,
+      "mean_channel_difference_0_255": 2.7605
+    },
+    {
+      "slide": 10,
+      "mean_channel_difference_0_255": 1.9808
+    }
+  ],
+  "visual_review": {
+    "date": "2026-09-28",
+    "all_slides_individually_reviewed": true,
+    "slides": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "text_clipping_observed": false,
+    "text_overflow_observed": false,
+    "unintended_overlap_observed": false,
+    "official_logos_verified": true,
+    "pdf_exported_from_final_pptx": true
+  },
+  "guion": {
+    "words_A": 1088,
+    "estimated_A": "8:30–9:30; objetivo 9:00",
+    "words_STA_B": 525,
+    "estimated_STA_B": "4:40–5:00",
+    "existing_video_R_seconds": 60,
+    "audio_newly_recorded": false
+  }
+}

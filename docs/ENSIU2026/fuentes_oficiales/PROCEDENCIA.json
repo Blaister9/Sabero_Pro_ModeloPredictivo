@@ -1,0 +1,58 @@
+[
+  {
+    "file": "ensiu_2026.html",
+    "url": "https://www.uniminuto.edu/ensiu",
+    "sha256": "c7e7134eac2cc3c31da8b92de9503e11ae44d790eb19ada879ce7a36fb68bb82",
+    "consultado": "2026-09-28",
+    "zona_horaria": "America/Bogota",
+    "http_status": 200
+  },
+  {
+    "file": "Programacion_Resultados_2026.pdf",
+    "url": "https://portalweb-uniminuto.s3.us-east-1.amazonaws.com/activos_digitales/PCIS/investigacion/ensiu/Programacio%CC%81n+y+Resultados+2026.pdf",
+    "sha256": "bfaf95ddd71f816b8e519008d44cd3ec87cbdaa86754588bb662eaf3673632dd",
+    "consultado": "2026-09-28",
+    "zona_horaria": "America/Bogota",
+    "http_status": 200
+  },
+  {
+    "file": "TDR_ENSIU_2026.pdf",
+    "url": "https://portalweb-uniminuto.s3.us-east-1.amazonaws.com/activos_digitales/PCIS/investigacion/ensiu/TDR+ENSIU+2026.pdf",
+    "sha256": "34da4906c4863b5f0923967c82cb0929e3e9889f2b71f66051c6d1bf423ebc53",
+    "consultado": "2026-09-28",
+    "zona_horaria": "America/Bogota",
+    "http_status": 200
+  },
+  {
+    "file": "Adenda_001.pdf",
+    "url": "https://portalweb-uniminuto.s3.us-east-1.amazonaws.com/activos_digitales/PCIS/investigacion/engiu/Adenda+001.pdf",
+    "sha256": "c1c3efb7b33b6921571e6023cfda6309dc59f187805e1104eac254b3ae2181e7",
+    "consultado": "2026-09-28",
+    "zona_horaria": "America/Bogota",
+    "http_status": 200
+  },
+  {
+    "file": "Anexo_Audiovisuales.docx",
+    "url": "https://portalweb-uniminuto.s3.us-east-1.amazonaws.com/activos_digitales/PCIS/investigacion/ensiu/ANEXO+1.+GUI%CC%81A+PRA%CC%81CTICA+PARA+PRODUCTOS+AUDIOVISUALES.docx",
+    "sha256": "26f21e6188adba39223b0267035483934ae9dd9f4d36c97e14fd33049973151a",
+    "consultado": "2026-09-28",
+    "zona_horaria": "America/Bogota",
+    "http_status": 200
+  },
+  {
+    "file": "Logo-Ensiu-2026-web.jpg",
+    "url": "https://www.uniminuto.edu/sites/default/files/2026-08/Logo-Ensiu-2026-web.jpg",
+    "sha256": "fa656c1298e58863dfe89d1edc3ccc92b46fe50f2015fba9ac31fe3a6872cf08",
+    "consultado": "2026-09-28",
+    "zona_horaria": "America/Bogota",
+    "http_status": 200
+  },
+  {
+    "file": "logo-uniminuto.png",
+    "url": "https://www.uniminuto.edu/sites/default/files/logo-para-web-2024.png",
+    "sha256": "461bb67894294b67d1b40e11a71dec55767120a9b216b2dedea8bd621dd15b73",
+    "consultado": "2026-09-28",
+    "zona_horaria": "America/Bogota",
+    "http_status": 200
+  }
+]
